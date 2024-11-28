@@ -6,7 +6,9 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+     "build": "prisma generate && next build",
+    "prisma:generate": "prisma generate"
   },
   "author": "WBT",
   "license": "ISC",
