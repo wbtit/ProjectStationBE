@@ -7,13 +7,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-     "build": "prisma generate && next build",
+    "build": "prisma generate && nodemon index.js",
     "prisma:generate": "prisma generate"
   },
   "author": "WBT",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,6 +21,7 @@
     "nodemon": "^3.1.7"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
