@@ -23,6 +23,21 @@ model Users {
   is_staff      Boolean  @default(false)
   is_superuser  Boolean  @default(false)
   is_firstLogin Boolean  @default(true)
+
+  fabricators Fabricator[] // Relation to Fabricator model
+
+  @@map("users")
+}
+
+model Fabricator {
+  id          String   @id @default(uuid()) @db.Uuid
+  createdById String   @db.Uuid // Matches the type of Users.id
+  createdBy   Users    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  fabDetails  Json     // JSON data type for storing fab details
+  createdAt   DateTime @default(now()) // Timestamp for creation
+  updatedAt   DateTime @updatedAt      // Automatically update on modification
+
+  @@map("fabricators") // Optional: map to a specific database table name
 }
 
 enum UserRole {

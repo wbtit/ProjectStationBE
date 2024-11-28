@@ -1,5 +1,5 @@
 // src/models/userModel.ts
-import prisma from "../lib/prisma"; // Import Prisma client
+import prisma from "../lib/prisma.js"; // Import Prisma client
 
 export const getUsers = async () => {
     try {

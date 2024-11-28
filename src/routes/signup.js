@@ -1,6 +1,7 @@
-import { hashPassword } from '../utils/crypter';// For hashing the password
-import prisma from '../lib/prisma';
+import { hashPassword } from '../utils/crypter.js'; // For hashing the password
+import prisma from '../lib/prisma.js';
 import { Router } from 'express';
+import { getUserByUsername } from '../models/userUniModel.js';
 
 const router = Router()
 
@@ -40,7 +41,6 @@ const createUser = async ({
                 is_firstLogin
             }
         });
-
         return newUser;
     } catch (error) {
         throw new Error('Error creating user: ' + error.message);
@@ -65,21 +65,20 @@ router.post('/', async (req, res) => {
     } = req.body;
 
     try {
-        // Call the createUser function to add the user to the database
 
-        console.log(
-            username, 
-            password, 
-            email, 
-            f_name, 
-            m_name, 
-            l_name, 
-            phone, 
-            role, 
-            is_active, 
-            is_staff, 
-            is_superuser, 
-            is_firstLogin )
+
+        // Check whether the username is available or not.
+
+        const isExist = await getUserByUsername(username);
+
+        // If user exists on that username then return the response.
+        if(isExist) 
+            return res.status(409).json({
+                success : false,
+                message : "Username already taken."
+        })
+
+        
 
         const newUser = await createUser({
             username, 

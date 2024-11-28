@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx index.js"
+    "dev": "nodemon index.js"
   },
   "author": "WBT",
   "license": "ISC",
@@ -16,7 +16,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.7"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

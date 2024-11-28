@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { generateToken } from "../utils/jwtutils.js";
-import prisma from "../lib/prisma.js";
 import { comparePassword } from "../utils/crypter.js";
 import { getUserByUsername } from "../models/userUniModel.js";
 
@@ -10,7 +9,7 @@ const route = Router()
 route.post('/', async(req, res) => {
     console.log('hello')
     console.log(req.body)
-    const {username, password } = req.body
+    let {username, password } = req.body
 
     if(!username || !password) {
         return res.status(401).json({
@@ -21,7 +20,9 @@ route.post('/', async(req, res) => {
     
     try {
         // Find the user by username
-        const user = getUserByUsername(username)
+        const user = await getUserByUsername(username)
+    
+        console.log(user)
     
         if (!user) {
           return res.status(404).json({
@@ -33,6 +34,7 @@ route.post('/', async(req, res) => {
         // Compare the provided password with the stored hashed password
         //@ts-ignore
         console.log(password, user.password)
+        password = typeof password === "number" ? password.toString() : password;
         //@ts-ignore
         const isPasswordValid = await comparePassword(password, user.password);
     

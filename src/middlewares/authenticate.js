@@ -1,15 +1,10 @@
-import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
-// Extending Request type to include the 'user' property
-interface CustomRequest extends Request {
-  user?: JwtPayload;  // Adding the user property
-}
 
-const Authenticate = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const Authenticate = async (req, res, next) => {
     const authHeaders = req.headers.authorization;
 
-    const secret = process.env.SECRET as string | undefined;
+    const secret = process.env.SECRET
     if (!secret) {
         return res.status(500).json({
             success: false,
@@ -22,7 +17,7 @@ const Authenticate = async (req: CustomRequest, res: Response, next: NextFunctio
 
         try {
             // Using async/await for verify
-            const payload = (await jwt.verify(token, secret)) as JwtPayload;
+            const payload = (await jwt.verify(token, secret))
             req.user = payload;  // Assigning decoded payload to req.user
             next();
         } catch (err) {

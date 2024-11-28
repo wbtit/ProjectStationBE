@@ -1,12 +1,17 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import Login from './src/routes/login';
-import SignUp from "./src/routes/signup"
-import { getUsers } from './src/models/userAllModel';
+import Login from './src/routes/login.js';
+import SignUp from "./src/routes/signup.js"
+import { getUsers } from './src/models/userAllModel.js';
+import cors from 'cors'
 
 dotenv.config();
+
 const app = express();
 app.use(express.json())
+app.use(cors({
+    origin  : 'http://192.168.1.50:5173'
+}))
 
 app.get('/', (req, res) => {
     console.log("I am getting hit!!");
