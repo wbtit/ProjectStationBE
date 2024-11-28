@@ -1,0 +1,47 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp")]
+}
+
+model Users {
+  id            String   @id @default(uuid()) @db.Uuid
+  username      String   @unique
+  password      String   
+  email         String?  @db.VarChar(150)
+  f_name        String   @db.VarChar(50)
+  m_name        String?  @db.VarChar(50)
+  l_name        String?  @db.VarChar(50)
+  phone         String   @db.VarChar(20)
+  role          UserRole
+  is_active     Boolean  @default(true)
+  is_staff      Boolean  @default(false)
+  is_superuser  Boolean  @default(false)
+  is_firstLogin Boolean  @default(true)
+
+  fabricators Fabricator[] // Relation to Fabricator model
+
+  @@map("users")
+}
+
+model Fabricator {
+  id          String   @id @default(uuid()) @db.Uuid
+  createdById String   @db.Uuid // Matches the type of Users.id
+  createdBy   Users    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  fabDetails  Json     // JSON data type for storing fab details
+  createdAt   DateTime @default(now()) // Timestamp for creation
+  updatedAt   DateTime @updatedAt      // Automatically update on modification
+
+  @@map("fabricators") // Optional: map to a specific database table name
+}
+
+enum UserRole {
+  STAFF
+  CLIENT
+  VENDOR
+}
