@@ -1,7 +1,7 @@
-import { hashPassword } from '../utils/crypter.js'; // For hashing the password
-import prisma from '../lib/prisma.js';
+import { hashPassword } from '../../utils/crypter.js'; // For hashing the password
+import prisma from '../../lib/prisma.js';
 import { Router } from 'express';
-import { getUserByUsername } from '../models/userUniModel.js';
+import { getUserByUsername } from '../../models/userUniModel.js';
 
 const router = Router()
 
@@ -44,6 +44,8 @@ const createUser = async ({
         return newUser;
     } catch (error) {
         throw new Error('Error creating user: ' + error.message);
+    } finally {
+        prisma.$disconnect()
     }
 };
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { generateToken } from "../utils/jwtutils.js";
-import { comparePassword } from "../utils/crypter.js";
-import { getUserByUsername } from "../models/userUniModel.js";
+import { generateToken } from "../../utils/jwtutils.js";
+import { comparePassword } from "../../utils/crypter.js";
+import { getUserByUsername } from "../../models/userUniModel.js";
 
 const route = Router()
 
