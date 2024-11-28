@@ -5,7 +5,6 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "build": "prisma generate && nodemon index.js",
     "prisma:generate": "prisma generate"
