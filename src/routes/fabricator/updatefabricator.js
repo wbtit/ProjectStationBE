@@ -2,7 +2,6 @@ import { Router } from "express";
 import prisma from "../../lib/prisma.js";
 import Authenticate from "../../middlewares/authenticate.js";
 import { sendResponse } from "../../utils/responder.js";
-import { send } from "process";
 
 const router = Router();
 

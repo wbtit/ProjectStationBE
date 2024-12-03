@@ -14,7 +14,7 @@ app.use(cors({
 app.get('/', (req, res) => {
     console.log("I am getting hit!!");
     res.status(200).json({
-        message: "You found me 😂",
+        message: "You found me 😂, I am a secured server. 🔒",
         data: {
             json: "json"
         }
