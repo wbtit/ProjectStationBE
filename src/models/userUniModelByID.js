@@ -1,4 +1,3 @@
-// src/models/userModel.ts
 import prisma from "../lib/prisma.js"; // Import Prisma client
 
 const getUserByID = async ({id}) => {

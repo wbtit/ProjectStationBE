@@ -1,4 +1,3 @@
-// src/utils/passwordUtils.ts
 import bcrypt from "bcryptjs";
 
 // Hash the password before saving it to the database
