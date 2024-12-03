@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
+import { sendResponse } from "../../utils/responder.js";
 
 const router = Router()
 
@@ -8,10 +9,7 @@ router.post('/', Authenticate, async(req, res) => {
     console.log(req.user)
 
     if(!req.user) {
-        return res.send(404).json({
-            message : "User not Authenticated.",
-            data : {}   
-        })
+        return sendResponse({message : "User not Authenticated.", res , statusCode : 403, success : false, data : null})
     }
 
     const {id, is_superuser } = req.user
@@ -19,10 +17,7 @@ router.post('/', Authenticate, async(req, res) => {
     const {name, headquater, website, drive} = req.body;
 
     if(!id) {
-        return res.send(404).json({
-            message : "User not found.",
-            data : {}   
-        })
+        return sendResponse({message : "User not found",res, statusCode : 404, success : false, data  : null})
     }
 
     // Checking the user is a super user.
@@ -39,26 +34,17 @@ router.post('/', Authenticate, async(req, res) => {
                 }
             })
     
-            return res.status(400).json({
-                message : "Fabricator Added Successfully.",
-                data : fabricator
-            })
+            return sendResponse({message : "Fabricator Added Successfully.", res, statusCode : 200, success : true, data : fabricator})
         } catch (error) {
             console.error(error)
-            return res.status(500).json({
-                message : "Sorry Something went wrong.",
-                data : {}
-            })
+            return sendResponse({message : "Sorry something went wrong.", res , statusCode : 500, success : false, data : null})
         } finally {
             prisma.$disconnect()
         }
        
 
     } else {
-        return res.status(404).json({
-            message : "Only superuser can add fabricators",
-            data : {}
-        })
+        return sendResponse({message : "Only superuser can add fabricator.", res , statusCode : 404, success : false, data : null})
     }
 })
 

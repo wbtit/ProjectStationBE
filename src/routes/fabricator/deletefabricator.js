@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../../lib/prisma.js";
 import Authenticate from "../../middlewares/authenticate.js";
+import { sendResponse } from "../../utils/responder.js";
 
 const router = Router()
 
@@ -9,10 +10,7 @@ router.delete("/:id", Authenticate, async (req, res) => {
     const user = req.user
   
       if(!user) 
-          return res.status(400).json({
-              message : "User Not Authenticated.",
-              data : {}
-      })
+        return sendResponse({message : "User not Authenticated", res , statusCode : 403, success : false, data : null})
   
     const {role, is_superuser} = user
   
@@ -25,27 +23,18 @@ router.delete("/:id", Authenticate, async (req, res) => {
               const deletedFabricator = await prisma.fabricator.delete({where : {
                 id : id
               }});
-              res.status(200).json({
-                  message : "Successfully deleted the Fabricator Data.",
-                  data : deletedFabricator
-              });
+              return sendResponse({message : "Successfully deleted the fabricator data.", res, statusCode : 200, success : true, data : deletedFabricator})
             } catch (error) {
               console.error(error);
-              res.status(500).json({ message : "Failed to delete fabricator", data : {} });
+              return sendResponse({message : "Failed to delete fabricator.", res , statusCode : 500, success : false, data : null})
             } finally {
               prisma.$disconnect()
             }
       } else {
-          return res.status(403).json({
-              message : "Only superuser can delete fabricator",
-              data : {}
-          });
+        return sendResponse({message : "Only superuser can delete fabricator.", res , statusCode : 403, success : false, data  : null})
       }
     } else {
-      return res.status(403).json({
-          message : "Only staff admin can delete fabricator",
-          data : {}
-      });
+      return sendResponse({message : "Only staff admin can delete fabricator.", res , statusCode : 403, success : false, data : null})
     }
   });
 

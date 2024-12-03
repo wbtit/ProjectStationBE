@@ -1,16 +1,11 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import Login from './src/routes/auth/login.js';
-import SignUp from "./src/routes/auth/signup.js"
 import { getUsers } from './src/models/userAllModel.js';
 import cors from 'cors'
-import AddFabricator from "./src/routes/fabricator/addfabricator.js"
-import UpdateFabricator from "./src/routes/fabricator/updatefabricator.js"
-import DeleteFabricator from "./src/routes/fabricator/deletefabricator.js"
+import { routes } from './src/routes/index.js';
+import { app } from './src/app.js';
 
 dotenv.config();
-
-const app = express();
 app.use(express.json())
 app.use(cors({
     origin  : 'http://192.168.1.50:5173'
@@ -46,11 +41,7 @@ app.get('/getall', async(req, res) => {
    
 })
 
-app.use('/login', Login);
-app.use('/signup', SignUp);
-app.use('/addfabricator', AddFabricator)
-app.use('/updatefabricator', UpdateFabricator)
-app.use('/deletefabricator', DeleteFabricator)
+app.use('/api', routes)
 
 const PORT = process.env.PORT || 3000;  // Default to 3000 if PORT is not set
 app.listen(PORT, () => {
