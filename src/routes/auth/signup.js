@@ -100,13 +100,15 @@ router.post('/', async (req, res) => {
         // Respond with the created user data
         res.status(201).json({
             success: true,
+            message : "User Created Successfully",
             data: newUser
         });
     } catch (error) {
         console.log(error)
         res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message,
+            data : {}
         });
     } finally {
         prisma.$disconnect()

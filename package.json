@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Healthy server for project station",
   "type": "module",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "build": "prisma generate && nodemon index.js",

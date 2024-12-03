@@ -1,6 +1,8 @@
 import { Router } from "express";
 import prisma from "../../lib/prisma.js";
 import Authenticate from "../../middlewares/authenticate.js";
+import { sendResponse } from "../../utils/responder.js";
+import { send } from "process";
 
 const router = Router();
 
@@ -11,10 +13,7 @@ router.patch("/:id", Authenticate, async (req, res) => {
     console.log(user) 
 
     if(!user) 
-        return res.status(400).json({
-            message : "User Not Authenticated.",
-            data : {}
-    })
+      return sendResponse({message : "User not authencated.", res , statusCode : 403, success : false, data : null})
 
     const {role, is_superuser} = user
 
@@ -29,27 +28,20 @@ router.patch("/:id", Authenticate, async (req, res) => {
               where: { id: id },
               data: updateData,
             });
-            res.status(200).json({
-                message : "Successfully Updated the Fabricator Data.",
-                data : updatedFabricator
-            });
+            return sendResponse({message : "Successfully updated the fabricator data.", res , statusCode : 200, success : true, data : updatedFabricator})
           } catch (error) {
             console.error(error);
-            res.status(500).json({ message : "Failed to update fabricator", data : {} });
+            return sendResponse({
+              message : "Failed to update the fabricator.", res , statusCode : 500, success : false , data : null
+            })
           } finally {
             prisma.$disconnect()
           }
     } else {
-        return res.status(403).json({
-            message : "Only superuser can update fabricator",
-            data : {}
-        });
+      return sendResponse({message : "Only superuser can update fabricator.", res , statusCode : 403, success : false, data  : null})
     }
   } else {
-    return res.status(403).json({
-        message : "Only staff admin can update fabricator",
-        data : {}
-    });
+    return sendResponse({message : "Only staff admin can upate fabricator."})
   }
 });
 

@@ -25,6 +25,8 @@ model Users {
   is_firstLogin Boolean  @default(true)
 
   fabricators Fabricator[] // Relation to Fabricator model
+  managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
+  createdDepartments Department[] @relation("Creator") // Departments created by the user
 
   @@map("users")
 }
@@ -45,6 +47,17 @@ model Fabricator {
   @@map("fabricators") // Optional: map to a specific database table name
 }
 
+model Department {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique
+  managerId  String?  @db.Uuid // Foreign key to the Users model (UUID)
+  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager")
+  createdById String? @db.Uuid // Foreign key to the Users model (UUID)
+  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator")
+  isBin      Boolean  @default(false)
+
+  @@map("department") // Optional: Matches the Django table name
+}
 
 enum UserRole {
   STAFF
