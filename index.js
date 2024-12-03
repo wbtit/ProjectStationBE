@@ -8,7 +8,7 @@ import { app } from './src/app.js';
 dotenv.config();
 app.use(express.json())
 app.use(cors({
-    origin  : 'http://192.168.1.50:5173'
+    origin  : 'http://localhost:5173'
 }))
 
 app.get('/', (req, res) => {
