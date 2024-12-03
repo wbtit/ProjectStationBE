@@ -7,6 +7,7 @@ import { app } from './src/app.js';
 
 dotenv.config();
 app.use(express.json())
+app.use(express.urlencoded({ extended: true, limit : '16kb' }));
 app.use(cors({
     origin  : 'http://localhost:5173'
 }))
