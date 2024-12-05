@@ -18,36 +18,54 @@ model Users {
   m_name        String?  @db.VarChar(50)
   l_name        String?  @db.VarChar(50)
   phone         String   @db.VarChar(20)
+  landline      String?  @db.VarChar(20) @default("")
+  alt_landline  String?  @db.VarChar(20) @default("")
+  alt_phone     String?  @db.VarChar(20) @default("")
+  designation   String   @db.VarChar(50) @default("")
+  city          String?  @default("")
+  zip_code      String?  @default("")
+  state         String?  @default("")
+  country       String?  @default("")
+  address       String?  @default("")
   role          UserRole
   is_active     Boolean  @default(true)
   is_staff      Boolean  @default(false)
   is_superuser  Boolean  @default(false)
   is_firstLogin Boolean  @default(true)
 
-  fabricators Fabricator[] // Relation to Fabricator model
+  fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
+  fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
+
+  fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
+
   managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
   createdDepartments Department[] @relation("Creator") // Departments created by the user
+
+  createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
 
   @@map("users")
 }
 
 model Fabricator {
   id          String   @id @default(uuid()) @db.Uuid
-  createdById String   @db.Uuid // Explicitly define as uuid
-  createdBy   Users    @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  fabName     String   @default("") // Default empty string for fabName
-  headquaters Json     @default("{}") // Default empty JSON object for headquaters
-  website     String   @default("") // Default empty string for website
-  drive       String   @default("") // Default empty string for drive
-  branches    Json     @default("[]") // Default to empty array
-  files       String[] @default([])  // Default to empty array
-  createdAt   DateTime @default(now()) // Timestamp for creation
-  updatedAt   DateTime @updatedAt      // Automatically update on modification
+  createdById String   @db.Uuid
+  createdBy   Users    @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  fabName     String   @default("")
+  headquaters Json     @default("{}")
+  website     String   @default("")
+  drive       String   @default("")
+  branches    Json     @default("[]")
+  files       String[] @default([])
+  is_bin      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  client Client[]
+  users       Users[] @relation("FabricatorUsers") // Relation for multiple users
+  singleUser  Users?  @relation("UserFabricator") // Opposite relation for fabricator in Users
 
-  @@map("fabricators") // Optional: map to a specific database table name
+  @@map("fabricators")
 }
+
 
 model Department {
   id         String   @id @default(uuid()) @db.Uuid
@@ -59,34 +77,6 @@ model Department {
   isBin      Boolean  @default(false)
 
   @@map("department") // Optional: Matches the Django table name
-}
-
- model Client {
-  id            String      @id @default(uuid()) @db.Uuid
-  username      String      @unique
-  password      String      
-  email         String?     @db.VarChar(150)
-  f_name        String      @db.VarChar(50)
-  m_name        String?     @db.VarChar(50)
-  l_name        String?     @db.VarChar(50)
-  phone         String      @db.VarChar(20)
-  alt_phone     String?     @db.VarChar(20) // Optional alternate phone
-  designation   String      @db.VarChar(50) // Added proper field name
-  address       String?     @db.VarChar(150)
-  city          String?     @db.VarChar(50)
-  state         String?     @db.VarChar(50)
-  country       String?     @db.VarChar(50)
-  zip_code      String?     @db.VarChar(10)
-  role          UserRole
-  is_active     Boolean     @default(true)
-  is_staff      Boolean     @default(false)
-  is_superuser  Boolean     @default(false)
-  is_firstLogin Boolean     @default(true)
-
-  fabricator    Fabricator  @relation(fields: [fabricatorId], references: [id])
-  fabricatorId  String      @db.Uuid
-
-  @@map("client")
 }
 
 enum UserRole {
