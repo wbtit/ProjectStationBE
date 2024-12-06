@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Files</title>
+  </head>
+  <body>
+    <h1>Upload Files</h1>
+
+    <!-- Form to select multiple files -->
+    <form id="fileForm">
+      <input
+        type="file"
+        id="fileInput"
+        name="files"
+        multiple
+        accept=".pdf, .jpeg, .jpg, .png"
+        required
+      />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="responseMessage"></div>
+
+    <script>
+      // Handle form submission
+      document
+        .getElementById("fileForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          const formData = new FormData();
+          const files = document.getElementById("fileInput").files;
+
+          // Check if files are selected
+          if (files.length === 0) {
+            console.log("No files selected");
+            document.getElementById("responseMessage").textContent =
+              "Please select files to upload.";
+            return;
+          }
+
+          // Append all selected files to the form data
+          for (let i = 0; i < files.length; i++) {
+            formData.append("files", files[i]);
+          }
+
+          // Log FormData content to verify the files
+          for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+          }
+
+          try {
+            const projectId = "36eacebd-ff31-4662-a057-83c001cf3e6e"; // Replace with actual project ID
+
+            // Send the request to the backend
+            const response = await fetch(
+              `http://localhost:5000/api/project/${projectId}/files`,
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+            if (response.ok) {
+              // Show success message
+              document.getElementById("responseMessage").textContent =
+                "Files uploaded successfully!";
+              console.log(data); // Optional: Log the server response
+            } else {
+              // Show error message
+              document.getElementById(
+                "responseMessage"
+              ).textContent = `Error: ${data.error}`;
+            }
+          } catch (error) {
+            console.error(error);
+            document.getElementById("responseMessage").textContent =
+              "An error occurred while uploading files.";
+          }
+        });
+    </script>
+  </body>
+</html>
