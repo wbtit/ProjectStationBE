@@ -6,6 +6,12 @@ import UpdateFabricator from "./fabricator/updatefabricator.js";
 import DeleteFabricator from "./fabricator/deletefabricator.js";
 import AddDepartment from "./departments/adddepartment.js";
 import GetUer from "./auth/getuserbytoken.js";
+import AddClient from "./client/addclient.js";
+import AddbranchFab from "./fabricator/addbranch.js";
+import GetAllFabricators from "./fabricator/getallfabricators.js";
+import AddTeam from "./team/addteam.js";
+import Team from "./team/team.js";
+import Project from "./project/project.js";
 
 const routes = express.Router();
 
@@ -16,5 +22,11 @@ routes.use("/updatefabricator", UpdateFabricator);
 routes.use("/deletefabricator", DeleteFabricator);
 routes.use("/adddepartment", AddDepartment);
 routes.use("/token", GetUer);
+routes.use("/addclient", AddClient);
+routes.use("/addbranchfab", AddbranchFab);
+routes.use("/fabricators", GetAllFabricators);
+routes.use("/addteam", AddTeam);
+routes.use("/team", Team);
+routes.use("/project", Project);
 
 export { routes };

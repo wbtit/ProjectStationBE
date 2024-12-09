@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "address" SET DEFAULT '',
+ALTER COLUMN "alt_landline" SET DEFAULT '',
+ALTER COLUMN "alt_phone" SET DEFAULT '',
+ALTER COLUMN "city" SET DEFAULT '',
+ALTER COLUMN "country" SET DEFAULT '',
+ALTER COLUMN "designation" SET DEFAULT '',
+ALTER COLUMN "landline" SET DEFAULT '',
+ALTER COLUMN "state" SET DEFAULT '',
+ALTER COLUMN "zip_code" SET DEFAULT '';

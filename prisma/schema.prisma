@@ -18,49 +18,144 @@ model Users {
   m_name        String?  @db.VarChar(50)
   l_name        String?  @db.VarChar(50)
   phone         String   @db.VarChar(20)
+  landline      String?  @db.VarChar(20) @default("")
+  alt_landline  String?  @db.VarChar(20) @default("")
+  alt_phone     String?  @db.VarChar(20) @default("")
+  designation   String   @db.VarChar(50) @default("")
+  city          String?  @default("")
+  zip_code      String?  @default("")
+  state         String?  @default("")
+  country       String?  @default("")
+  address       String?  @default("")
   role          UserRole
   is_active     Boolean  @default(true)
   is_staff      Boolean  @default(false)
   is_superuser  Boolean  @default(false)
   is_firstLogin Boolean  @default(true)
 
-  fabricators Fabricator[] // Relation to Fabricator model
+  fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
+  fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
+
+  fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
+
   managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
   createdDepartments Department[] @relation("Creator") // Departments created by the user
+
+  teamManager Team[] @relation("TeamManager")
+
+  createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
+
+  project Project[] @relation("projectManager")
 
   @@map("users")
 }
 
 model Fabricator {
   id          String   @id @default(uuid()) @db.Uuid
-  createdById String   @db.Uuid // Explicitly define as uuid
-  createdBy   Users    @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  fabName     String   @default("") // Default empty string for fabName
-  headquaters Json     @default("{}") // Default empty JSON object for headquaters
-  website     String   @default("") // Default empty string for website
-  drive       String   @default("") // Default empty string for drive
-  branches    Json     @default("[]") // Default to empty array
-  files       String[] @default([])  // Default to empty array
-  createdAt   DateTime @default(now()) // Timestamp for creation
-  updatedAt   DateTime @updatedAt      // Automatically update on modification
+  createdById String   @db.Uuid
+  createdBy   Users    @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  fabName     String   @default("")
+  headquaters Json     @default("{}")
+  website     String   @default("")
+  drive       String   @default("")
+  branches    Json     @default("[]")
+  files       String[] @default([])
+  is_bin      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@map("fabricators") // Optional: map to a specific database table name
+  users       Users[] @relation("FabricatorUsers") // Relation for multiple users
+  singleUser  Users?  @relation("UserFabricator") // Opposite relation for fabricator in Users
+
+  project    Project[] @relation("projectFabricator")
+
+  @@map("fabricators")
 }
+
 
 model Department {
   id         String   @id @default(uuid()) @db.Uuid
   name       String   @unique
   managerId  String?  @db.Uuid // Foreign key to the Users model (UUID)
-  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager")
+  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager", onDelete: Cascade)
   createdById String? @db.Uuid // Foreign key to the Users model (UUID)
-  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator")
+  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator", onDelete: Cascade)
   isBin      Boolean  @default(false)
+
+  project Project[] @relation("projectDepartment")
 
   @@map("department") // Optional: Matches the Django table name
 }
+
+
+
+model Team {
+  id  String @id @default(uuid()) @db.Uuid
+  name  String @unique
+  managerID String @db.Uuid 
+  manager  Users @relation(fields: [managerID], references: [id], name: "TeamManager", onDelete: Cascade)
+  members Json @default("[]")
+
+  project Project[] @relation("projectTeam")
+
+  @@map("team")
+}
+
+model Project {
+  id String @id @default(uuid()) @db.Uuid
+  name String @unique
+  description String 
+  fabricatorID String @db.Uuid
+  fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
+  departmentID String @db.Uuid
+  department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
+  teamID String @db.Uuid
+  team Team @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
+  managerID  String @db.Uuid
+  manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
+  status Status @default(ACTIVE)
+  stage Stage @default(RFI)
+  tools Tools @default(TEKLA) // Not sure about the default value
+  files Json @default("[]")
+  connectionDesign Boolean @default(true) // Not sure about the default value
+  miscDesign Boolean @default(true) // Not sure about the default value
+  customerDesign Boolean @default(false) // Not sure about the default value
+  startDate DateTime @default(now()) // Not sure about the default value
+  approvalDate DateTime @default(now()) // Not sure about the default value
+  estimatedHours Int 
+
+  @@map("project")
+} 
 
 enum UserRole {
   STAFF
   CLIENT
   VENDOR
+}
+
+enum Status {
+  ACTIVE
+  ON_HOLD
+  INACTIVE
+  DELAY
+  COMPLETE
+}
+
+enum Stage {
+  RFI
+  IFA
+  BFA
+  BFA_M // Not possible to use "-"
+  RIFA
+  RBFA
+  IFC
+  BFC
+  RJFC
+  REV
+  CO // Not possible to use "#"
+}
+
+enum Tools {
+  TEKLA
+  SDS2
 }
