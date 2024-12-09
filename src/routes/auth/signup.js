@@ -20,6 +20,10 @@ const createUser = async ({
   is_staff,
   is_superuser,
   is_firstLogin,
+  emp_code,
+  department,
+  designation,
+  is_sales,
 }) => {
   try {
     // Hash the password before storing
@@ -40,6 +44,10 @@ const createUser = async ({
         is_staff,
         is_superuser,
         is_firstLogin,
+        emp_code,
+        department,
+        designation,
+        is_sales,
       },
     });
     return newUser;
@@ -52,8 +60,7 @@ const createUser = async ({
 
 // User route to handle user creation
 router.post("/", async (req, res) => {
-
-    console.log("Hello", req.body)
+  console.log("Hello", req.body);
 
   const {
     username,
@@ -68,21 +75,32 @@ router.post("/", async (req, res) => {
     is_staff,
     is_superuser,
     is_firstLogin,
-    } = req.body;
-    
-    console.log(
-      username,
-      password,
-      email,
-      f_name,
-      m_name,
-      l_name,
-      phone,
-      role,
-      is_active,
-      is_staff,
-      is_superuser,
-      is_firstLogin);
+    emp_code,
+    department,
+    designation,
+    manager,
+    sales,
+  } = req.body;
+
+  console.log(
+    username,
+    password,
+    email,
+    f_name,
+    m_name,
+    l_name,
+    phone,
+    role,
+    is_active,
+    is_staff,
+    is_superuser,
+    is_firstLogin,
+    department,
+    designation,
+    manager,
+    sales,
+    emp_code
+  );
 
   if (!username || !password || !f_name || !phone || !role) {
     return sendResponse({
@@ -106,6 +124,9 @@ router.post("/", async (req, res) => {
         message: "Username already taken.",
       });
 
+    const is_staff = manager ? true : false;
+    const is_sales = sales ? true : false;
+
     const newUser = await createUser({
       username,
       password,
@@ -119,6 +140,10 @@ router.post("/", async (req, res) => {
       is_staff,
       is_superuser,
       is_firstLogin,
+      emp_code,
+      department,
+      designation,
+      is_sales,
     });
 
     // Respond with the created user data
@@ -137,7 +162,7 @@ router.post("/", async (req, res) => {
       statusCode: 500,
       success: false,
       data: null,
-    }); 
+    });
   } finally {
     prisma.$disconnect();
   }

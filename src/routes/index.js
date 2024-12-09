@@ -12,6 +12,8 @@ import GetAllFabricators from "./fabricator/getallfabricators.js";
 import AddTeam from "./team/addteam.js";
 import Team from "./team/team.js";
 import Project from "./project/project.js";
+import ResetPassword from "./auth/resetpassword.js";
+import getAllDepartments from "./departments/getdepartments.js";
 
 const routes = express.Router();
 
@@ -28,5 +30,7 @@ routes.use("/fabricators", GetAllFabricators);
 routes.use("/addteam", AddTeam);
 routes.use("/team", Team);
 routes.use("/project", Project);
+routes.use("/reset", ResetPassword);
+routes.use("/getalldepartments", getAllDepartments);
 
 export { routes };

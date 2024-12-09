@@ -1,8 +1,11 @@
 import jwt from "jsonwebtoken";
 
 const Authenticate = async (req, res, next) => {
-  const authHeaders = req?.headers?.authorization;
-  // const authHeaders = req.body?.headers?.Authorization;
+    //   const authHeaders = req?.headers?.authorization;
+    console.log(req.headers)
+    const authHeaders =
+      req.body?.headers?.Authorization || req?.headers?.authorization;
+    console.log(authHeaders)
 
   const secret = process.env.SECRET;
   if (!secret) {

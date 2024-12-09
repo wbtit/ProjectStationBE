@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "designation" DROP NOT NULL,
+ALTER COLUMN "department" DROP NOT NULL,
+ALTER COLUMN "emp_code" DROP NOT NULL,
+ALTER COLUMN "is_sales" DROP NOT NULL;
