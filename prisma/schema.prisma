@@ -9,49 +9,57 @@ datasource db {
   extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
-model Users {
-  id            String   @id @default(uuid()) @db.Uuid
-  username      String   @unique
-  password      String   
-  email         String?  @db.VarChar(150)
-  f_name        String   @db.VarChar(50)
-  m_name        String?  @db.VarChar(50)
-  l_name        String?  @db.VarChar(50)
-  phone         String   @db.VarChar(20)
-  landline      String?  @db.VarChar(20) @default("")
-  alt_landline  String?  @db.VarChar(20) @default("")
-  alt_phone     String?  @db.VarChar(20) @default("")
-  designation   String?   @db.VarChar(50) @default("")
-  city          String?  @default("")
-  zip_code      String?  @default("")
-  state         String?  @default("")
-  country       String?  @default("")
-  address       String?  @default("")
-  role          UserRole
-  emp_code      String?   @default("WBT")
-  department    Json?    @default("{}")
-  is_sales      Boolean? @default(false)
-  is_active     Boolean  @default(true) // True for manager
-  is_staff      Boolean  @default(false) // True for manager
-  is_superuser  Boolean  @default(false)
-  is_firstLogin Boolean  @default(true)
+  model Users {
+    id            String   @id @default(uuid()) @db.Uuid
+    username      String   @unique
+    password      String   
+    email         String?  @db.VarChar(150)
+    f_name        String   @db.VarChar(50)
+    m_name        String?  @db.VarChar(50)
+    l_name        String?  @db.VarChar(50)
+    phone         String   @db.VarChar(20)
+    landline      String?  @db.VarChar(20) @default("")
+    alt_landline  String?  @db.VarChar(20) @default("")
+    alt_phone     String?  @db.VarChar(20) @default("")
+    designation   String?   @db.VarChar(50) @default("")
+    city          String?  @default("")
+    zip_code      String?  @default("")
+    state         String?  @default("")
+    country       String?  @default("")
+    address       String?  @default("")
+    role          UserRole
+    emp_code      String?   @default("WBT")
+    department    Json?    @default("{}")
+    is_sales      Boolean? @default(false)
+    is_active     Boolean  @default(true) // True for manager
+    is_staff      Boolean  @default(false) // True for manager
+    is_superuser  Boolean  @default(false)
+    is_firstLogin Boolean  @default(true)
 
-  fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
-  fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
+    fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
+    fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
 
-  fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
+    fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
 
-  managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
-  createdDepartments Department[] @relation("Creator") // Departments created by the user
+    managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
+    createdDepartments Department[] @relation("Creator") // Departments created by the user
 
-  teamManager Team[] @relation("TeamManager")
+    teamManager Team[] @relation("TeamManager")
 
-  createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
+    createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
 
-  project Project[] @relation("projectManager")
+    project Project[] @relation("projectManager")
 
-  @@map("users")
-}
+    tasks Task[] @relation("userTask")
+    
+    assignedByUser Assigned_list[] @relation("assignedByUser")
+    assignedToUser Assigned_list[] @relation("assignedToUser")
+    approvedByUser Assigned_list[] @relation("approvedByUser")
+
+
+
+    @@map("users")
+  }
 
 model Fabricator {
   id          String   @id @default(uuid()) @db.Uuid
@@ -71,6 +79,7 @@ model Fabricator {
   singleUser  Users?  @relation("UserFabricator") // Opposite relation for fabricator in Users
 
   project    Project[] @relation("projectFabricator")
+  tasks Task[] @relation("fabricatorTask")
 
   @@map("fabricators")
 }
@@ -104,11 +113,11 @@ model Team {
   @@map("team")
 }
 
-model Project {
-  id String @id @default(uuid()) @db.Uuid
-  name String @unique
-  description String 
-  fabricatorID String @db.Uuid
+  model Project {
+    id String @id @default(uuid()) @db.Uuid
+    name String @unique
+    description String 
+    fabricatorID String @db.Uuid
   fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
   departmentID String @db.Uuid
   department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
@@ -126,14 +135,58 @@ model Project {
   startDate DateTime @default(now()) // Not sure about the default value
   approvalDate DateTime @default(now()) // Not sure about the default value
   estimatedHours Int 
+  tasks Task[] @relation("projectTask")
 
   @@map("project")
 } 
+
+model Task {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  status      Boolean   @default(true)
+  attachment  String
+  priority    Int
+  created_on  DateTime  @default(now())
+  due_date    DateTime
+  duration    String
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id], references: [id], name: "projectTask", onDelete: Cascade)
+  fabricator_id String @db.Uuid
+  fabricator Fabricator @relation(fields: [fabricator_id], references: [id], name: "fabricatorTask", onDelete: Cascade)
+  user_id String @db.Uuid
+  user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
+
+  assignedTask Assigned_list[] @relation("assignedTask")
+  @@map("task")
+}
+
+
+
+
+model Assigned_list {
+ id String @id @default(uuid()) @db.Uuid
+ approved_on DateTime @default(now())
+ assigned_on DateTime @default(now())
+ approved Boolean @default(false) //not sure about the default value
+ comment String
+  task_id String  @db.Uuid
+ task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
+
+  assigned_by String @db.Uuid
+    users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
+    assigned_to String @db.Uuid
+    user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
+    approved_by String @db.Uuid
+    userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
+}
+
 
 enum UserRole {
   STAFF
   CLIENT
   VENDOR
+  
 }
 
 enum Status {
