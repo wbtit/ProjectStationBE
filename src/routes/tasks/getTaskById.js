@@ -5,7 +5,7 @@ import { sendResponse } from "../../utils/responder.js"
 
 const router=Router();
 
-router.get('/',Authenticate,async(req,res)=>{
+router.get('/:id',Authenticate,async(req,res)=>{
     try{
         if(!req.user){
         console.log("user not authenticated")
@@ -17,11 +17,15 @@ router.get('/',Authenticate,async(req,res)=>{
             data:null
         });
     }
-    const tasks=await prisma.task.findMany();
+    const tasks=await prisma.task.findUnique({
+        where:{
+            id
+        }
+    });
     if(!tasks){
-        console.log("error in fetching tasks")
+        console.log("error in fetching task by id")
         return sendResponse({
-            message:"error in fetching tasks",
+            message:"error in fetching task by id",
             res,
             statusCode:403,
             success:false,
@@ -29,16 +33,16 @@ router.get('/',Authenticate,async(req,res)=>{
         });
     }
     return sendResponse({
-        message:"Tasks fetched successfully",
+        message:"Task by id fetched successfully",
         res,
         statusCode:200,
         success:true,
         data:tasks
     })
 }catch(error){
-    console.log("error in fetching tasks",error)
+    console.log("error in fetching task byh id",error)
     return sendResponse({
-        message:"Error in fetching tasks",
+        message:"Error in fetching task by id",
         res,
         statusCode:500
     })

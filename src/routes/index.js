@@ -15,7 +15,9 @@ import Project from "./project/project.js";
 import ResetPassword from "./auth/resetpassword.js";
 import getAllDepartments from "./departments/getdepartments.js";
 import AddTask from "./tasks/addtask.js"
-
+import getAllTasks from '../routes/tasks/gettasks.js'
+import updateTaskById from './tasks/updatetaskById.js'
+import deleteTaskById from './tasks/deletetask.js'
 const routes = express.Router();
 
 routes.use("/login", Login);
@@ -34,5 +36,8 @@ routes.use("/project", Project);
 routes.use("/reset", ResetPassword);
 routes.use("/getalldepartments", getAllDepartments);
 routes.use('/addtask', AddTask)
+routes.use('/tasks', getAllTasks)
+routes.use('/tasks',updateTaskById )
+routes.use('/tasks',deleteTaskById )
 
 export { routes };
