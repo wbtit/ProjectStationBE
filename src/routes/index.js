@@ -18,6 +18,8 @@ import AddTask from "./tasks/addtask.js"
 import getAllTasks from '../routes/tasks/gettasks.js'
 import updateTaskById from './tasks/updatetaskById.js'
 import deleteTaskById from './tasks/deletetask.js'
+import getTaskById from './tasks/getTaskById.js'
+import patchUpdateById from './tasks/patchUpdateById.js'
 const routes = express.Router();
 
 routes.use("/login", Login);
@@ -37,7 +39,9 @@ routes.use("/reset", ResetPassword);
 routes.use("/getalldepartments", getAllDepartments);
 routes.use('/addtask', AddTask)
 routes.use('/tasks', getAllTasks)
-routes.use('/tasks',updateTaskById )
-routes.use('/tasks',deleteTaskById )
+routes.use('/tasksbyid', getTaskById)
+routes.use('/tasksupdatebyid',updateTaskById )
+routes.use('/deletetask',deleteTaskById )
+routes.use('/updateTaskByid',patchUpdateById )
 
 export { routes };

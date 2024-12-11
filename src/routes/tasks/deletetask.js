@@ -6,6 +6,7 @@ import { sendResponse } from "../../utils/responder.js";
 const router=Router()
 
 router.delete("/:id",Authenticate,async(req,res)=>{
+    const {id}=req?.params
     try{
         if(!req.user){
             console.log("user not authenticated")

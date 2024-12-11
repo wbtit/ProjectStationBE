@@ -2,10 +2,14 @@ import {Route, Router} from "express"
 import Authenticate from "../../middlewares/authenticate.js"
 import prisma from "../../lib/prisma.js"
 import { sendResponse } from "../../utils/responder.js"
+import { isValidUUID } from "../../utils/isValiduuid.js"
 
 const router=Router();
 
 router.get('/:id',Authenticate,async(req,res)=>{
+
+    const {id} =req?.params
+
     try{
         if(!req.user){
         console.log("user not authenticated")
@@ -15,14 +19,40 @@ router.get('/:id',Authenticate,async(req,res)=>{
             statusCode:403,
             success:false,
             data:null
-        });
+        }); 
+          }
+
+
+    console.log("id:",id)
+
+    if(!id) {
+        return sendResponse({
+            message : "Invalid task ID",
+            res ,
+            statusCode : 400,
+            success : false,
+            data : null
+        })
     }
-    const tasks=await prisma.task.findUnique({
+
+    console.log(isValidUUID(id), typeof id)
+
+    if(!isValidUUID(id))  {
+        return sendResponse({
+            message : "Invalid task UUid",
+            res ,
+            statusCode : 400,
+            success : false,
+            data : null
+        })
+    } 
+
+    const task=await prisma.task.findUnique({
         where:{
             id
         }
     });
-    if(!tasks){
+    if(!task){
         console.log("error in fetching task by id")
         return sendResponse({
             message:"error in fetching task by id",
@@ -37,10 +67,10 @@ router.get('/:id',Authenticate,async(req,res)=>{
         res,
         statusCode:200,
         success:true,
-        data:tasks
+        data:task
     })
 }catch(error){
-    console.log("error in fetching task byh id",error)
+    console.log("error in fetching task by id",error)
     return sendResponse({
         message:"Error in fetching task by id",
         res,
