@@ -3,37 +3,15 @@ import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
 import { isValidUUID } from "../../utils/isValiduuid.js"
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router=Router();
 
-router.put("/:id",Authenticate,async(req,res)=>{
+router.put("/:id",Authenticate, BroadAccess, async(req,res)=>{
     const {id}=req?.params;
 
     try{
-    if(!req.user){
-        console.log("user not authenticated")
-        return sendResponse({
-            message:"User not authnticated",
-            res,
-            statusCode:403,
-            success:false,
-            data:null
-        });
-    }  
     
-    console.log("id:",id)
-
-    if(!id) {
-        return sendResponse({
-            message : "Invalid task ID",
-            res ,
-            statusCode : 400,
-            success : false,
-            data : null
-        })
-    }
-    console.log(isValidUUID(id), typeof id)
-
     if(!isValidUUID(id))  {
         return sendResponse({
             message : "Invalid task UUid",

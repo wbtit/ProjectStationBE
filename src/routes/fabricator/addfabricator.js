@@ -2,36 +2,14 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
+import { isAdmin } from "../../middlewares/isadmin.js";
 
 const router = Router();
 
-router.post("/", Authenticate, async (req, res) => {
-  console.log(req.body);
-
-  if (!req.user) {
-    return sendResponse({
-      message: "User not Authenticated.",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
-  const { id, is_superuser } = req.user;
+router.post("/", Authenticate, isAdmin, async (req, res) => {
+  const { id } = req.user;
 
   const { name, headquater, website, drive } = req.body;
-
-  if (!id) {
-    console.log("User Not Founs");
-    return sendResponse({
-      message: "User not found",
-      res,
-      statusCode: 400,
-      success: false,
-      data: null,
-    });
-  }
 
   if (!name || !headquater || !website || !drive) {
     console.log("Invalid Field");
@@ -45,45 +23,35 @@ router.post("/", Authenticate, async (req, res) => {
   }
 
   // Checking the user is a super user.
-  if (is_superuser) {
-    try {
-      const fabricator = await prisma.fabricator.create({
-        data: {
-          createdById: id,
-          fabName: name,
-          headquaters: headquater,
-          drive: drive,
-          website: website,
-        },
-      });
+  try {
+    const fabricator = await prisma.fabricator.create({
+      data: {
+        createdById: id,
+        fabName: name,
+        headquaters: headquater,
+        drive: drive,
+        website: website,
+      },
+    });
 
-      return sendResponse({
-        message: "Fabricator Added Successfully.",
-        res,
-        statusCode: 200,
-        success: true,
-        data: fabricator,
-      });
-    } catch (error) {
-      console.error(error);
-      return sendResponse({
-        message: "Sorry something went wrong.",
-        res,
-        statusCode: 500,
-        success: false,
-        data: null,
-      });
-    } finally {
-      prisma.$disconnect();
-    }
-  } else {
     return sendResponse({
-      message: "Only superuser can add fabricator.",
+      message: "Fabricator Added Successfully.",
       res,
-      statusCode: 404,
+      statusCode: 200,
+      success: true,
+      data: fabricator,
+    });
+  } catch (error) {
+    console.error(error);
+    return sendResponse({
+      message: "Sorry something went wrong.",
+      res,
+      statusCode: 500,
       success: false,
       data: null,
     });
+  } finally {
+    prisma.$disconnect();
   }
 });
 

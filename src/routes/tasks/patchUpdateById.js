@@ -3,34 +3,13 @@ import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
 import { isValidUUID } from "../../utils/isValiduuid.js"
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router = Router();
 
-router.patch("/:id", Authenticate, async (req, res) => {
+router.patch("/:id", Authenticate, BroadAccess, async (req, res) => {
   const { id } = req.params;
   try {
-    if (!req.user) {
-      console.log("User not authenticated");
-      return sendResponse({
-        message: "User not authenticated",
-        res,
-        statusCode: 403,
-        success: false,
-        data: null,
-      });
-    }
-    console.log("id:",id)
-
-    if(!id) {
-        return sendResponse({
-            message : "Invalid task ID",
-            res ,
-            statusCode : 400,
-            success : false,
-            data : null
-        })
-    }
-    console.log(isValidUUID(id), typeof id)
 
     if(!isValidUUID(id))  {
         return sendResponse({
@@ -41,9 +20,7 @@ router.patch("/:id", Authenticate, async (req, res) => {
             data : null
         })
     } 
-
     
-
     // Ensure the request body is not empty
     if (!Object.keys(req.body).length) {
       return sendResponse({

@@ -2,22 +2,13 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router=Router()
 
-router.delete("/:id",Authenticate,async(req,res)=>{
+router.delete("/:id",Authenticate, BroadAccess, async(req,res)=>{
     const {id}=req?.params
     try{
-        if(!req.user){
-            console.log("user not authenticated")
-            return sendResponse({
-                message:"User not authenticated",
-                res,
-                statusCode:403,
-                success:false,
-                data:null
-            });
-        }
     const deletedTask= await prisma.task.delete({
         where:{
             id

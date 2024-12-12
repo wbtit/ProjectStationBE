@@ -2,24 +2,13 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { sendResponse } from "../../utils/responder.js";
 import { getUserByID } from "../../models/userUniModelByID.js";
-import { areUsers } from "../../models/areUsers.js";
 import prisma from "../../lib/prisma.js";
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router = Router();
 
-router.post("/", Authenticate, async (req, res) => {
+router.post("/", Authenticate,BroadAccess, async (req, res) => {
   const { name, manager, teammembers } = req.body;
-
-  if (!req.user) {
-    console.log("User not Authenticated");
-    return sendResponse({
-      message: "User not authentcated",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
 
   if (!name || !manager || !teammembers) {
     console.log("Fields are empty!");
@@ -31,8 +20,6 @@ router.post("/", Authenticate, async (req, res) => {
       data: null,
     });
   }
-
-  console.log(manager, name, teammembers);
 
   try {
     const isManager = await getUserByID({ id: manager });

@@ -3,19 +3,13 @@ import Authenticate from "../../middlewares/authenticate.js";
 import { Router } from "express";
 import { sendResponse } from "../../utils/responder.js";
 import { getUserByID } from "../../models/userUniModelByID.js";
+import { isAdmin } from "../../middlewares/isadmin.js";
 
 const router = Router();
 
-router.post('/',Authenticate, async(req, res) => {
-
-    if(!req.user) {
-        return sendResponse({message : "User not Authenticated.", res , statusCode : 403, success : false, data : null})
-    }
-
-    const {id, is_superuser } = req.user
-
-    if(!is_superuser) 
-    return sendResponse({message : "Only Admin can add department.", res , statusCode : 400, success : false, data : null})
+router.post('/', Authenticate, isAdmin, async (req, res) => {
+    
+    const {id } = req.user
 
     const {name, managerID} = req.body
 
@@ -27,7 +21,6 @@ router.post('/',Authenticate, async(req, res) => {
     if(!user) 
         return sendResponse({message : "Invalid Manager ID.", res , statusCode : 400, success : false, data : null})
 
-    console.log(user)
 
     const {is_active, is_staff, username} = user
 
@@ -50,12 +43,6 @@ router.post('/',Authenticate, async(req, res) => {
     } else {
         return sendResponse({message : `${username} is not a manager.`, res , statusCode : 403, success : false, data : null})
     }
-
-
-
-
-    return sendResponse({message : `Department is supposed to be named ${name} and the manager is ${managerID} and created by ${id} and is a superuser ?, ${is_superuser}`, res , statusCode : 200, success : true, data : user})
-
 
 })
 

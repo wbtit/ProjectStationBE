@@ -9,26 +9,12 @@ import { generateToken } from "../../utils/jwtutils.js";
 const router = Router();
 
 router.put("/", Authenticate, async (req, res) => {
-  if (!req.user) {
-    console.log("User Not Authenticated.");
-    return sendResponse({
-      message: "User not authenticated.",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
   const { old_password, new_password } = req.body;
 
-  const { username, password, id } = req.user;
-
-  console.log(await comparePassword(old_password, password));
+  const { password, id } = req.user;
 
   if (await comparePassword(old_password, password)) {
     const newPassword = await hashPassword(new_password);
-    console.log("New Passowrd", newPassword);
 
     const updatedUser = await prisma.users.update({
       where: {
@@ -40,19 +26,19 @@ router.put("/", Authenticate, async (req, res) => {
       },
     });
 
-    console.log("Password resetted successfully.");
+    console.log("Password resetted successfully");
 
     const token = generateToken(updatedUser);
 
     return sendResponse({
-      message: "Password resetted successfully.",
+      message: "Password resetted successfully",
       res,
       statusCode: 200,
       success: true,
       data: token,
     });
   } else {
-    console.log("Password doesn't match.");
+    console.log("Password doesn't match");
     return sendResponse({
       message: "Old Password is wrong",
       res,

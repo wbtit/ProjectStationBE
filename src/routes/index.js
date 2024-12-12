@@ -14,14 +14,17 @@ import Team from "./team/team.js";
 import Project from "./project/project.js";
 import ResetPassword from "./auth/resetpassword.js";
 import getAllDepartments from "./departments/getdepartments.js";
-import AddTask from "./tasks/addtask.js"
-import getAllTasks from '../routes/tasks/gettasks.js'
-import updateTaskById from './tasks/updatetaskById.js'
-import deleteTaskById from './tasks/deletetask.js'
-import getTaskById from './tasks/getTaskById.js'
-import patchUpdateById from './tasks/patchUpdateById.js'
-import taskByIdAccept from './tasks/Accept/taskByIdAccept.js'
-import updateTaskByIdAccept from './tasks/Accept/updateTaskByIdAccept.js'
+import AddTask from "./tasks/addtask.js";
+import getAllTasks from "../routes/tasks/gettasks.js";
+import updateTaskById from "./tasks/updatetaskById.js";
+import deleteTaskById from "./tasks/deletetask.js";
+import getTaskById from "./tasks/getTaskById.js";
+import patchUpdateById from "./tasks/patchUpdateById.js";
+import taskByIdAccept from "./tasks/Accept/taskByIdAccept.js";
+import updateTaskByIdAccept from "./tasks/Accept/updateTaskByIdAccept.js";
+import getTeamMembers from "./team/getteammembers.js";
+import getIndiviualTeamMember from "./team/getindiviualteammember.js";
+
 const routes = express.Router();
 
 routes.use("/login", Login);
@@ -39,13 +42,15 @@ routes.use("/team", Team);
 routes.use("/project", Project);
 routes.use("/reset", ResetPassword);
 routes.use("/getalldepartments", getAllDepartments);
-routes.use('/addtask', AddTask)
-routes.use('/tasks', getAllTasks)
-routes.use('/tasksbyid', getTaskById)
-routes.use('/tasksupdatebyid',updateTaskById )
-routes.use('/deletetask',deleteTaskById )
-routes.use('/updateTaskByid',patchUpdateById )
-routes.use('/getTaskByidaccept',taskByIdAccept )
-routes.use('/updateTaskByidaccept',updateTaskByIdAccept )
+routes.use("/addtask", AddTask);
+routes.use("/tasks", getAllTasks);
+routes.use("/tasksbyid", getTaskById);
+routes.use("/tasksupdatebyid", updateTaskById);
+routes.use("/deletetask", deleteTaskById);
+routes.use("/updateTaskByid", patchUpdateById);
+routes.use("/getTaskByidaccept", taskByIdAccept);
+routes.use("/updateTaskByidaccept", updateTaskByIdAccept);
+routes.use("/team/:id/members", getTeamMembers);
+routes.use("/team/:teamid/members/:id", getIndiviualTeamMember);
 
 export { routes };

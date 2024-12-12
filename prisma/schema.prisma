@@ -31,8 +31,9 @@ datasource db {
     emp_code      String?   @default("WBT")
     department    Json?    @default("{}")
     is_sales      Boolean? @default(false)
-    is_active     Boolean  @default(true) // True for manager
-    is_staff      Boolean  @default(false) // True for manager
+    is_manager    Boolean @default(false)
+    is_active     Boolean  @default(true) 
+    is_staff      Boolean  @default(false)
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
 

@@ -1,17 +1,22 @@
 import jwt from "jsonwebtoken";
+import { sendResponse } from "../utils/responder.js";
 
 const Authenticate = async (req, res, next) => {
-    //   const authHeaders = req?.headers?.authorization;
-    console.log(req.headers)
-    const authHeaders =
-      req.body?.headers?.Authorization || req?.headers?.authorization;
-    console.log(authHeaders)
+  //   const authHeaders = req?.headers?.authorization;
+  console.log(req.headers);
+  const authHeaders =
+    req.body?.headers?.Authorization || req?.headers?.authorization;
+  console.log(authHeaders);
 
   const secret = process.env.SECRET;
   if (!secret) {
-    return res.status(500).json({
+    console.log("Secret key is not defined");
+    return sendResponse({
+      message: "Secret key is defined",
+      res,
+      statusCode: 500,
       success: false,
-      message: "Secret key is not defined",
+      data: null,
     });
   }
 
@@ -24,15 +29,21 @@ const Authenticate = async (req, res, next) => {
       req.user = payload; // Assigning decoded payload (setting user deatils in the req) to req.user
       next();
     } catch (err) {
-      return res.status(403).json({
-        success: false,
+      return sendResponse({
         message: "Invalid token",
+        res,
+        statusCode: 403,
+        success: false,
+        data: null,
       });
     }
   } else {
-    return res.status(401).json({
-      success: false,
+    return sendResponse({
       message: "Token is not provided",
+      res,
+      statusCode: 401,
+      success: false,
+      data: null,
     });
   }
 };

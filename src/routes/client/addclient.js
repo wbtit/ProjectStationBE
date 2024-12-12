@@ -4,10 +4,11 @@ import { sendResponse } from "../../utils/responder.js";
 import prisma from "../../lib/prisma.js";
 import { hashPassword } from "../../utils/crypter.js";
 import { getUserByUsername } from "../../models/userUniModel.js";
+import { isAdmin } from "../../middlewares/isadmin.js";
 
 const router = Router();
 
-router.post("/:fid", Authenticate, async (req, res) => {
+router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
   console.log("Hello")
   const { fid } = req.params;
   console.log(fid)
@@ -26,22 +27,6 @@ router.post("/:fid", Authenticate, async (req, res) => {
     address,
     fabricator,
   } = req.body;
-
-  console.log(
-    username,
-    password,
-    email,
-    f_name,
-    m_name,
-    l_name,
-    phone,
-    landline,
-    alt_landline,
-    alt_phone,
-    designation,
-    address,
-    fabricator,
-  );
 
   if (
     !username ||
@@ -71,30 +56,8 @@ router.post("/:fid", Authenticate, async (req, res) => {
     });
   }
 
-  const { id, headquaters } = fabricator;
+  const { headquaters } = fabricator;
   const { city, state, country, zip_code } = headquaters;
-
-  if (!req.user) {
-    return sendResponse({
-      message: "User not authenticated.",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
-  const { is_superuser } = req.user;
-
-  if (!is_superuser) {
-    return sendResponse({
-      message: "Only admin can added clients.",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
 
   const hashedPassword = await hashPassword(password);
 

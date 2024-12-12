@@ -2,33 +2,11 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router = Router();
 
-router.post("/", Authenticate, async (req, res) => {
-  if (!req.user) {
-    console.log("User Not Authenticated");
-    return sendResponse({
-      message: "User not authenticated",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
-  const { id, is_superuser } = req?.user;
-
-  if (!is_superuser) {
-    console.log("Only Admin can add tasks");
-    return sendResponse({
-      message: "Only admin can add task",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
+router.post("/", Authenticate,  BroadAccess, async (req, res) => {
 
   const {
     attachment,

@@ -5,35 +5,13 @@ import prisma from "../../lib/prisma.js";
 import uploads from "../../config/multer.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValidUUID } from "../../utils/isValiduuid.js";
+import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router = Router();
 
 // Route for adding project
 
-router.post("/", Authenticate, async (req, res) => {
-  if (!req.user) {
-    console.log("User not authenticated");
-    return sendResponse({
-      message: "User not authenticated",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
-  const { is_superuser } = req.user;
-
-  if (!is_superuser) {
-    console.log("Only Admin can add project");
-    return sendResponse({
-      message: "Only admin can add project",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
+router.post("/", Authenticate, BroadAccess, async (req, res) => {
 
   const {
     name,
@@ -115,10 +93,8 @@ router.post("/", Authenticate, async (req, res) => {
 
 //  Uplaod Files
 
-router.post("/:id/files", uploads.array("files"), async (req, res) => {
+router.post("/:id/files", BroadAccess, uploads.array("files"), async (req, res) => {
   const { id } = req.params;
-
-  console.log(id);
 
   if (!isValidUUID(id)) {
     console.log("Invalid UUID");

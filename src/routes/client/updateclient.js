@@ -2,11 +2,11 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { sendResponse } from "../../utils/responder.js";
 import prisma from "../../lib/prisma.js";
-import { hashPassword } from "../../utils/crypter.js";
+import { isAdmin } from "../../middlewares/isadmin.js";
 
 const router = Router();
 
-router.post("/:cid", Authenticate, async (req, res) => {
+router.post("/:cid", Authenticate, isAdmin, async (req, res) => {
   const { cid } = req.params;
 
   if (!cid) {
@@ -24,28 +24,6 @@ router.post("/:cid", Authenticate, async (req, res) => {
       message: "Fields are empty!",
       res,
       statusCode: 400,
-      success: false,
-      data: null,
-    });
-  }
-
-  if (!req.user) {
-    return sendResponse({
-      message: "User not authenticated.",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
-    });
-  }
-
-  const { is_superuser, role } = req.user;
-
-  if (!is_superuser) {
-    return sendResponse({
-      message: "Only admin can added clients.",
-      res,
-      statusCode: 403,
       success: false,
       data: null,
     });
