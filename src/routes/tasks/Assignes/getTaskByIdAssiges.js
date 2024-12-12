@@ -1,13 +1,13 @@
 
 import {Router} from 'express'
-import Authenticate from '../../middlewares/authenticate.js'
-import prisma from '../../lib/prisma.js'
-import { sendResponse } from '../../utils/responder.js'
-import { isValidUUID } from '../../utils/isValiduuid.js'
+import Authenticate from '../../../middlewares/authenticate.js'
+import prisma from '../../../lib/prisma.js'
+import { sendResponse } from '../../../utils/responder.js'
+import { isValidUUID } from '../../../utils/isValiduuid.js'
 
 const router=Router()
 
-router.get("/:id/accept/",Authenticate,async(req,res)=>{
+router.get("/:id/add_assignes/",Authenticate,async(req,res)=>{
     const {id} =req?.params
 
     try{
@@ -53,9 +53,9 @@ router.get("/:id/accept/",Authenticate,async(req,res)=>{
         }
     });
     if(!task){
-        console.log("error in fetching task by id accept")
+        console.log("error in fetching task by id assigned")
         return sendResponse({
-            message:"error in fetching task by id accept",
+            message:"error in fetching task by id assigned",
             res,
             statusCode:403,
             success:false,
@@ -63,16 +63,16 @@ router.get("/:id/accept/",Authenticate,async(req,res)=>{
         });
     }
     return sendResponse({
-        message:"Task by id  accept fetched successfully",
+        message:"Task by id  assigned fetched successfully",
         res,
         statusCode:200,
         success:true,
         data:task
     })
 }catch(error){
-    console.log("error in fetching task by id accept",error)
+    console.log("error in fetching task by id assigned",error)
     return sendResponse({
-        message:"Error in fetching task by id accept",
+        message:"Error in fetching task by id assigned",
         res,
         statusCode:500
     })

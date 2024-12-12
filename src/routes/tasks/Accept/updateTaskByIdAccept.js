@@ -1,8 +1,8 @@
 import { Router } from "express";
-import Authenticate from "../../middlewares/authenticate.js";
-import prisma from "../../lib/prisma.js";
-import { sendResponse } from "../../utils/responder.js";
-import { isValidUUID } from "../../utils/isValiduuid.js"
+import Authenticate from "../../../middlewares/authenticate.js";
+import prisma from "../../../lib/prisma.js";
+import { sendResponse } from "../../../utils/responder.js";
+import { isValidUUID } from "../../../utils/isValiduuid.js"
 
 const router=Router();
 

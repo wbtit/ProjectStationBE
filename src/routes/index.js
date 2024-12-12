@@ -20,8 +20,8 @@ import updateTaskById from './tasks/updatetaskById.js'
 import deleteTaskById from './tasks/deletetask.js'
 import getTaskById from './tasks/getTaskById.js'
 import patchUpdateById from './tasks/patchUpdateById.js'
-import taskByIdAccept from './tasks/taskByIdAccept.js'
-import updateTaskByIdAccept from './tasks/updateTaskByIdAccept.js'
+import taskByIdAccept from './tasks/Accept/taskByIdAccept.js'
+import updateTaskByIdAccept from './tasks/Accept/updateTaskByIdAccept.js'
 const routes = express.Router();
 
 routes.use("/login", Login);

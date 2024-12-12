@@ -172,13 +172,12 @@ model Assigned_list {
  comment String
   task_id String  @db.Uuid
  task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
-
   assigned_by String @db.Uuid
-    users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
-    assigned_to String @db.Uuid
-    user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
-    approved_by String @db.Uuid
-    userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
+  users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
+  assigned_to String @db.Uuid
+  user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
+  approved_by String @db.Uuid
+  userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
 }
 
 
