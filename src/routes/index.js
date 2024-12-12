@@ -21,6 +21,7 @@ import deleteTaskById from './tasks/deletetask.js'
 import getTaskById from './tasks/getTaskById.js'
 import patchUpdateById from './tasks/patchUpdateById.js'
 import taskByIdAccept from './tasks/taskByIdAccept.js'
+import updateTaskByIdAccept from './tasks/updateTaskByIdAccept.js'
 const routes = express.Router();
 
 routes.use("/login", Login);
@@ -45,5 +46,6 @@ routes.use('/tasksupdatebyid',updateTaskById )
 routes.use('/deletetask',deleteTaskById )
 routes.use('/updateTaskByid',patchUpdateById )
 routes.use('/getTaskByidaccept',taskByIdAccept )
+routes.use('/updateTaskByidaccept',updateTaskByIdAccept )
 
 export { routes };
