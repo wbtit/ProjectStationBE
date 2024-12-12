@@ -1,13 +1,21 @@
-import {Router} from "express"
-import Authenticate from "../../middlewares/authenticate.js"
-import prisma from "../../lib/prisma.js"
-import { sendResponse } from "../../utils/responder.js"
-import { isValidUUID } from "../../utils/isValiduuid.js"
+/*get a task by id with the updated the status=>(
+('ASSINGED', 'Assigned'),
+        ('IN-PROGRESS', 'In Progress'),
+        ('ON-HOLD', 'On Hold'),
+        ('BREAK', 'Break'),
+        ('IN-REVIEW', 'In Review'),
+        ('COMPLETE', 'Completed'),
+        ('APPROVED', 'Approved')
+    ], default='ASSIGNED'))*/
+import {Router} from 'express'
+import Authenticate from '../../middlewares/authenticate'
+import prisma from '../../lib/prisma'
+import { sendResponse } from '../../utils/responder'
+import { isValidUUID } from '../../utils/isValiduuid'
 
-const router=Router();
+const router=Router()
 
-router.get('/:id',Authenticate,async(req,res)=>{
-
+router.get("/:id/accept/",Authenticate,async(req,res)=>{
     const {id} =req?.params
 
     try{
@@ -79,5 +87,5 @@ router.get('/:id',Authenticate,async(req,res)=>{
 }finally{
     prisma.$disconnect();
 }
-})
+    })
 export default router;

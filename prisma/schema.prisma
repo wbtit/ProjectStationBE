@@ -144,7 +144,7 @@ model Task {
   id          String    @id @default(uuid()) @db.Uuid
   name        String
   description String
-  status      Boolean   @default(true)
+  status      String   
   attachment  String
   priority    Int
   created_on  DateTime  @default(now())
