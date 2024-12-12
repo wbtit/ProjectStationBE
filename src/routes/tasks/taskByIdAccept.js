@@ -1,17 +1,9 @@
-/*get a task by id with the updated the status=>(
-('ASSINGED', 'Assigned'),
-        ('IN-PROGRESS', 'In Progress'),
-        ('ON-HOLD', 'On Hold'),
-        ('BREAK', 'Break'),
-        ('IN-REVIEW', 'In Review'),
-        ('COMPLETE', 'Completed'),
-        ('APPROVED', 'Approved')
-    ], default='ASSIGNED'))*/
+
 import {Router} from 'express'
-import Authenticate from '../../middlewares/authenticate'
-import prisma from '../../lib/prisma'
-import { sendResponse } from '../../utils/responder'
-import { isValidUUID } from '../../utils/isValiduuid'
+import Authenticate from '../../middlewares/authenticate.js'
+import prisma from '../../lib/prisma.js'
+import { sendResponse } from '../../utils/responder.js'
+import { isValidUUID } from '../../utils/isValiduuid.js'
 
 const router=Router()
 
@@ -61,9 +53,9 @@ router.get("/:id/accept/",Authenticate,async(req,res)=>{
         }
     });
     if(!task){
-        console.log("error in fetching task by id")
+        console.log("error in fetching task by id accept")
         return sendResponse({
-            message:"error in fetching task by id",
+            message:"error in fetching task by id accept",
             res,
             statusCode:403,
             success:false,
@@ -71,16 +63,16 @@ router.get("/:id/accept/",Authenticate,async(req,res)=>{
         });
     }
     return sendResponse({
-        message:"Task by id fetched successfully",
+        message:"Task by id  accept fetched successfully",
         res,
         statusCode:200,
         success:true,
         data:task
     })
 }catch(error){
-    console.log("error in fetching task by id",error)
+    console.log("error in fetching task by id accept",error)
     return sendResponse({
-        message:"Error in fetching task by id",
+        message:"Error in fetching task by id accept",
         res,
         statusCode:500
     })
