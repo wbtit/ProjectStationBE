@@ -7,10 +7,10 @@ import { BroadAccess } from "../../middlewares/broadaccess.js";
 
 const router = Router();
 
-router.post("/", Authenticate,BroadAccess, async (req, res) => {
+router.post("/", Authenticate, BroadAccess, async (req, res) => {
   const { name, manager, teammembers } = req.body;
 
-  if (!name || !manager || !teammembers) {
+  if (!name || !manager || !teammembers) {  
     console.log("Fields are empty!");
     return sendResponse({
       message: "Fields are empty",
