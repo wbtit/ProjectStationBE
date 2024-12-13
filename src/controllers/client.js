@@ -1,17 +1,12 @@
-import { Router } from "express";
-import Authenticate from "../../middlewares/authenticate.js";
-import { sendResponse } from "../../utils/responder.js";
-import prisma from "../../lib/prisma.js";
-import { hashPassword } from "../../utils/crypter.js";
-import { getUserByUsername } from "../../models/userUniModel.js";
-import { isAdmin } from "../../middlewares/isadmin.js";
+import { sendResponse } from "../utils/responder.js";
+import prisma from "../lib/prisma.js";
+import { hashPassword } from "../utils/crypter.js";
+import { getUserByUsername } from "../models/userUniModel.js";
 
-const router = Router();
-
-router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
-  console.log("Hello")
+const addClient = async (req, res) => {
   const { fid } = req.params;
-  console.log(fid)
+
+    
   const {
     username,
     password,
@@ -62,7 +57,6 @@ router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
   const hashedPassword = await hashPassword(password);
 
   try {
-
     const isExist = await getUserByUsername(username);
 
     // If user exists on that username then return the response.
@@ -74,19 +68,19 @@ router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
 
     const newclient = await prisma.users.create({
       data: {
-        username: username, 
-        role : "CLIENT",
+        username: username,
+        role: "CLIENT",
         password: hashedPassword,
         address: address,
         designation: designation,
         f_name: f_name,
         phone: phone,
-        fabricatorId: fid, 
-        alt_landline: alt_landline, 
-        alt_phone: alt_phone, 
-        email: email, 
-        l_name: l_name, 
-        landline: landline ,
+        fabricatorId: fid,
+        alt_landline: alt_landline,
+        alt_phone: alt_phone,
+        email: email,
+        l_name: l_name,
+        landline: landline,
         m_name: m_name,
         city: city,
         country: country,
@@ -103,7 +97,7 @@ router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
       data: newclient,
     });
   } catch (error) {
-    console.log(error.message);
+    
     sendResponse({
       message: "Something went wrong!!",
       res,
@@ -114,6 +108,58 @@ router.post("/:fid", Authenticate, isAdmin, async (req, res) => {
   } finally {
     prisma.$disconnect();
   }
-});
+};
 
-export default router;
+const updateClient = async (req, res) => {
+  const { cid } = req.params;
+
+  if (!cid) {
+    return sendResponse({
+      message: "Invalid Client",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  if (!req.body) {
+    return sendResponse({
+      message: "Fields are empty!",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const updateclient = await prisma.client.update({
+      where: {
+        id: cid,
+      },
+      data: req.body,
+    });
+
+    return sendResponse({
+      message: "Client Updated Successfully.",
+      res,
+      statusCode: 200,
+      success: true,
+      data: updateclient,
+    });
+  } catch (error) {
+
+    sendResponse({
+      message: "Something went wrong!!",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    prisma.$disconnect();
+  }
+};
+
+export { addClient, updateClient };

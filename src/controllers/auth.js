@@ -1,0 +1,274 @@
+import { generateToken } from "../utils/jwtutils.js";
+import { comparePassword, hashPassword } from "../utils/crypter.js";
+import { getUserByUsername } from "../models/userUniModel.js";
+import prisma from "../lib/prisma.js";
+import { sendResponse } from "../utils/responder.js";
+
+const createUser = async ({
+  username,
+  password,
+  email,
+  f_name,
+  m_name,
+  l_name,
+  phone,
+  role,
+  is_active,
+  is_staff,
+  is_superuser,
+  is_firstLogin,
+  emp_code,
+  department,
+  designation,
+  is_sales,
+}) => {
+  try {
+    // Hash the password before storing
+    const hashedPassword = await hashPassword(password);
+    // Create user in the database
+    const newUser = await prisma.users.create({
+      data: {
+        username,
+        password: hashedPassword,
+        email,
+        f_name,
+        m_name,
+        l_name,
+        phone,
+        role,
+        is_active,
+        is_staff,
+        is_superuser,
+        is_firstLogin,
+        emp_code,
+        department,
+        designation,
+        is_sales,
+      },
+    });
+    return newUser;
+  } catch (error) {
+    return "Error creating user: " + error.message;
+  } finally {
+    prisma.$disconnect();
+  }
+};
+
+const login = async (req, res) => {
+  let { username, password } = req.body;
+
+  if (!username || !password) {
+    return sendResponse({
+      message: "Fields are empty",
+      res,
+      statusCode: 401,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    // Find the user by username
+    const user = await getUserByUsername(username);
+
+    if (!user) {
+      return sendResponse({
+        message: "user not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Compare the provided password with the stored hashed password
+      password = typeof password === "number" ? password.toString() : password;
+      
+    const isPasswordValid = await comparePassword(password, user.password);
+
+    if (!isPasswordValid) {
+      return sendResponse({
+        message: "Invalid password",
+        res,
+        statusCode: 401,
+        success: false,
+        data: null,
+      });
+    }
+
+    const token = generateToken(user);
+
+    return sendResponse({
+      message: "Login Success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: token,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: "Error in logging in",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const signup = async (req, res) => {
+  const {
+    username,
+    password,
+    email,
+    f_name,
+    m_name,
+    l_name,
+    phone,
+    role,
+    is_active,
+    is_staff,
+    is_superuser,
+    is_firstLogin,
+    emp_code,
+    department,
+    designation,
+    manager,
+    sales,
+  } = req.body;
+
+  if (!username || !password || !f_name || !phone || !role) {
+    return sendResponse({
+      message: "Fields are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    // Check whether the username is available or not.
+
+    const isExist = await getUserByUsername(username);
+
+    // If user exists on that username then return the response.
+    if (isExist)
+      return res.status(409).json({
+        success: false,
+        message: "Username already taken.",
+      });
+
+    const is_staff = manager ? true : false;
+    const is_sales = sales ? true : false;
+
+    const newUser = await createUser({
+      username,
+      password,
+      email,
+      f_name,
+      m_name,
+      l_name,
+      phone,
+      role,
+      is_active,
+      is_staff,
+      is_superuser,
+      is_firstLogin,
+      emp_code,
+      department,
+      designation,
+      is_sales,
+    });
+
+    // Respond with the created user data
+    return sendResponse({
+      message: "User created successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: newUser,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    prisma.$disconnect();
+  }
+};
+
+const resetpassword = async (req, res) => {
+  const { old_password, new_password } = req.body;
+
+  const { password, id } = req.user;
+
+  if (!old_password || !new_password) {
+    return sendResponse({
+      message: "Fields are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  if (await comparePassword(old_password, password)) {
+    const newPassword = await hashPassword(new_password);
+
+    const updatedUser = await prisma.users.update({
+      where: {
+        id: id,
+      },
+      data: {
+        is_firstLogin: false,
+        password: newPassword,
+      },
+    });
+
+    const token = generateToken(updatedUser);
+
+    return sendResponse({
+      message: "Password resetted successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: token,
+    });
+  } else {
+
+    return sendResponse({
+      message: "Old Password is wrong",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const getuserbytoken = (req, res) => {
+    if (!req.user) {
+      return sendResponse({
+        message: "User not Authenticated.",
+        res,
+        statusCode: 403,
+        success: false,
+        data: null,
+      });
+    } else {
+      return sendResponse({
+        message: "User Fetched Successfully.",
+        res,
+        statusCode: 200,
+        success: true,
+        data: req.user,
+      });
+    }
+}
+
+export { login, signup, resetpassword, getuserbytoken };
