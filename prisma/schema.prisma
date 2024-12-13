@@ -57,6 +57,7 @@ datasource db {
     assignedToUser Assigned_list[] @relation("assignedToUser")
     approvedByUser Assigned_list[] @relation("approvedByUser")
 
+    accepttasks AcceptTask[] @relation("acceptTaskUser")
 
 
     @@map("users")
@@ -81,6 +82,7 @@ model Fabricator {
 
   project    Project[] @relation("projectFabricator")
   tasks Task[] @relation("fabricatorTask")
+  accepttasks AcceptTask[] @relation("acceptTaskFabricator")
 
   @@map("fabricators")
 }
@@ -137,6 +139,7 @@ model Team {
   approvalDate DateTime @default(now()) // Not sure about the default value
   estimatedHours Int 
   tasks Task[] @relation("projectTask")
+  accepttasks AcceptTask[] @relation("acceptTaskProject")
 
   @@map("project")
 } 
@@ -163,6 +166,26 @@ model Task {
 }
 
 
+model AcceptTask{
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  description String
+  satus String
+  attachment String
+  priority Int
+  created_on DateTime @default(now())
+  due_date DateTime
+  duration String
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id],references: [id],name: "acceptTaskProject",onDelete: Cascade)
+  fabricator_id String @db.Uuid
+  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name: "acceptTaskFabricator",onDelete: Cascade)
+  user_id String @db.Uuid
+  user Users @relation(fields: [user_id],references: [id],name: "acceptTaskUser",onDelete: Cascade)
+
+  @@map("accepttask")
+}
+
 
 
 model Assigned_list {
@@ -179,6 +202,8 @@ model Assigned_list {
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
   approved_by String @db.Uuid
   userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
+
+  @@map("assignedlist")
 }
 
 
