@@ -59,6 +59,8 @@ datasource db {
 
     accepttasks AcceptTask[] @relation("acceptTaskUser")
 
+    taskcommentuser Comment[] @relation("taskcommentuser")
+
 
     @@map("users")
   }
@@ -162,6 +164,7 @@ model Task {
   user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
 
   assignedTask Assigned_list[] @relation("assignedTask")
+  taskcomment Comment[] @relation("taskcomment")
   @@map("task")
 }
 
@@ -205,7 +208,19 @@ model Assigned_list {
 
   @@map("assignedlist")
 }
+model Comment{
+  id String @id @default(uuid()) @db.Uuid
+  created_on DateTime @default(now())
+  data String
+  file String
+  task_id String @db.Uuid
+  task Task @relation(fields: [task_id],references: [id],name: "taskcomment",onDelete: Cascade)
+  user_id String @db.Uuid
+  user Users @relation(fields: [user_id],references: [id],name: "taskcommentuser",onDelete: Cascade)
 
+  @@map("comment")
+
+}
 
 enum UserRole {
   STAFF
