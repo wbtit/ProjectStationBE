@@ -11,6 +11,7 @@ import {
 } from "../../controllers/task.js";
 import { TaskByIDAccept, UpdateTaskByIDs } from "../../controllers/accept.js";
 import { GetTaskByIDAssignedList,addTaskAssignedList,updateTaskAssignesById } from "../../controllers/assignedList.js";
+import { addComment,getCommentById,updateCommentByID } from "../../controllers/comment.js";
 
 const router = Router();
 
@@ -25,5 +26,8 @@ router.put("/tasks/:id/accept", Authenticate, UpdateTaskByIDs);
 router.post('/tasks/add_assignes',Authenticate,addTaskAssignedList)
 router.get('/tasks/:id/get_assignes',Authenticate,GetTaskByIDAssignedList)
 router.put('/tasks/:id/update_assignes',Authenticate,updateTaskAssignesById)
+router.post('/tasks/add_comment',Authenticate,addComment)
+router.get("tasks/:id/get_commnet",Authenticate,getCommentById)
+router.put("/tasks/:id/update_comment",Authenticate,updateCommentByID)
 
 export default router;

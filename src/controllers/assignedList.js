@@ -33,6 +33,16 @@ const addTaskAssignedList=async(req,res)=>{
         })
     }
     try{
+      if (!req.user) {
+  
+        return sendResponse({
+          message: "User not authenticated",
+          res,
+          statusCode: 403,
+          success: false,
+          data: null,
+        });
+      }
         const newTaskAssignedList=await prisma.assigned_list.create({
             data:{
                 approved_on,
@@ -142,6 +152,16 @@ const updateTaskAssignesById=async(req,res)=>{
  const {id} =req?.params
 
  try{
+  if (!req.user) {
+  
+    return sendResponse({
+      message: "User not authenticated",
+      res,
+      statusCode: 403,
+      success: false,
+      data: null,
+    });
+  }
     if (!isValidUUID(id)) {
         return sendResponse({
           message: "Invalid task UUid",
