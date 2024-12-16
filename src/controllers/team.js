@@ -4,7 +4,6 @@ import { getUserByID } from "../models/userUniModelByID.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import { areUsers } from "../models/areUsers.js";
 
-
 const isMember = ({ members, id }) => {
   console.log(members, id);
 
@@ -276,4 +275,51 @@ const GetIndiviualTeamMembers = async (req, res) => {
   }
 };
 
-export { AddTeam, GetIndiviualTeamMembers, GetTeam, GetTeamMembers };
+const DeleteTeam = async (req, res) => {
+  console.log("You ");
+
+  const { id } = req.params;
+
+  console.log(id);
+
+  if (!id) {
+    return sendResponse({
+      message: "Invalid ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const response = await prisma.team.delete({
+      where: {
+        id,
+      },
+    });
+    return sendResponse({
+      message: "Team Deletion Success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: response,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+export {
+  AddTeam,
+  GetIndiviualTeamMembers,
+  GetTeam,
+  GetTeamMembers,
+  DeleteTeam,
+};
