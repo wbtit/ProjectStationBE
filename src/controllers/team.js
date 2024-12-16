@@ -306,6 +306,232 @@ const DeleteTeam = async (req, res) => {
       data: response,
     });
   } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const RemoveMember = async (req, res) => {
+  const { id, mid, role } = req.params;
+
+  if (!id || !mid || !role)
+    return sendResponse({
+      message: "Fields are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+
+  try {
+    const { members } = await prisma.team.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        members: true,
+      },
+    });
+
+    if (!members) {
+      return sendResponse({
+        message: "Cannot find team",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    const newMembers = members.filter(
+      (mem) => mem.id !== mid && mem.role !== role
+    );
+
+    const newTeam = await prisma.team.update({
+      where: {
+        id,
+      },
+      data: {
+        members: newMembers,
+      },
+    });
+
+    return sendResponse({
+      message: "Member removed successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: newTeam,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 200,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const AddMember = async (req, res) => {
+  console.log("Add Member");
+  const { tid } = req.params;
+  const { id, role } = req.body;
+  console.log(tid, id, role);
+
+  if (!tid || !id || !role) {
+    return sendResponse({
+      message: "Incomplete data",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const { members } = await prisma.team.findUnique({
+      where: {
+        id: tid,
+      },
+      select: {
+        members: true,
+      },
+    });
+
+    if (!members) {
+      return sendResponse({
+        message: "Invalid Team ID",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    members.push({
+      id: id,
+      role: role,
+    });
+
+    const newTeam = await prisma.team.update({
+      where: {
+        id: tid,
+      },
+      data: {
+        members,
+      },
+    });
+
+    return sendResponse({
+      message: "Member added successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: newTeam,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const GetAllTeams = async (req, res) => {
+  try {
+    const Teams = await prisma.team.findMany();
+
+    return sendResponse({
+      message: "Retrived All Teams",
+      res,
+      statusCode: 200,
+      success: true,
+      data: Teams,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const UpdateTeam = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return sendResponse({
+      message: "Invalid ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  if (req.manager_id) {
+    const { is_manager } = await prisma.users.findUnique({
+      where: {
+        id: req.manager_id,
+      },
+      select: {
+        is_manager: true,
+      },
+    });
+
+    if (!is_manager) {
+      return sendResponse({
+        message: "Selected Person is not a Manager",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+  }
+
+  const { members, ...updatableData } = req.body;
+
+  try {
+    const updatedTeam = await prisma.team.update({
+      where: {
+        id,
+      },
+      data: updatableData,
+    });
+
+    return sendResponse({
+      message: "Team Updated Successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: updatedTeam,
+    });
+  } catch (error) {
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -322,4 +548,8 @@ export {
   GetTeam,
   GetTeamMembers,
   DeleteTeam,
+  RemoveMember,
+  AddMember,
+  GetAllTeams,
+  UpdateTeam,
 };
