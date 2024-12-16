@@ -10,7 +10,7 @@ import {
   
 } from "../../controllers/task.js";
 import { TaskByIDAccept, UpdateTaskByIDs } from "../../controllers/accept.js";
-import { GetTaskByIDAssignes,addTaskAssignes,updateTaskAssignes } from "../../controllers/assignedList.js";
+import { GetTaskByIDAssignes,addTaskAssignes,updateTaskAssignes } from "../../controllers/assignes.js";
 import { addComment,getCommentById,updateCommentByID } from "../../controllers/comment.js";
 
 const router = Router();
