@@ -27,7 +27,7 @@ router.post('/tasks/add_assignes',Authenticate,addTaskAssignedList)
 router.get('/tasks/:id/get_assignes',Authenticate,GetTaskByIDAssignedList)
 router.put('/tasks/:id/update_assignes',Authenticate,updateTaskAssignesById)
 router.post('/tasks/add_comment',Authenticate,addComment)
-router.get("tasks/:id/get_commnet",Authenticate,getCommentById)
+router.get("/tasks/:id/get_comment",Authenticate,getCommentById)
 router.put("/tasks/:id/update_comment",Authenticate,updateCommentByID)
 
 export default router;

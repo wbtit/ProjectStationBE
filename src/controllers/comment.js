@@ -5,20 +5,18 @@ import { sendResponse } from "../utils/responder.js";
 
 const addComment=async(req,res)=>{
     const {
-        created_on,
         data,
         file,
         task_id,
         user_id
     }=req.body
 
-    if(!created_on||
-        !data||
+    if(!data||
         !file||
         !task_id||
         !user_id
     ){
-        sendResponse ({
+        return sendResponse ({
             message:"Fields are Empty!",
             res,
             statusCode:400,
@@ -39,7 +37,6 @@ const addComment=async(req,res)=>{
           }
         const newComment= await prisma.comment.create({
             data:{
-                created_on,
                 data,
                 file,
                 task_id,
@@ -66,7 +63,7 @@ const addComment=async(req,res)=>{
     
 }
 const getCommentById=async(req,res)=>{
-    const {id}=req?.prisma
+    const {id}=req?.params
     try{
         if(!req.user){
             return sendResponse({
