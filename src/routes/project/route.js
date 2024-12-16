@@ -6,13 +6,13 @@ import uploads from "../../config/multer.js";
 
 const router = Router();
 
-router.post("/addproject", Authenticate, BroadAccess, AddProject);
+router.post("/addproject", Authenticate, BroadAccess, AddProject); // Adding Projects
 router.post(
   "/:id/uploadprojectfiles",
   Authenticate,
   BroadAccess,
   uploads.array("files"),
   Uploadfiles
-);
+); // Upload Files To Project
 
 export default router;

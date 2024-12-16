@@ -11,10 +11,14 @@ import {
 
 const router = Router({ mergeParams: true });
 
-router.post("/addfabricator", Authenticate, isAdmin, AddFabricator);
-router.post("/:fid/addbranch", Authenticate, isAdmin, AddBranch);
-router.delete("/:id/deletefabricator", Authenticate, isAdmin, DeleteFabricator);
-router.get("/getallfabricators", GetAllFabricator);
-router.patch("/:id/updatefabricator", Authenticate, isAdmin, UpdateFabricator);
+router.post("/addfabricator", Authenticate, isAdmin, AddFabricator); // Adding Fabricator
+
+router.post("/:fid/addbranch", Authenticate, isAdmin, AddBranch); // Adding Branch By Fabricator ID
+
+router.delete("/:id/deletefabricator", Authenticate, isAdmin, DeleteFabricator); // Delete Fabricator By ID
+
+router.get("/getallfabricators", GetAllFabricator); // Get All The Fabricator
+
+router.patch("/:id/updatefabricator", Authenticate, isAdmin, UpdateFabricator); // Updating Fabricator By ID
 
 export default router;
