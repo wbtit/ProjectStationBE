@@ -288,5 +288,10 @@ const UpdateTaskByID = async (req, res) => {
   }
 };
 
-
-export {AddTask, DeleteTask, GetTask, GetTaskByID, UpdateTaskByID}
+export {
+  AddTask,
+   DeleteTask,
+   GetTask, 
+   GetTaskByID, 
+   UpdateTaskByID
+}

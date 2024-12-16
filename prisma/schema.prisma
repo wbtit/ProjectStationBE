@@ -228,7 +228,7 @@ enum UserRole {
   VENDOR
   
 }
-
+//task
 enum Status {
   ACTIVE
   ON_HOLD
@@ -237,6 +237,7 @@ enum Status {
   COMPLETE
 }
 
+//PROJECT AND TASK
 enum Stage {
   RFI
   IFA
