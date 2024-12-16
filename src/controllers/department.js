@@ -1,3 +1,7 @@
+
+// Please navigate to very bottom of the file to know the logics in this file.
+
+
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { getUserByID } from "../models/userUniModelByID.js";

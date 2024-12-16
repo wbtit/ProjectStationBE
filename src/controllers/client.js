@@ -1,3 +1,7 @@
+
+// Please navigate to very bottom of the file to know the logics in this file.
+
+
 import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 import { hashPassword } from "../utils/crypter.js";

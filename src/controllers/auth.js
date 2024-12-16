@@ -1,3 +1,7 @@
+
+// Please navigate to very bottom of the file to know the logics in this file.
+
+
 import { generateToken } from "../utils/jwtutils.js";
 import { comparePassword, hashPassword } from "../utils/crypter.js";
 import { getUserByUsername } from "../models/userUniModel.js";
