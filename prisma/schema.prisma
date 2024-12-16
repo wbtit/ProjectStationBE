@@ -52,10 +52,11 @@ datasource db {
     project Project[] @relation("projectManager")
 
     tasks Task[] @relation("userTask")
-    
-    assignedByUser Assigned_list[] @relation("assignedByUser")
-    assignedToUser Assigned_list[] @relation("assignedToUser")
-    approvedByUser Assigned_list[] @relation("approvedByUser")
+    taskAssignedby Assigned_list[] @relation("taskAssignedby")
+    taskApprovedBy Assigned_list[] @relation("taskApprovedBy")
+    assignedByUser Assignes[] @relation("assignedByUser")
+    assignedToUser Assignes[] @relation("assignedToUser")
+    approvedByUser Assignes[] @relation("approvedByUser")
 
     accepttasks AcceptTask[] @relation("acceptTaskUser")
 
@@ -163,7 +164,8 @@ model Task {
   user_id String @db.Uuid
   user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
 
-  assignedTask Assigned_list[] @relation("assignedTask")
+  taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
+  assignedTask Assignes[] @relation("assignedTask")
   taskcomment Comment[] @relation("taskcomment")
   @@map("task")
 }
@@ -189,9 +191,22 @@ model AcceptTask{
   @@map("accepttask")
 }
 
+model Assigned_list{
+  id  String @id @default(uuid()) @db.Uuid
+  approved_on DateTime
+  assigned_on DateTime
+  approved Boolean
+  task_id String @db.Uuid
+  task Task @relation(fields: [task_id],references: [id],name: "taskInAssignedList",onDelete: Cascade)
+  assigned_by String @db.Uuid
+  users Users @relation(fields: [assigned_by],references: [id],name: "taskAssignedby",onDelete: Cascade)
+  approved_by String @db.Uuid
+  user Users @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
 
+  @@map("assigendList")
+}
 
-model Assigned_list {
+model Assignes {
  id String @id @default(uuid()) @db.Uuid
  approved_on DateTime @default(now())
  assigned_on DateTime @default(now())
@@ -206,7 +221,7 @@ model Assigned_list {
   approved_by String @db.Uuid
   userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
 
-  @@map("assignedlist")
+  @@map("assignes")
 }
 model Comment{
   id String @id @default(uuid()) @db.Uuid

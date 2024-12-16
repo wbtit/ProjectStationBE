@@ -2,7 +2,7 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 
-const addTaskAssignedList=async(req,res)=>{
+const addTaskAssignes=async(req,res)=>{
     const {
         approved_on,
         assigned_on,
@@ -43,7 +43,7 @@ const addTaskAssignedList=async(req,res)=>{
           data: null,
         });
       }
-        const newTaskAssignedList=await prisma.assigned_list.create({
+        const newTaskAssignedList=await prisma.assignes.create({
             data:{
                 approved_on,
         assigned_on,
@@ -75,7 +75,7 @@ const addTaskAssignedList=async(req,res)=>{
     }
 };
 
-const GetTaskByIDAssignedList = async (req, res) => {
+const GetTaskByIDAssignes = async (req, res) => {
 
     const { id } = req?.params;
   
@@ -114,7 +114,7 @@ const GetTaskByIDAssignedList = async (req, res) => {
         });
       }
   
-      const task = await prisma.assigned_list.findUnique({
+      const task = await prisma.assignes.findUnique({
         where: {
           id,
         },
@@ -148,7 +148,7 @@ const GetTaskByIDAssignedList = async (req, res) => {
     }
   };
 
-const updateTaskAssignesById=async(req,res)=>{
+const updateTaskAssignes=async(req,res)=>{
  const {id} =req?.params
 
  try{
@@ -172,7 +172,7 @@ const updateTaskAssignesById=async(req,res)=>{
         });
       }
 
-    const task=await prisma.assigned_list.update({
+    const task=await prisma.assignes.update({
         where:{id},
         data:req.body
     })
@@ -204,7 +204,7 @@ const updateTaskAssignesById=async(req,res)=>{
 }
 
   export{
-    GetTaskByIDAssignedList,
-    addTaskAssignedList,
-    updateTaskAssignesById
+    GetTaskByIDAssignes,
+    addTaskAssignes,
+    updateTaskAssignes
   }
