@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { BroadAccess } from "../../middlewares/broadaccess.js";
+
 import {
   AddTask,
   DeleteTask,
@@ -8,17 +9,27 @@ import {
   GetTaskByID,
   UpdateTaskByID,
 } from "../../controllers/task.js";
+
 import { TaskByIDAccept, UpdateTaskByIDs } from "../../controllers/accept.js";
+
 import {
   GetTaskByIDAssignes,
   addTaskAssignes,
   updateTaskAssignes,
 } from "../../controllers/assignes.js";
+
 import {
   addComment,
   getCommentById,
   updateCommentByID,
 } from "../../controllers/comment.js";
+
+import {
+  addAssignedList,
+  getAssignedListById,
+  getAssignedList,
+  updateAssignedList,
+  deleteAssignedList} from "../../controllers/assignedList.js"
 
 const router = Router();
 
@@ -49,5 +60,17 @@ router.post("/tasks/add_comment", Authenticate, addComment);//add comment
 router.get("/tasks/:id/get_comment", Authenticate, getCommentById);//get comment
 
 router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID);//update comment
+
+router.post("/add_assigned-list",Authenticate,addAssignedList)// add assigned-list
+
+router.get("/get_assigned-list",Authenticate,getAssignedList)// get assigned-list
+
+router.get("/get_assigned-list/:id",Authenticate,getAssignedListById)// get assigned-list
+
+router.put("/update_assigned-list/:id",Authenticate,updateAssignedList)// update assigned-list
+
+router.patch("/update_assigned-list/:id",Authenticate,updateAssignedList)// patchUpdate assigned-list
+
+router.delete("/delete_assigned-list/:id",Authenticate,deleteAssignedList)//delete assigned-list
 
 export default router;
