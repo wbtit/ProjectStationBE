@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download File</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Download File from Project</h2>
+  <p>Enter the File ID to download:</p>
+  <input type="text" id="fileId" placeholder="File ID">
+  <button onclick="downloadFile()">Download File</button>
+  <p id="message"></p>
+
+  <script>
+    async function downloadFile() {
+      const fileId = document.getElementById("fileId").value;
+
+      if (!fileId) {
+        document.getElementById("message").innerText = "Please enter a valid File ID.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/project/projects/aabca569-3abc-4125-ac3b-8ad737e839ab/files/${fileId}`, {
+          method: 'GET',
+        });
+
+        if (response.ok) {
+          const fileBlob = await response.blob(); // Get the file as a Blob
+          const fileURL = URL.createObjectURL(fileBlob); // Create a URL for the file
+
+          // Create a link element to trigger download
+          const a = document.createElement('a');
+          a.href = fileURL;
+          a.download = fileId; // Use fileId as the filename
+          document.body.appendChild(a);
+          a.click(); // Trigger the download
+          a.remove(); // Clean up the link element
+          
+          document.getElementById("message").innerText = "File downloaded successfully!";
+        } else {
+          const result = await response.json();
+          document.getElementById("message").innerText = result.message || "Error downloading the file.";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("message").innerText = "Something went wrong.";
+      }
+    }
+  </script>
+
+</body>
+</html>
