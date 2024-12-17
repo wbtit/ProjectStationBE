@@ -62,6 +62,10 @@ datasource db {
 
     taskcommentuser Comment[] @relation("taskcommentuser")
 
+    assignedByConfirm Confirm[] @relation("assignedByUserConfirm")
+    assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
+    approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
+
 
     @@map("users")
   }
@@ -196,13 +200,14 @@ model Assigned_list{
   approved_on DateTime
   assigned_on DateTime
   approved Boolean
+  comment String @default(" ")
   task_id String @db.Uuid
   task Task @relation(fields: [task_id],references: [id],name: "taskInAssignedList",onDelete: Cascade)
   assigned_by String @db.Uuid
   users Users @relation(fields: [assigned_by],references: [id],name: "taskAssignedby",onDelete: Cascade)
   approved_by String @db.Uuid
   user Users @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
-
+  confirm Confirm[] @relation("assignedTaskConfirm")
   @@map("assigendlist")
 }
 
@@ -220,8 +225,25 @@ model Assignes {
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
   approved_by String @db.Uuid
   userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
-
+  
   @@map("assignes")
+}
+model Confirm {
+ id String @id @default(uuid()) @db.Uuid
+ approved_on DateTime @default(now())
+ assigned_on DateTime @default(now())
+ approved Boolean @default(false) //not sure about the default value
+ comment String
+  assigned_task_id String  @db.Uuid
+ task  Assigned_list? @relation(fields: [assigned_task_id],references: [id],name: "assignedTaskConfirm",onDelete: Cascade)
+  assigned_by String @db.Uuid
+  users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUserConfirm")
+  assigned_to String @db.Uuid
+  user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUserConfirm")
+  approved_by String @db.Uuid
+  userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUserConfirm")
+
+  @@map("confirm")
 }
 model Comment{
   id String @id @default(uuid()) @db.Uuid
