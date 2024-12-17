@@ -30,6 +30,13 @@ import {
   getAssignedList,
   updateAssignedList,
   deleteAssignedList} from "../../controllers/assignedList.js"
+import {
+  getConfirmtaskById,
+  postConfirmtaskById,
+  putConfirmtaskById,
+  patchConfirmtaskById,
+  deleteConfirmtaskById
+}  from "../../controllers/confirm.js"
 
 const router = Router();
 
