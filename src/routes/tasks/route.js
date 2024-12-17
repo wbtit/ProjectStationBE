@@ -61,7 +61,7 @@ router.get("/tasks/:id/get_comment", Authenticate, getCommentById);//get comment
 
 router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID);//update comment
 
-router.post("/add_assigned-list",Authenticate,addAssignedList)// add assigned-list
+router.post("/add_assigned-list",Authenticate, addAssignedList)// add assigned-list
 
 router.get("/get_assigned-list",Authenticate,getAssignedList)// get assigned-list
 
@@ -69,7 +69,7 @@ router.get("/get_assigned-list/:id",Authenticate,getAssignedListById)// get assi
 
 router.put("/update_assigned-list/:id",Authenticate,updateAssignedList)// update assigned-list
 
-router.patch("/update_assigned-list/:id",Authenticate,updateAssignedList)// patchUpdate assigned-list
+router.patch("/update_assigned-list/:id",Authenticate, updateAssignedList)// patchUpdate assigned-list
 
 router.delete("/delete_assigned-list/:id",Authenticate,deleteAssignedList)//delete assigned-list
 

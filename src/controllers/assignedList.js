@@ -46,6 +46,7 @@ const addAssignedList=async(req,res)=>{
             return sendResponse({
                 message:"Task added to Assigned list",
                 res,
+                statusCode:200,
                 success:true,
                 data:newAssigendTask
             })
@@ -53,6 +54,7 @@ const addAssignedList=async(req,res)=>{
         return sendResponse({
             message:"error in adding task to Assigned list",
             res,
+            statusCode:403,
             success:false,
             data:null
         })
@@ -60,6 +62,7 @@ const addAssignedList=async(req,res)=>{
         return sendResponse({
             message:error.message,
             res,
+            statusCode:500,
             success:false,
             data:null
         })
@@ -74,6 +77,7 @@ const getAssignedList=async(req,res)=>{
             sendResponse({
                 message:"Error in getting assigned list",
                 res,
+                statusCode:403,
                 success:false,
                 data:null
             })
@@ -81,6 +85,7 @@ const getAssignedList=async(req,res)=>{
          return sendResponse({
             message:"assigned list fetched successfully",
             res,
+            statusCode:200,
             success:true,
             data:assigned_list
         })
@@ -88,6 +93,7 @@ const getAssignedList=async(req,res)=>{
     return sendResponse({
         message:error.message,
         res,
+        statusCode:500,
         success:false,
         data:null
     })
@@ -103,6 +109,7 @@ const getAssignedListById=async(req,res)=>{
             return sendResponse({
                 message:"Invalid ID",
                 res,
+                statusCode:400,
                 success:false,
                 data:null
             })
@@ -125,13 +132,15 @@ const getAssignedListById=async(req,res)=>{
              return sendResponse({
                 message:"error in fetching the taskById",
                 res,
+                statusCode:403,
                 success:false,
                 data:null
             })
         }
         return sendResponse({
-            message:"error in fetching the taskById",
+            message:"fetching the taskById succcess",
             res,
+            statusCode:200,
             success:true,
             data:assigned_list
         })
@@ -139,6 +148,7 @@ const getAssignedListById=async(req,res)=>{
         return sendResponse({
             message:error.message,
             res,
+            statusCode:500,
             success:false,
             data:null
         })
@@ -154,6 +164,7 @@ const updateAssignedList=async(req,res)=>{
             return sendResponse({
                 message:"Invalid ID",
                 res,
+                statusCode:403,
                 success:false,
                 data:null
             })
@@ -175,15 +186,17 @@ const updateAssignedList=async(req,res)=>{
         });
         if(!assigned_list){
              return sendResponse({
-                message:"error in fetching the taskById",
+                message:"error in updating the taskById",
                 res,
+                statusCode:403,
                 success:false,
                 data:null
             })
         }
         return sendResponse({
-            message:"error in fetching the taskById",
+            message:"updated the taskById successfully",
             res,
+            statusCode:200,
             success:true,
             data:assigned_list
         })
@@ -191,6 +204,7 @@ const updateAssignedList=async(req,res)=>{
         return sendResponse({
             message:error.message,
             res,
+            statusCode:500,
             success:false,
             data:null
         })
