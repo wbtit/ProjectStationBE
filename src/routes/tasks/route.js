@@ -82,9 +82,14 @@ router.delete("/delete_assigned-list/:id",Authenticate,deleteAssignedList)//dele
 
 
 // CRUD confirm assign list
-router.post("/assigned-list/:id/confirm",Authenticate,postConfirmtaskById)
-router.get("/assigned-list/:id/confirm",Authenticate,getConfirmtaskById)
-router.put("/assigned-list/:id/confirm",Authenticate,putConfirmtaskById)
-router.patch("/assigned-list/:id/confirm",Authenticate,patchConfirmtaskById)
-router.delete("/assigned-list/:id/confirm",Authenticate,deleteConfirmtaskById)
+router.post("/assigned-list/:id/confirm", Authenticate, postConfirmtaskById)
+
+router.get("/assigned-list/:id/confirm", Authenticate, getConfirmtaskById)
+
+router.put("/assigned-list/:id/confirm", Authenticate, putConfirmtaskById)
+
+router.patch("/assigned-list/:id/confirm", Authenticate, patchConfirmtaskById)
+
+router.delete("/assigned-list/:id/confirm", Authenticate, deleteConfirmtaskById)
+
 export default router;
