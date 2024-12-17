@@ -38,11 +38,16 @@ router.get("/tasks/:id/accept", Authenticate, TaskByIDAccept); // Accept Task Us
 
 router.put("/tasks/:id/accept", Authenticate, UpdateTaskByIDs); // Update Accept Tasks By ID
 
-router.post("/tasks/add_assignes", Authenticate, GetTaskByIDAssignes);
-router.get("/tasks/:id/get_assignes", Authenticate, addTaskAssignes);
-router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes);
-router.post("/tasks/add_comment", Authenticate, addComment);
-router.get("/tasks/:id/get_comment", Authenticate, getCommentById);
-router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID);
+router.post("/tasks/add_assignes", Authenticate, GetTaskByIDAssignes);//add assignes
+
+router.get("/tasks/:id/get_assignes", Authenticate, addTaskAssignes);//get assignes
+
+router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes);//update assignes
+
+router.post("/tasks/add_comment", Authenticate, addComment);//add comment
+
+router.get("/tasks/:id/get_comment", Authenticate, getCommentById);//get comment
+
+router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID);//update comment
 
 export default router;

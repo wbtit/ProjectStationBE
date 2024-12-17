@@ -203,7 +203,7 @@ model Assigned_list{
   approved_by String @db.Uuid
   user Users @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
 
-  @@map("assigendList")
+  @@map("assigendlist")
 }
 
 model Assignes {

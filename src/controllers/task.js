@@ -15,7 +15,6 @@ const AddTask = async (req, res) => {
     duration,
     name,
     priority,
-    assignedTask,
     fabricator_id,
     project_id,
     user_id,
@@ -59,14 +58,23 @@ const AddTask = async (req, res) => {
       },
     });
 
-    
-    return sendResponse({
-      message: "Task Added Successfully",
+    if(newTask){
+      return sendResponse({
+        message: "Task Added Successfully",
+        res,
+        statusCode: 200,
+        success: true,
+        data: newTask,
+      });
+    }
+    sendResponse({
+      message: "error in adding task",
       res,
-      statusCode: 200,
-      success: true,
-      data: newTask,
+      statusCode: 403,
+      success: false,
+      data: null,
     });
+   
   } catch (error) {
    
     return sendResponse({
