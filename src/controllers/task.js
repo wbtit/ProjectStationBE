@@ -300,10 +300,96 @@ const UpdateTaskByID = async (req, res) => {
   }
 };
 
+const calender = async (req, res) => {
+  const { id: user_id, date } = req?.params;
+
+  try {
+    console.log("User ID:", user_id);
+    if (!user_id) {
+      return sendResponse({
+        message: "Invalid userId",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    if (!isValidUUID(user_id)) {
+      return sendResponse({
+        message: "Invalid UUID",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    const startDate = new Date(date);
+    const endDate = new Date(date);
+
+    if (isNaN(startDate.getTime())) {
+      return sendResponse({
+        message: "Invalid date",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    const taskFetched = await prisma.task.findMany({
+      where: {
+        user_id,
+        created_on: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        project: true,
+        fabricator: true,
+      },
+    });
+
+    if (!taskFetched || taskFetched.length === 0) {
+      return sendResponse({
+        message: "No tasks found for the given date and user",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    return sendResponse({
+      message: "Tasks fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: taskFetched,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
 export {
   AddTask,
    DeleteTask,
    GetTask, 
    GetTaskByID, 
-   UpdateTaskByID
+   UpdateTaskByID,
+   calender
 }
