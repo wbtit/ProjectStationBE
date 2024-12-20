@@ -1,6 +1,4 @@
-
 // Please navigate to very bottom of the file to know the logics in this file.
-
 
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
@@ -9,13 +7,11 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 import { getFabricators } from "../models/getAllFabricator.js";
 
 const AddFabricator = async (req, res) => {
-
   const { id } = req.user;
 
   const { name, headquater, website, drive } = req.body;
 
   if (!name || !headquater || !website || !drive) {
-
     return sendResponse({
       message: "Fields are emmpty",
       res,
@@ -45,7 +41,6 @@ const AddFabricator = async (req, res) => {
       data: fabricator,
     });
   } catch (error) {
-
     return sendResponse({
       message: "Sorry something went wrong.",
       res,
@@ -59,9 +54,7 @@ const AddFabricator = async (req, res) => {
 };
 
 const AddBranch = async (req, res) => {
-
   const { fid } = req.params;
-
 
   if (!isValidUUID(fid)) {
     return sendResponse({
@@ -114,7 +107,6 @@ const AddBranch = async (req, res) => {
       country,
     });
 
-
     const newbranches = await prisma.fabricator.update({
       where: {
         id: fid,
@@ -145,8 +137,6 @@ const AddBranch = async (req, res) => {
 };
 
 const DeleteFabricator = async (req, res) => {
-
-
   const { id } = req.params;
 
   const user = req.user;
@@ -169,7 +159,6 @@ const DeleteFabricator = async (req, res) => {
         data: deletedFabricator,
       });
     } catch (error) {
-
       return sendResponse({
         message: "Failed to delete fabricator.",
         res,
@@ -192,7 +181,6 @@ const DeleteFabricator = async (req, res) => {
 };
 
 const GetAllFabricator = async (req, res) => {
-
   try {
     const fabricators = await getFabricators();
     return sendResponse({
@@ -214,7 +202,6 @@ const GetAllFabricator = async (req, res) => {
 };
 
 const UpdateFabricator = async (req, res) => {
-
   const { id } = req.params;
 
   const user = req.user;
@@ -255,10 +242,60 @@ const UpdateFabricator = async (req, res) => {
   }
 };
 
+const GetFabricatorByID = async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidUUID(id)) {
+    return sendResponse({
+      message: "Invalid Fabricator ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const fabricator = await prisma.fabricator.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!fabricator) {
+      return sendResponse({
+        message: "Fabricator not found",
+        res,
+        statusCode: 400,
+        success: true,
+        data: null,
+      });
+    }
+
+    return sendResponse({
+      message: "Fabricator fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: fabricator,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: "Something went wrong",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
 export {
   AddBranch,
   AddFabricator,
   DeleteFabricator,
   GetAllFabricator,
   UpdateFabricator,
+  GetFabricatorByID,
 };

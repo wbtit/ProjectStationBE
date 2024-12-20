@@ -432,7 +432,9 @@ const DownloadFile = async (req, res) => {
 
     // Construct the file path using __dirname
     const __dirname = path.resolve(); // Get the absolute path of the current directory
-    const filePath = path.join(__dirname, "public", fileObject.path);
+    const filePath = path.join(__dirname, fileObject.path);
+
+    console.log("Firnam", __dirname);
 
     console.log("File path:", filePath);
 
@@ -440,6 +442,8 @@ const DownloadFile = async (req, res) => {
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
+
+    console.log("FO", fileObject);
 
     // Initiate file download
     res.download(filePath, fileObject.originalName, (err) => {
