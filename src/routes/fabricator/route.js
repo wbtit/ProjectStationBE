@@ -7,6 +7,7 @@ import {
   DeleteFabricator,
   GetAllFabricator,
   UpdateFabricator,
+  GetFabricatorByID,
 } from "../../controllers/fabricator.js";
 
 const router = Router({ mergeParams: true });
@@ -20,5 +21,7 @@ router.delete("/:id/deletefabricator", Authenticate, isAdmin, DeleteFabricator);
 router.get("/fabricator", GetAllFabricator); // Get All The Fabricator
 
 router.patch("/:id/updatefabricator", Authenticate, isAdmin, UpdateFabricator); // Updating Fabricator By ID
+
+router.get("/fabricator/:id", Authenticate, isAdmin, GetFabricatorByID); // Get fabricator by ID
 
 export default router;
