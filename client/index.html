@@ -52,11 +52,11 @@
           }
 
           try {
-            const projectId = "36eacebd-ff31-4662-a057-83c001cf3e6e"; // Replace with actual project ID
+            const projectId = "45f521f5-aafb-432d-b891-fb208181f518"; // Replace with actual project ID
 
             // Send the request to the backend
             const response = await fetch(
-              `http://localhost:5000/api/project/${projectId}/files`,
+              `http://localhost:8000/api/project/${projectId}/uploadprojectfiles`,
               {
                 method: "POST",
                 body: formData,

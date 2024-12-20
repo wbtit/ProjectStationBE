@@ -1,32 +1,20 @@
 import express from "express";
-import Login from "./auth/login.js";
-import SignUp from "./auth/signup.js";
-import AddFabricator from "./fabricator/addfabricator.js";
-import UpdateFabricator from "./fabricator/updatefabricator.js";
-import DeleteFabricator from "./fabricator/deletefabricator.js";
-import AddDepartment from "./departments/adddepartment.js";
-import GetUer from "./auth/getuserbytoken.js";
-import AddClient from "./client/addclient.js";
-import AddbranchFab from "./fabricator/addbranch.js";
-import GetAllFabricators from "./fabricator/getallfabricators.js";
-import AddTeam from "./team/addteam.js";
-import Team from "./team/team.js";
-import Project from "./project/project.js";
+import Auth from "./auth/route.js";
+import Client from "./client/route.js";
+import Department from "./departments/route.js";
+import Fabricator from "./fabricator/route.js";
+import Project from "./project/route.js";
+import Task from "./tasks/route.js";
+import Team from "./team/route.js";
 
 const routes = express.Router();
 
-routes.use("/login", Login);
-routes.use("/signup", SignUp);
-routes.use("/addfabricator", AddFabricator);
-routes.use("/updatefabricator", UpdateFabricator);
-routes.use("/deletefabricator", DeleteFabricator);
-routes.use("/adddepartment", AddDepartment);
-routes.use("/token", GetUer);
-routes.use("/addclient", AddClient);
-routes.use("/addbranchfab", AddbranchFab);
-routes.use("/fabricators", GetAllFabricators);
-routes.use("/addteam", AddTeam);
-routes.use("/team", Team);
+routes.use("/auth", Auth);
+routes.use("/client", Client);
+routes.use("/department", Department);
+routes.use("/fabricator", Fabricator);
 routes.use("/project", Project);
+routes.use("/task", Task);
+routes.use("/team", Team);
 
 export { routes };

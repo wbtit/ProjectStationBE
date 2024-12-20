@@ -15,17 +15,15 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  console.log("I am getting hit!!");
   res.status(200).json({
-    message: "You found me 😂, I am a secured server. 🔒",
+    message: "You Summoned WBT Sever",
     data: {
-      json: "json",
+      reward: "Summon Success",
     },
   });
 });
 
 app.get("/getall", async (req, res) => {
-  console.log("Hola");
 
   try {
     const users = await getUsers();
