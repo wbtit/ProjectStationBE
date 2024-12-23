@@ -246,6 +246,7 @@ const getAllClients=async(req,res)=>{
   }finally{
     await prisma.$disconnect()
   }
-}
+} 
 
 export { addClient, updateClient,deleteClient,getAllClients};
+

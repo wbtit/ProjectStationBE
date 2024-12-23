@@ -8,6 +8,7 @@ router.post("/:fid/addclient", addClient); // Add Client
 router.patch("/:cid/updateclient", updateClient); // Update Client By ID
 
 router.delete("/:cid/deletClient",deleteClient)//dele client by ID
-router.get("/getallclients",getAllClients)
+
+router.get("/getallclients",getAllClients)//get Clients
 
 export default router;
