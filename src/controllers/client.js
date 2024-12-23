@@ -166,4 +166,50 @@ const updateClient = async (req, res) => {
   }
 };
 
-export { addClient, updateClient };
+const deleteClient =async(req,res)=>{
+  const {cid}=req?.params
+  if(!cid){
+    return sendResponse({
+      message:"Failed to get clientId",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  try{
+    const deleteClient= await prisma.client.delete({
+      where:{
+        id:cid
+      }
+    })
+    if(!deleteClient){
+      return sendResponse({
+        message:"No client found with ID",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    return sendResponse({
+      message:"Client deleted Success",
+      res,
+      statusCode:200,
+      success:true,
+      data:deleteClient
+    })
+  }catch(error){
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }finally{
+   await prisma.$disconnect()
+  }
+}
+
+export { addClient, updateClient,deleteClient};
