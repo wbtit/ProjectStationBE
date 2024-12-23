@@ -1,6 +1,4 @@
-
 // Please navigate to very bottom of the file to know the logics in this file.
-
 
 import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
@@ -10,7 +8,6 @@ import { getUserByUsername } from "../models/userUniModel.js";
 const addClient = async (req, res) => {
   const { fid } = req.params;
 
-    
   const {
     username,
     password,
@@ -25,6 +22,7 @@ const addClient = async (req, res) => {
     designation,
     address,
     fabricator,
+    is_superuser,
   } = req.body;
 
   if (
@@ -90,6 +88,7 @@ const addClient = async (req, res) => {
         country: country,
         state: state,
         zip_code: zip_code,
+        is_superuser: is_superuser,
       },
     });
 
@@ -101,7 +100,6 @@ const addClient = async (req, res) => {
       data: newclient,
     });
   } catch (error) {
-    
     sendResponse({
       message: "Something went wrong!!",
       res,
@@ -153,7 +151,6 @@ const updateClient = async (req, res) => {
       data: updateclient,
     });
   } catch (error) {
-
     sendResponse({
       message: "Something went wrong!!",
       res,

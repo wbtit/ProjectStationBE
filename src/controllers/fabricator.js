@@ -11,7 +11,8 @@ const AddFabricator = async (req, res) => {
 
   const { name, headquater, website, drive } = req.body;
 
-  if (!name || !headquater || !website || !drive) {
+  
+  if (!name || !headquater) {
     return sendResponse({
       message: "Fields are emmpty",
       res,
@@ -28,8 +29,8 @@ const AddFabricator = async (req, res) => {
         createdById: id,
         fabName: name,
         headquaters: headquater,
-        drive: drive,
-        website: website,
+        drive: drive ? drive : " ",
+        website: website ? website : "",
       },
     });
 
@@ -294,29 +295,61 @@ const GetFabricatorByID = async (req, res) => {
 const DeleteBranch = async (req, res) => {
   const { fid, bid } = req.params;
 
-  // const fabricator = await prisma.fabricator.findUnique({
-  //   where: {
-  //     id: fid,
-  //   },
-  // });
+  if (!isValidUUID(fid) || !isValidUUID(bid)) {
+    return sendResponse({
+      message: "Invalid Ids",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
 
-  // fabricator.branches = [];
+  const fabricator = await prisma.fabricator.findUnique({
+    where: {
+      id: fid,
+    },
+  });
+
+  if (!fabricator) {
+    return sendResponse({
+      message: "Cannot find fabricator",
+      res,
+      statusCode: 409,
+      success: false,
+      data: null,
+    });
+  }
+
+  const branches = fabricator.branches;
+
+  if (branches.length === 0) {
+    return sendResponse({
+      message: "Branches are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  const newBranches = branches.filter((item) => item.id != bid);
 
   const newFabricator = await prisma.fabricator.update({
     where: {
-      id: fid
-    }, 
+      id: fid,
+    },
     data: {
-      branches : []
-    }
-  })
+      branches: newBranches,
+    },
+  });
 
   return sendResponse({
     message: "Branch Deletion Success",
     res,
     statusCode: 200,
     success: true,
-    data: newFabricator
+    data: newFabricator,
   });
 };
 
@@ -327,5 +360,5 @@ export {
   GetAllFabricator,
   UpdateFabricator,
   GetFabricatorByID,
-  DeleteBranch
+  DeleteBranch,
 };
