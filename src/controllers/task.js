@@ -451,6 +451,71 @@ const getMyTaskByIdAndStatus=async(req,res)=>{
   await prisma.$disconnect()
  }
 }
+const getAllTasksByUserId=async(req,res)=>{
+  const {id:user_id}=req?.params
+
+  if(!user_id){
+    return sendResponse({
+      message:"Invalid userId",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  
+  if (!isValidUUID(user_id)) {
+    return sendResponse({
+      message: "Invalid UUID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+ try{
+  const tasks=await prisma.task.findMany({
+    where:{
+      user_id:parseInt(user_id),
+      }
+  })
+  if(!tasks){
+    return sendResponse({
+      message:"Failed to fetch My_tasks",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  if(tasks.length===0){
+    return sendResponse({
+      message:"No tasks found for this user",
+      res,
+      statusCode:200,
+      success:true,
+      data:tasks
+    })
+  }
+  return sendResponse({
+    message:"All_tasks fetch success",
+    res,
+    statusCode:200,
+    success:true,
+    data:tasks
+  })
+ }catch(error){
+  return sendResponse({
+    message:error.message,
+    res,
+    statusCode:500,
+    success:false,
+    data:null
+  })
+ }finally{
+  await prisma.$disconnect()
+ }
+}
 
 export {
   AddTask,
@@ -459,6 +524,7 @@ export {
    GetTaskByID, 
    UpdateTaskByID,
    calender,
-   getMyTaskByIdAndStatus
+   getMyTaskByIdAndStatus,
+   getAllTasksByUserId
 
 }
