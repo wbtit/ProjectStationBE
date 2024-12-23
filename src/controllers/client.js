@@ -8,6 +8,8 @@ import { getUserByUsername } from "../models/userUniModel.js";
 const addClient = async (req, res) => {
   const { fid } = req.params;
 
+  console.log(req.body);
+
   const {
     username,
     password,
@@ -53,8 +55,39 @@ const addClient = async (req, res) => {
     });
   }
 
-  const { headquaters } = fabricator;
-  const { city, state, country, zip_code } = headquaters;
+  const fab = await prisma.fabricator.findUnique({
+    where: {
+      id: fabricator,
+    },
+  });
+
+  if (!fab) {
+    return sendResponse({
+      message: "Cannot find fabricator",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  let city, state, country, zip_code;
+
+  if (address === fab.headquaters.id) {
+    city = fab.headquaters.city;
+    state = fab.headquaters.state;
+    country = fab.headquaters.country;
+    zip_code = fab.headquaters.zip_code;
+  } else {
+    fab.branches.map((branch) => {
+      if (branch.id === address) {
+        city = branch.city;
+        state = branch.state;
+        country = branch.country;
+        zip_code = branch.zip_code;
+      }
+    });
+  }
 
   const hashedPassword = await hashPassword(password);
 
@@ -101,7 +134,7 @@ const addClient = async (req, res) => {
     });
   } catch (error) {
     sendResponse({
-      message: "Something went wrong!!",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -163,87 +196,86 @@ const updateClient = async (req, res) => {
   }
 };
 
-const deleteClient =async(req,res)=>{
-  const {cid}=req?.params
-  if(!cid){
+const deleteClient = async (req, res) => {
+  const { cid } = req?.params;
+  if (!cid) {
     return sendResponse({
-      message:"Failed to get clientId",
+      message: "Failed to get clientId",
       res,
-      statusCode:400,
-      success:false,
-      data:null
-    })
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
   }
-  try{
-    const deleteClient= await prisma.client.delete({
-      where:{
-        id:cid
-      }
-    })
-    if(!deleteClient){
+  try {
+    const deleteClient = await prisma.client.delete({
+      where: {
+        id: cid,
+      },
+    });
+    if (!deleteClient) {
       return sendResponse({
-        message:"No client found with ID",
+        message: "No client found with ID",
         res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
     }
     return sendResponse({
-      message:"Client deleted Success",
+      message: "Client deleted Success",
       res,
-      statusCode:200,
-      success:true,
-      data:deleteClient
-    })
-  }catch(error){
+      statusCode: 200,
+      success: true,
+      data: deleteClient,
+    });
+  } catch (error) {
     return sendResponse({
-      message:error.message,
+      message: error.message,
       res,
-      statusCode:500,
-      success:false,
-      data:null
-    })
-  }finally{
-   await prisma.$disconnect()
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
   }
-}
+};
 
-const getAllClients=async(req,res)=>{
-  try{
-    const clients= await prisma.client.findMany({
-      where:{
-        role:"CLIENT"
-      }
-    })
-    if(!clients){
+const getAllClients = async (req, res) => {
+  try {
+    const clients = await prisma.client.findMany({
+      where: {
+        role: "CLIENT",
+      },
+    });
+    if (!clients) {
       return sendResponse({
-        message:"No clients found",
+        message: "No clients found",
         res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
     }
     return sendResponse({
-      message:"Clients Fetched Successfully",
+      message: "Clients Fetched Successfully",
       res,
-      statusCode:200,
-      success:true,
-      data:null
-    })
-  }catch(error){
+      statusCode: 200,
+      success: true,
+      data: null,
+    });
+  } catch (error) {
     return sendResponse({
-      message:error.message,
+      message: error.message,
       res,
-      statusCode:500,
-      success:false,
-      data:null
-    })
-  }finally{
-    await prisma.$disconnect()
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
   }
-} 
+};
 
-export { addClient, updateClient,deleteClient,getAllClients};
-
+export { addClient, updateClient, deleteClient, getAllClients };

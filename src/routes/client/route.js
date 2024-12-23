@@ -3,12 +3,12 @@ import { addClient, updateClient,deleteClient,getAllClients } from "../../contro
 
 const router = Router({ mergeParams: true });
 
-router.post("/:fid/addclient", addClient); // Add Client
+router.post("/client/:fid/addclient", addClient); // Add Client
 
-router.patch("/:cid/updateclient", updateClient); // Update Client By ID
+router.patch("/cleint/:cid/updateclient", updateClient); // Update Client By ID
 
-router.delete("/:cid/deletClient",deleteClient)//dele client by ID
+router.delete("/cleint/:cid/deletClient",deleteClient)//dele client by ID
 
-router.get("/getallclients",getAllClients)//get Clients
+router.get("/client/getallclients",getAllClients)//get Clients
 
 export default router;

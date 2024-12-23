@@ -11,7 +11,6 @@ const AddFabricator = async (req, res) => {
 
   const { name, headquater, website, drive } = req.body;
 
-  
   if (!name || !headquater) {
     return sendResponse({
       message: "Fields are emmpty",
@@ -23,12 +22,13 @@ const AddFabricator = async (req, res) => {
   }
 
   // Checking the user is a super user.
+
   try {
     const fabricator = await prisma.fabricator.create({
       data: {
         createdById: id,
         fabName: name,
-        headquaters: headquater,
+        headquaters: { ...headquater, id: uuidv4() },
         drive: drive ? drive : " ",
         website: website ? website : "",
       },
@@ -57,6 +57,8 @@ const AddFabricator = async (req, res) => {
 const AddBranch = async (req, res) => {
   const { fid } = req.params;
 
+  console.log(req.body);
+
   if (!isValidUUID(fid)) {
     return sendResponse({
       message: "Invalid fabricator",
@@ -67,7 +69,7 @@ const AddBranch = async (req, res) => {
     });
   }
 
-  const { city, state, country, zip_code, address } = req.body;
+  const { city, state, country, zip_code, address } = req.body.branch;
 
   const { id } = req.user;
 
