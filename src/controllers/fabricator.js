@@ -291,6 +291,35 @@ const GetFabricatorByID = async (req, res) => {
   }
 };
 
+const DeleteBranch = async (req, res) => {
+  const { fid, bid } = req.params;
+
+  // const fabricator = await prisma.fabricator.findUnique({
+  //   where: {
+  //     id: fid,
+  //   },
+  // });
+
+  // fabricator.branches = [];
+
+  const newFabricator = await prisma.fabricator.update({
+    where: {
+      id: fid
+    }, 
+    data: {
+      branches : []
+    }
+  })
+
+  return sendResponse({
+    message: "Branch Deletion Success",
+    res,
+    statusCode: 200,
+    success: true,
+    data: newFabricator
+  });
+};
+
 export {
   AddBranch,
   AddFabricator,
@@ -298,4 +327,5 @@ export {
   GetAllFabricator,
   UpdateFabricator,
   GetFabricatorByID,
+  DeleteBranch
 };

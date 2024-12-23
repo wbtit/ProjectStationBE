@@ -1,6 +1,4 @@
-
 // Please navigate to very bottom of the file to know the logics in this file.
-
 
 import { generateToken } from "../utils/jwtutils.js";
 import { comparePassword, hashPassword } from "../utils/crypter.js";
@@ -61,6 +59,8 @@ const createUser = async ({
 const login = async (req, res) => {
   let { username, password } = req.body;
 
+  console.log(username.length, password.length);
+
   if (!username || !password) {
     return sendResponse({
       message: "Fields are empty",
@@ -86,8 +86,8 @@ const login = async (req, res) => {
     }
 
     // Compare the provided password with the stored hashed password
-      password = typeof password === "number" ? password.toString() : password;
-      
+    password = typeof password === "number" ? password.toString() : password;
+
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
@@ -107,7 +107,7 @@ const login = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: token,
+      token: token,
     });
   } catch (error) {
     return sendResponse({
@@ -244,7 +244,6 @@ const resetpassword = async (req, res) => {
       data: token,
     });
   } else {
-
     return sendResponse({
       message: "Old Password is wrong",
       res,
@@ -256,23 +255,23 @@ const resetpassword = async (req, res) => {
 };
 
 const getuserbytoken = (req, res) => {
-    if (!req.user) {
-      return sendResponse({
-        message: "User not Authenticated.",
-        res,
-        statusCode: 403,
-        success: false,
-        data: null,
-      });
-    } else {
-      return sendResponse({
-        message: "User Fetched Successfully.",
-        res,
-        statusCode: 200,
-        success: true,
-        data: req.user,
-      });
-    }
-}
+  if (!req.user) {
+    return sendResponse({
+      message: "User not Authenticated.",
+      res,
+      statusCode: 403,
+      success: false,
+      data: null,
+    });
+  } else {
+    return sendResponse({
+      message: "User Fetched Successfully.",
+      res,
+      statusCode: 200,
+      success: true,
+      data: req.user,
+    });
+  }
+};
 
 export { login, signup, resetpassword, getuserbytoken };
