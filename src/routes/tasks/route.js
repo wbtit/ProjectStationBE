@@ -1,6 +1,10 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { BroadAccess } from "../../middlewares/broadaccess.js";
+import {isAdmin} from "../../middlewares/isadmin.js"
+import {isManager} from "../../middlewares/ismanager.js"
+import {isProjectManager} from  "../../middlewares/isprojectmanager.js"
+import {isSales} from "../../middlewares/issales.js"
 
 import {
   AddTask,
@@ -92,6 +96,7 @@ router.put("/assigned-list/:id/confirm", Authenticate, putConfirmtaskById)
 router.patch("/assigned-list/:id/confirm", Authenticate, patchConfirmtaskById)
 
 router.delete("/assigned-list/:id/confirm", Authenticate, deleteConfirmtaskById)
+
 
 router.get("/tasks/:id/:date/calender",Authenticate,calender)
 
