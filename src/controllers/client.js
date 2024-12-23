@@ -212,4 +212,40 @@ const deleteClient =async(req,res)=>{
   }
 }
 
-export { addClient, updateClient,deleteClient};
+const getAllClients=async(req,res)=>{
+  try{
+    const clients= await prisma.client.findMany({
+      where:{
+        role:"CLIENT"
+      }
+    })
+    if(!clients){
+      return sendResponse({
+        message:"No clients found",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    return sendResponse({
+      message:"Clients Fetched Successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:null
+    })
+  }catch(error){
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }finally{
+    await prisma.$disconnect()
+  }
+}
+
+export { addClient, updateClient,deleteClient,getAllClients};
