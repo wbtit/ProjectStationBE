@@ -12,7 +12,9 @@ import {
   GetTask,
   GetTaskByID,
   UpdateTaskByID,
-  calender
+  calender,
+  getMyTaskByIdAndStatus,
+  getAllTasksByUserId
 } from "../../controllers/task.js";
 
 import { TaskByIDAccept, UpdateTaskByIDs } from "../../controllers/accept.js";
@@ -99,5 +101,9 @@ router.delete("/assigned-list/:id/confirm", Authenticate, deleteConfirmtaskById)
 
 
 router.get("/tasks/:id/:date/calender",Authenticate,calender)
+
+router.get("/tasks/:id/my_tasks",Authenticate,getMyTaskByIdAndStatus)
+
+router.get("/tasks/:id/my_tasks",Authenticate,getAllTasksByUserId)
 
 export default router;
