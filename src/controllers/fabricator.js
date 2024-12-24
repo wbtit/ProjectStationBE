@@ -265,6 +265,8 @@ const GetFabricatorByID = async (req, res) => {
       },
     });
 
+    console.log(fabricator);
+
     if (!fabricator) {
       return sendResponse({
         message: "Fabricator not found",

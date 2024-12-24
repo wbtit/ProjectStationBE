@@ -11,17 +11,18 @@ const AddProject = async (req, res) => {
   const {
     name,
     description,
-    fabricatorID,
-    departmentID,
-    teamID,
-    managerID,
+    fabricator,
+    department,
+    team,
+    manager,
     status,
     stage,
     tools,
     connectionDesign,
     miscDesign,
     customerDesign,
-    startDate,
+    start_date,
+    end_date,
     appprovalDate,
     estimatedHours,
   } = req.body;
@@ -31,11 +32,12 @@ const AddProject = async (req, res) => {
   if (
     !name ||
     !description ||
-    !fabricatorID ||
-    !departmentID ||
-    !teamID ||
-    !managerID ||
-    !startDate ||
+    !fabricator ||
+    !department ||
+    !team ||
+    !manager ||
+    !start_date ||
+    !end_date ||
     !estimatedHours
   ) {
     return sendResponse({
@@ -56,18 +58,19 @@ const AddProject = async (req, res) => {
         approvalDate: appprovalDate,
         connectionDesign: connectionDesign,
         customerDesign: customerDesign,
-        departmentID: departmentID,
-        fabricatorID: fabricatorID,
-        managerID: managerID,
+        departmentID: department,
+        fabricatorID: fabricator,
+        managerID: manager,
         miscDesign: miscDesign,
         stage: stage,
-        startDate: startDate,
-        teamID: teamID,
+        startDate: start_date,
+        teamID: team,
         status: status,
         tools: tools,
+        endDate: end_date,
       },
     });
-    console.log(project)
+    console.log(project);
 
     return sendResponse({
       message: "Project created successfully",

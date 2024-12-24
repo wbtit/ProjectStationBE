@@ -142,7 +142,8 @@ model Team {
   connectionDesign Boolean @default(true) // Not sure about the default value
   miscDesign Boolean @default(true) // Not sure about the default value
   customerDesign Boolean @default(false) // Not sure about the default value
-  startDate DateTime @default(now()) // Not sure about the default value
+  startDate DateTime  // Not sure about the default value
+  endDate DateTime 
   approvalDate DateTime @default(now()) // Not sure about the default value
   estimatedHours Int 
   tasks Task[] @relation("projectTask")

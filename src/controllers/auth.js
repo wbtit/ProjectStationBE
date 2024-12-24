@@ -274,4 +274,30 @@ const getuserbytoken = (req, res) => {
   }
 };
 
-export { login, signup, resetpassword, getuserbytoken };
+const GetAllManager = async (req, res) => {
+  try {
+    const managers = await prisma.users.findMany({
+      where: {
+        is_manager: true,
+      },
+    });
+
+    return sendResponse({
+      message: "Fetched all managers",
+      res,
+      statusCode: 200,
+      success: true,
+      data: managers,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+export { login, signup, resetpassword, getuserbytoken, GetAllManager };

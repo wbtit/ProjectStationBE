@@ -26,8 +26,7 @@ const AddEmployee = async (req, res) => {
     !f_name ||
     !email ||
     !phone ||
-    !emp_code ||
-    !department
+    !emp_code
   ) {
     return sendResponse({
       message: "Fields are empty.",

@@ -5,6 +5,7 @@ import {
   deleteClient,
   getAllClients,
   GetClientBYID,
+  
 } from "../../controllers/client.js";
 import { ClientAccess } from "../../middlewares/clientaccess.js";
 import Authenticate from "../../middlewares/authenticate.js";

@@ -1,20 +1,18 @@
-
 // Please navigate to very bottom of the file to know the logics in this file.
-
 
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { getUserByID } from "../models/userUniModelByID.js";
 import { getDepartments } from "../models/getAllDepartments.js";
 
-
 const AddDepartment = async (req, res) => {
-
   const { id } = req.user;
 
-  const { name, managerID } = req.body;
+  const { name, manager } = req.body;
 
-  if (!name || !managerID)
+  console.log(req.body);
+
+  if (!name || !manager)
     return sendResponse({
       message: "Incomplete credentials.",
       res,
@@ -23,7 +21,7 @@ const AddDepartment = async (req, res) => {
       data: null,
     });
 
-  const user = await getUserByID({ id: managerID });
+  const user = await getUserByID({ id: manager });
 
   if (!user)
     return sendResponse({
@@ -34,15 +32,15 @@ const AddDepartment = async (req, res) => {
       data: null,
     });
 
-  const { is_active, is_staff, username } = user;
+  const { is_active, is_staff, is_manager, username } = user;
 
-  if (is_active && is_staff) {
+  if (is_manager) {
     try {
       const department = await prisma.department.create({
         data: {
           name,
           createdById: id,
-          managerId: managerID,
+          managerId: manager,
         },
       });
       return sendResponse({
@@ -75,7 +73,6 @@ const AddDepartment = async (req, res) => {
 };
 
 const GetDepartment = async (req, res) => {
-
   try {
     const departments = await getDepartments();
     return sendResponse({
