@@ -37,8 +37,8 @@ datasource db {
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
 
-    fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
-    fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
+    fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
+    fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")
 
     fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
 
@@ -85,7 +85,7 @@ model Fabricator {
   updatedAt   DateTime @updatedAt
 
   users       Users[] @relation("FabricatorUsers") // Relation for multiple users
-  singleUser  Users?  @relation("UserFabricator") // Opposite relation for fabricator in Users
+  userss       Users[] @relation("UsersFabricator")
 
   project    Project[] @relation("projectFabricator")
   tasks Task[] @relation("fabricatorTask")

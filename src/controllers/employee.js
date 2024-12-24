@@ -18,17 +18,7 @@ const AddEmployee = async (req, res) => {
     is_manager,
   } = req.body;
 
-  console.log(
-    username,
-    password,
-    f_name,
-    email,
-    phone,
-    emp_code,
-    department,
-    is_manager,
-    is_sales
-  );
+  console.log(req.body);
 
   if (
     !username ||
@@ -100,4 +90,93 @@ const AddEmployee = async (req, res) => {
   }
 };
 
-export { AddEmployee };
+const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await prisma.users.findMany({
+      where: {
+        role: "STAFF",
+      },
+    });
+    console.log(employees);
+    if (!employees) {
+      return sendResponse({
+        message: "No employee found",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Employees Fetched Successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: employees,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const GetEmployeeBYID = async (req, res) => {
+  const { eid } = req.params;
+
+  if (!isValidUUID(eid)) {
+    return sendResponse({
+      message: "Invalid client ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const employee = await prisma.users.findUnique({
+      where: {
+        id: eid,
+      },
+    });
+
+    if (!employee) {
+      return sendResponse({
+        message: "No employee found",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    console.log(employee);
+
+    return sendResponse({
+      message: "Employee fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: employee,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export { AddEmployee , GetEmployeeBYID, getAllEmployees};

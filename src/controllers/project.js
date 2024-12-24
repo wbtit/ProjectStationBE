@@ -26,6 +26,8 @@ const AddProject = async (req, res) => {
     estimatedHours,
   } = req.body;
 
+  console.log(req.body);
+
   if (
     !name ||
     !description ||
@@ -65,6 +67,7 @@ const AddProject = async (req, res) => {
         tools: tools,
       },
     });
+    console.log(project)
 
     return sendResponse({
       message: "Project created successfully",

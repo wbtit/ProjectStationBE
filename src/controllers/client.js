@@ -4,6 +4,7 @@ import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 import { hashPassword } from "../utils/crypter.js";
 import { getUserByUsername } from "../models/userUniModel.js";
+import { isValidUUID } from "../utils/isValiduuid.js";
 
 const addClient = async (req, res) => {
   const { fid } = req.params;
@@ -169,7 +170,7 @@ const updateClient = async (req, res) => {
   }
 
   try {
-    const updateclient = await prisma.client.update({
+    const updateclient = await prisma.users.update({
       where: {
         id: cid,
       },
@@ -208,7 +209,7 @@ const deleteClient = async (req, res) => {
     });
   }
   try {
-    const deleteClient = await prisma.client.delete({
+    const deleteClient = await prisma.users.delete({
       where: {
         id: cid,
       },
@@ -244,11 +245,15 @@ const deleteClient = async (req, res) => {
 
 const getAllClients = async (req, res) => {
   try {
-    const clients = await prisma.client.findMany({
+    const clients = await prisma.users.findMany({
       where: {
         role: "CLIENT",
       },
+      include: {
+        fabricator: true,
+      },
     });
+    console.log(clients);
     if (!clients) {
       return sendResponse({
         message: "No clients found",
@@ -263,7 +268,7 @@ const getAllClients = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: null,
+      data: clients,
     });
   } catch (error) {
     return sendResponse({
@@ -278,4 +283,56 @@ const getAllClients = async (req, res) => {
   }
 };
 
-export { addClient, updateClient, deleteClient, getAllClients };
+const GetClientBYID = async (req, res) => {
+  const { cid } = req.params;
+
+  if (!isValidUUID(cid)) {
+    return sendResponse({
+      message: "Invalid client ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const client = await prisma.users.findUnique({
+      where: {
+        id: cid,
+      },
+    });
+
+    if (!client) {
+      return sendResponse({
+        message: "No client found",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    console.log(client);
+
+    return sendResponse({
+      message: "Client fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: client,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export { addClient, updateClient, deleteClient, getAllClients, GetClientBYID };

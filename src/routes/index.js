@@ -17,6 +17,6 @@ routes.use("/fabricator", Fabricator);
 routes.use("/project", Project);
 routes.use("/task", Task);
 routes.use("/team", Team);
-routes.use("/employe", Employee);
+routes.use("/employee", Employee);
 
 export { routes };
