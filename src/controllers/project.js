@@ -20,10 +20,9 @@ const AddProject = async (req, res) => {
     tools,
     connectionDesign,
     miscDesign,
-    customerDesign,
+    customer,
     start_date,
     end_date,
-    appprovalDate,
     estimatedHours,
   } = req.body;
 
@@ -53,11 +52,11 @@ const AddProject = async (req, res) => {
     const project = await prisma.project.create({
       data: {
         description: description,
-        estimatedHours: estimatedHours,
+        estimatedHours: parseInt(estimatedHours),
         name: name,
-        approvalDate: appprovalDate,
+        approvalDate: start_date,
         connectionDesign: connectionDesign,
-        customerDesign: customerDesign,
+        customerDesign: customer,
         departmentID: department,
         fabricatorID: fabricator,
         managerID: manager,
@@ -80,8 +79,9 @@ const AddProject = async (req, res) => {
       data: project,
     });
   } catch (error) {
+    console.log(error.message)
     return sendResponse({
-      message: "Somethings went wrong!!",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -93,6 +93,7 @@ const AddProject = async (req, res) => {
 const Uploadfiles = async (req, res) => {
   const { id } = req.params;
   console.log(id);
+  console.log(req.body)
 
   if (!isValidUUID(id)) {
     return sendResponse({

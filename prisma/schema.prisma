@@ -142,9 +142,9 @@ model Team {
   connectionDesign Boolean @default(true) // Not sure about the default value
   miscDesign Boolean @default(true) // Not sure about the default value
   customerDesign Boolean @default(false) // Not sure about the default value
-  startDate DateTime  // Not sure about the default value
-  endDate DateTime 
-  approvalDate DateTime @default(now()) // Not sure about the default value
+  startDate String  // Not sure about the default value
+  endDate String 
+  approvalDate String
   estimatedHours Int 
   tasks Task[] @relation("projectTask")
   accepttasks AcceptTask[] @relation("acceptTaskProject")
@@ -269,10 +269,11 @@ enum UserRole {
 //task
 enum Status {
   ACTIVE
-  ON_HOLD
+  ONHOLD
   INACTIVE
   DELAY
   COMPLETE
+  ASSIGNED
 }
 
 //PROJECT AND TASK
