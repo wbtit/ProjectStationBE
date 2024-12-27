@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE "UserRole" AS ENUM ('STAFF', 'CLIENT', 'VENDOR');
 
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('ACTIVE', 'ON_HOLD', 'INACTIVE', 'DELAY', 'COMPLETE');
+CREATE TYPE "Status" AS ENUM ('ACTIVE', 'ONHOLD', 'INACTIVE', 'DELAY', 'COMPLETE', 'ASSIGNED');
 
 -- CreateEnum
 CREATE TYPE "Stage" AS ENUM ('RFI', 'IFA', 'BFA', 'BFA_M', 'RIFA', 'RBFA', 'IFC', 'BFC', 'RJFC', 'REV', 'CO');
@@ -36,6 +36,7 @@ CREATE TABLE "users" (
     "emp_code" TEXT DEFAULT 'WBT',
     "department" JSONB DEFAULT '{}',
     "is_sales" BOOLEAN DEFAULT false,
+    "is_manager" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "is_staff" BOOLEAN NOT NULL DEFAULT false,
     "is_superuser" BOOLEAN NOT NULL DEFAULT false,
@@ -51,8 +52,8 @@ CREATE TABLE "fabricators" (
     "createdById" UUID NOT NULL,
     "fabName" TEXT NOT NULL DEFAULT '',
     "headquaters" JSONB NOT NULL DEFAULT '{}',
-    "website" TEXT NOT NULL DEFAULT '',
-    "drive" TEXT NOT NULL DEFAULT '',
+    "website" TEXT DEFAULT '',
+    "drive" TEXT DEFAULT '',
     "branches" JSONB NOT NULL DEFAULT '[]',
     "files" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "is_bin" BOOLEAN NOT NULL DEFAULT true,
@@ -99,8 +100,9 @@ CREATE TABLE "project" (
     "connectionDesign" BOOLEAN NOT NULL DEFAULT true,
     "miscDesign" BOOLEAN NOT NULL DEFAULT true,
     "customerDesign" BOOLEAN NOT NULL DEFAULT false,
-    "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "approvalDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "startDate" TEXT NOT NULL,
+    "endDate" TEXT NOT NULL,
+    "approvalDate" TEXT NOT NULL,
     "estimatedHours" INTEGER NOT NULL,
 
     CONSTRAINT "project_pkey" PRIMARY KEY ("id")
@@ -111,7 +113,7 @@ CREATE TABLE "task" (
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT true,
+    "status" TEXT NOT NULL,
     "attachment" TEXT NOT NULL,
     "priority" INTEGER NOT NULL,
     "created_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -125,7 +127,39 @@ CREATE TABLE "task" (
 );
 
 -- CreateTable
-CREATE TABLE "Assigned_list" (
+CREATE TABLE "accepttask" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "satus" TEXT NOT NULL,
+    "attachment" TEXT NOT NULL,
+    "priority" INTEGER NOT NULL,
+    "created_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "due_date" TIMESTAMP(3) NOT NULL,
+    "duration" TEXT NOT NULL,
+    "project_id" UUID NOT NULL,
+    "fabricator_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+
+    CONSTRAINT "accepttask_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "assigendlist" (
+    "id" UUID NOT NULL,
+    "approved_on" TIMESTAMP(3) NOT NULL,
+    "assigned_on" TIMESTAMP(3) NOT NULL,
+    "approved" BOOLEAN NOT NULL,
+    "comment" TEXT NOT NULL DEFAULT ' ',
+    "task_id" UUID NOT NULL,
+    "assigned_by" UUID NOT NULL,
+    "approved_by" UUID NOT NULL,
+
+    CONSTRAINT "assigendlist_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "assignes" (
     "id" UUID NOT NULL,
     "approved_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "assigned_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -136,7 +170,34 @@ CREATE TABLE "Assigned_list" (
     "assigned_to" UUID NOT NULL,
     "approved_by" UUID NOT NULL,
 
-    CONSTRAINT "Assigned_list_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "assignes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "confirm" (
+    "id" UUID NOT NULL,
+    "approved_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "assigned_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "comment" TEXT NOT NULL,
+    "assigned_task_id" UUID NOT NULL,
+    "assigned_by" UUID NOT NULL,
+    "assigned_to" UUID NOT NULL,
+    "approved_by" UUID NOT NULL,
+
+    CONSTRAINT "confirm_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "comment" (
+    "id" UUID NOT NULL,
+    "created_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "data" TEXT NOT NULL,
+    "file" TEXT NOT NULL,
+    "task_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+
+    CONSTRAINT "comment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -147,9 +208,6 @@ CREATE TABLE "_FabricatorUsers" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
-
--- CreateIndex
-CREATE UNIQUE INDEX "users_fabricatorId_key" ON "users"("fabricatorId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "department_name_key" ON "department"("name");
@@ -203,16 +261,52 @@ ALTER TABLE "task" ADD CONSTRAINT "task_fabricator_id_fkey" FOREIGN KEY ("fabric
 ALTER TABLE "task" ADD CONSTRAINT "task_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Assigned_list" ADD CONSTRAINT "Assigned_list_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Assigned_list" ADD CONSTRAINT "Assigned_list_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Assigned_list" ADD CONSTRAINT "Assigned_list_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Assigned_list" ADD CONSTRAINT "Assigned_list_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_task_id_fkey" FOREIGN KEY ("assigned_task_id") REFERENCES "assigendlist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "comment" ADD CONSTRAINT "comment_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "comment" ADD CONSTRAINT "comment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_FabricatorUsers" ADD CONSTRAINT "_FabricatorUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
