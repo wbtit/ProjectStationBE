@@ -66,6 +66,9 @@ datasource db {
     assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
     approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
 
+    messageSentBy Message[] @relation("messageSentBy")
+    messageReceivedBy Message[] @relation("messageReceivedBy")
+
 
     @@map("users")
   }
@@ -259,6 +262,29 @@ model Comment{
   @@map("comment")
 
 }
+model Message {
+  id String @id @default(uuid()) @db.Uuid
+  sender_id String @db.Uuid
+  user Users @relation(fields: [sender_id], references: [id], onDelete: Cascade, name: "messageSentBy")
+  receiver_id String @db.Uuid
+  users Users @relation(fields: [receiver_id], references: [id], onDelete: Cascade, name: "messageReceivedBy")
+  subject String
+  body String
+  timeStamp DateTime @default(now())
+  status Boolean
+  attachment Attachment[] @relation("fileAttachment")
+  @@map("message")
+}
+
+model Attachment {
+  id String @id @default(uuid()) @db.Uuid
+  message_id String @db.Uuid
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade, name: "fileAttachment")
+  file_path String
+  file_name String
+  @@map("attachment")
+}
+
 
 enum UserRole {
   STAFF
