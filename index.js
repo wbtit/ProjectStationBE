@@ -24,7 +24,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/getall", async (req, res) => {
-
   try {
     const users = await getUsers();
     console.log(users);
