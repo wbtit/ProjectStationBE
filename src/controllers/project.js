@@ -7,6 +7,7 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 import path from "path";
 import fs from "fs";
 import client from "../redis/index.js";
+import mime from "mime";
 
 const AddProject = async (req, res) => {
   const {
@@ -99,8 +100,6 @@ const AddProject = async (req, res) => {
 
 const Uploadfiles = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
-  console.log(req.body);
 
   if (!isValidUUID(id)) {
     return sendResponse({
@@ -357,7 +356,7 @@ const UpdateProject = async (req, res) => {
 const GetAllProjects = async (req, res) => {
   try {
     const project = await client.get("allprojects");
-
+    console.log("I got hit")
     // if (project) {
     //   console.log("From Redis ");
     //   return sendResponse({
@@ -591,6 +590,48 @@ const DownloadFile = async (req, res) => {
   }
 };
 
+const ViewFile = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id },
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const fileObject = project.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 export {
   AddProject,
   Uploadfiles,
@@ -600,4 +641,5 @@ export {
   GetAllFilesByProjectID,
   GetAllfiles,
   DownloadFile,
+  ViewFile,
 };

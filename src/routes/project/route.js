@@ -9,9 +9,10 @@ import {
   GetProjectByID,
   GetAllFilesByProjectID,
   GetAllfiles,
-  DownloadFile
+  DownloadFile,
+  ViewFile,
 } from "../../controllers/project.js";
-import { uploads } from "../../config/multer.js"
+import { uploads } from "../../config/multer.js";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.post(
   BroadAccess,
   uploads.array("files"),
   Uploadfiles
-); // Upload Files To Project
+); // Upload Files To Project+
 
 router.get("/projects/project-files", Authenticate, BroadAccess, GetAllfiles);
 
@@ -32,7 +33,6 @@ router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Upda
 router.get("/projects", Authenticate, BroadAccess, GetAllProjects); // Get All Projects
 
 router.get("/projects/:id", Authenticate, BroadAccess, GetProjectByID); // Get Project by ID
-
 
 router.get(
   "/projects/:id/files",
@@ -43,8 +43,10 @@ router.get(
 
 router.get(
   "/projects/:id/files/:fid",
-  
+
   DownloadFile
 ); // Download specific file
+
+router.get("/projects/viewfile/:id/:fid", ViewFile);
 
 export default router;

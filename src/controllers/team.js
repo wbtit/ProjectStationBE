@@ -355,9 +355,12 @@ const RemoveMember = async (req, res) => {
 
 const AddMember = async (req, res) => {
   const { tid } = req.params;
-  const { id, role } = req.body;
+  const { employee, role } = req.body;
 
-  if (!tid || !id || !role) {
+  console.log("Tid", tid)
+  console.log("body", req.body)
+
+  if (!tid || !employee || !role) {
     // Checking if the necessary data are not undefined.
     return sendResponse({
       message: "Incomplete data",
@@ -392,9 +395,11 @@ const AddMember = async (req, res) => {
 
     members.push({
       // Push the new member to the array and update
-      id: id,
+      id: employee.trim(),
       role: role,
     });
+
+    console.log(members)
 
     const newTeam = await prisma.team.update({
       where: {
@@ -413,6 +418,7 @@ const AddMember = async (req, res) => {
       data: newTeam,
     });
   } catch (error) {
+    console.log(error.message)
     return sendResponse({
       message: "Something went wrong",
       res,

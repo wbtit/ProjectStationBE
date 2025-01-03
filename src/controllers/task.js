@@ -132,7 +132,7 @@ const DeleteTask = async (req, res) => {
 
 const GetTask = async (req, res) => {
 
-
+console.log("I got hit on the getAllTasks")
   try {
     if (!req.user) {
 
@@ -144,7 +144,38 @@ const GetTask = async (req, res) => {
         data: null,
       });
     }
-    const tasks = await prisma.task.findMany();
+    const tasks = await prisma.task.findMany({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        attachment: true,
+        priority: true,
+        created_on: true,
+        due_date: true,
+        duration: true,
+        assignedTask:true,
+        project: {
+          select: {
+            name: true,
+            manager: {
+              select: {
+                f_name: true,
+              },
+            },
+          },
+        },
+        user: {
+          select: {
+            f_name: true,
+          },
+        },
+      },
+    });
+    
+        
+    console.log("--------------------------------------------",tasks)
     if (!tasks) {
    
       return sendResponse({
@@ -165,7 +196,7 @@ const GetTask = async (req, res) => {
   } catch (error) {
  
     return sendResponse({
-      message: "Error in fetching tasks",
+      message: error.message,
       res,
       statusCode: 500,
     });
