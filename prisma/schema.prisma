@@ -91,7 +91,6 @@ model Fabricator {
   userss       Users[] @relation("UsersFabricator")
 
   project    Project[] @relation("projectFabricator")
-  tasks Task[] @relation("fabricatorTask")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
 
   @@map("fabricators")
@@ -160,15 +159,13 @@ model Task {
   name        String
   description String
   status      String   
-  attachment  String
   priority    Int
   created_on  DateTime  @default(now())
-  due_date    DateTime
+  due_date    String
+  start_date  String
   duration    String
   project_id String @db.Uuid
   project Project @relation(fields: [project_id], references: [id], name: "projectTask", onDelete: Cascade)
-  fabricator_id String @db.Uuid
-  fabricator Fabricator @relation(fields: [fabricator_id], references: [id], name: "fabricatorTask", onDelete: Cascade)
   user_id String @db.Uuid
   user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
 

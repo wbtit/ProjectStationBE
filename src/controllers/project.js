@@ -8,6 +8,7 @@ import path from "path";
 import fs from "fs";
 import client from "../redis/index.js";
 import mime from "mime";
+import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 
 const AddProject = async (req, res) => {
   const {
@@ -216,15 +217,15 @@ const UpdateProject = async (req, res) => {
           id: req.body.fabricator,
         },
       });
-      if (!fabricator) {
-        return sendResponse({
-          message: "Invalid Fabricator",
-          res,
-          statusCode: 400,
-          success: false,
-          data: null,
-        });
-      }
+      // if (!fabricator) {
+      //   return sendResponse({
+      //     message: "Invalid Fabricator",
+      //     res,
+      //     statusCode: 400,
+      //     success: false,
+      //     data: null,
+      //   });
+      // }
     }
 
     if (req.body.department) {
@@ -249,7 +250,7 @@ const UpdateProject = async (req, res) => {
       // Check whether such team exists
       const team = await prisma.team.findUnique({
         where: {
-          id: req.team,
+          id: req.body.team,
         },
       });
       if (!team) {
@@ -342,7 +343,7 @@ const UpdateProject = async (req, res) => {
   } catch (error) {
     console.log(error);
     return sendResponse({
-      message: "Something went wrong",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -356,7 +357,7 @@ const UpdateProject = async (req, res) => {
 const GetAllProjects = async (req, res) => {
   try {
     const project = await client.get("allprojects");
-    console.log("I got hit")
+    console.log("I got hit");
     // if (project) {
     //   console.log("From Redis ");
     //   return sendResponse({
@@ -431,32 +432,50 @@ const GetProjectByID = async (req, res) => {
     });
   }
 
-  const projects = JSON.parse(await client.get("allprojects"));
+  // const projects = JSON.parse(await client.get("allprojects"));
 
-  const pro = projects.filter((pros) => pros.id === id);
+  // const pro = projects.filter((pros) => pros.id === id);
 
-  if (pro.length !== 0) {
-    return sendResponse({
-      message: "Project Retrived Successfully",
-      res,
-      statusCode: 200,
-      success: true,
-      data: pro,
-    });
-  }
+  // if (pro.length !== 0) {
+  //   return sendResponse({
+  //     message: "Project Retrived Successfully",
+  //     res,
+  //     statusCode: 200,
+  //     success: true,
+  //     data: pro,
+  //   });
+  // }
 
   try {
     const project = await prisma.project.findUnique({
       where: {
         id,
       },
+      include: {
+        team: true,
+      },
     });
+
+    const ids = project.team.members.map((mem) => mem.id);
+
+    const data = await fetchTeamDetails({ ids });
+
+    const Data = project.team.members.map((m) => {
+      return { ...data[m.id], role: m.role };
+    });
+
     return sendResponse({
       message: "Project Retrived Successfully",
       res,
       statusCode: 200,
       success: true,
-      data: project,
+      data: {
+        ...project,
+        team: {
+          ...project.team,
+          members: Data,
+        },
+      },
     });
   } catch (error) {
     console.log(error.message);

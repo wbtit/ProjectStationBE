@@ -104,6 +104,6 @@ router.get("/tasks/:id/:date/calender",Authenticate,calender)
 
 router.get("/tasks/:id/my_tasks",Authenticate,getMyTaskByIdAndStatus)
 
-router.get("/tasks/:id/my_tasks",Authenticate,getAllTasksByUserId)
+router.get("/task/my_tasks",Authenticate,getAllTasksByUserId)
 
 export default router;

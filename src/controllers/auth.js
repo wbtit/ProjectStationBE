@@ -74,7 +74,7 @@ const login = async (req, res) => {
   try {
     // Find the user by username
     const user = await getUserByUsername(username);
-
+    console.log(username)
     if (!user) {
       return sendResponse({
         message: "user not found",
