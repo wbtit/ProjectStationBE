@@ -135,7 +135,6 @@ const GetTask = async (req, res) => {
         name: true,
         description: true,
         status: true,
-        attachment: true,
         priority: true,
         created_on: true,
         due_date: true,
@@ -224,8 +223,20 @@ const GetTaskByID = async (req, res) => {
     const task = await prisma.task.findUnique({
       where: {
         id,
-      },
+      }, include: {
+        project: {
+          include: {
+            fabricator: true,
+            manager: true,
+            team: true,
+         }
+        },
+        taskInAssignedList:true
+        
+      }
     });
+
+    
     if (!task) {
       return sendResponse({
         message: "error in fetching task by id",
@@ -240,8 +251,11 @@ const GetTaskByID = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: task,
+      data: {
+        task,
+      },
     });
+  
   } catch (error) {
     return sendResponse({
       message: "Error in fetching task by id",
