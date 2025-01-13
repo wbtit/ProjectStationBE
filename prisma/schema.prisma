@@ -69,6 +69,13 @@ datasource db {
     messageSentBy Message[] @relation("messageSentBy")
     messageReceivedBy Message[] @relation("messageReceivedBy")
 
+    submittalRecepients Submittals[] @relation("UsersSubmittals")
+    submittalsender Submittals[] @relation("senderSubmittals")
+
+
+    rfiRecepients RFI[] @relation("UsersRFI")
+    rfisender RFI[] @relation("senderRFI")
+
 
     @@map("users")
   }
@@ -92,6 +99,9 @@ model Fabricator {
 
   project    Project[] @relation("projectFabricator")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
+  submittals Submittals[] @relation("FabricatorSubmittals")
+  rfi RFI[] @relation("FabricatorRFI")
+
 
   @@map("fabricators")
 }
@@ -150,6 +160,10 @@ model Team {
   estimatedHours Int 
   tasks Task[] @relation("projectTask")
   accepttasks AcceptTask[] @relation("acceptTaskProject")
+
+   submittals Submittals[] @relation("ProjectSubmittals")
+  rfi RFI[] @relation("ProjectRFI")
+
 
   @@map("project")
 } 
@@ -281,6 +295,48 @@ model Attachment {
   file_name String
   @@map("attachment")
 }
+
+
+
+model Submittals{
+  id String @id @default(uuid()) @db.Uuid
+  fabricator_id String @db.Uuid
+  date DateTime @default(now())
+  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorSubmittals",onDelete: Cascade)
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id],references: [id],name:"ProjectSubmittals",onDelete: Cascade)
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersSubmittals",onDelete: Cascade)
+  sender_id String @db.Uuid
+  sender Users @relation(fields: [sender_id],references: [id],name: "senderSubmittals",onDelete: Cascade)
+  status Boolean @default(false)
+  subject String
+  description String
+  files String[] @default([])
+
+
+  @@map("submittals")
+}
+model RFI{
+  id String @id @default(uuid()) @db.Uuid
+  fabricator_id String @db.Uuid
+  date DateTime @default(now())
+  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorRFI",onDelete: Cascade)
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id],references: [id],name:"ProjectRFI",onDelete: Cascade)
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersRFI",onDelete: Cascade)
+  sender_id String @db.Uuid
+  sender Users @relation(fields: [sender_id],references: [id],name: "senderRFI",onDelete: Cascade)
+  status Boolean @default(false)
+  subject String
+  description String
+  files String[] @default([])
+
+
+  @@map("rfi")
+}
+
 
 
 enum UserRole {
