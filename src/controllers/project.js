@@ -432,20 +432,6 @@ const GetProjectByID = async (req, res) => {
     });
   }
 
-  // const projects = JSON.parse(await client.get("allprojects"));
-
-  // const pro = projects.filter((pros) => pros.id === id);
-
-  // if (pro.length !== 0) {
-  //   return sendResponse({
-  //     message: "Project Retrived Successfully",
-  //     res,
-  //     statusCode: 200,
-  //     success: true,
-  //     data: pro,
-  //   });
-  // }
-
   try {
     const project = await prisma.project.findUnique({
       where: {

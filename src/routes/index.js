@@ -7,6 +7,7 @@ import Project from "./project/route.js";
 import Task from "./tasks/route.js";
 import Team from "./team/route.js";
 import Employee from "./employee/route.js";
+import { Submittals } from "./submittals/route.js";
 
 const routes = express.Router();
 
@@ -18,5 +19,6 @@ routes.use("/project", Project);
 routes.use("/task", Task);
 routes.use("/team", Team);
 routes.use("/employee", Employee);
+routes.use("/submittals", Submittals);
 
 export { routes };
