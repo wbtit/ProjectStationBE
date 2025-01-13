@@ -312,7 +312,7 @@ model Submittals{
   status Boolean @default(false)
   subject String
   description String
-  files String[] @default([])
+  files Json[] @default([])
 
 
   @@map("submittals")
@@ -331,8 +331,7 @@ model RFI{
   status Boolean @default(false)
   subject String
   description String
-  files String[] @default([])
-
+  files Json[] @default([])
 
   @@map("rfi")
 }
