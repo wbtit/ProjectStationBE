@@ -5,8 +5,8 @@ import { AddDepartment, GetDepartment } from "../../controllers/department.js";
 
 const router = Router();
 
-router.post("/adddepartment", Authenticate, isAdmin, AddDepartment); // Adding Departments
+router.post("/department", Authenticate, isAdmin, AddDepartment); // Adding Departments
 
-router.get("/getdepartment", GetDepartment); // Get All Departments ( Not sure about middlewares )
+router.get("/department", GetDepartment); // Get All Departments ( Not sure about middlewares )
 
 export default router;

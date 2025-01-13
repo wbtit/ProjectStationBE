@@ -6,34 +6,40 @@ import prisma from "../lib/prisma.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import path from "path";
 import fs from "fs";
+import client from "../redis/index.js";
+import mime from "mime";
+import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 
 const AddProject = async (req, res) => {
   const {
     name,
     description,
-    fabricatorID,
-    departmentID,
-    teamID,
-    managerID,
+    fabricator,
+    department,
+    team,
+    manager,
     status,
     stage,
     tools,
     connectionDesign,
     miscDesign,
-    customerDesign,
-    startDate,
-    appprovalDate,
+    customer,
+    start_date,
+    end_date,
     estimatedHours,
   } = req.body;
+
+  console.log(req.body);
 
   if (
     !name ||
     !description ||
-    !fabricatorID ||
-    !departmentID ||
-    !teamID ||
-    !managerID ||
-    !startDate ||
+    !fabricator ||
+    !department ||
+    !team ||
+    !manager ||
+    !start_date ||
+    !end_date ||
     !estimatedHours
   ) {
     return sendResponse({
@@ -49,22 +55,30 @@ const AddProject = async (req, res) => {
     const project = await prisma.project.create({
       data: {
         description: description,
-        estimatedHours: estimatedHours,
+        estimatedHours: parseInt(estimatedHours),
         name: name,
-        approvalDate: appprovalDate,
+        approvalDate: start_date,
         connectionDesign: connectionDesign,
-        customerDesign: customerDesign,
-        departmentID: departmentID,
-        fabricatorID: fabricatorID,
-        managerID: managerID,
+        customerDesign: customer,
+        departmentID: department,
+        fabricatorID: fabricator,
+        managerID: manager,
         miscDesign: miscDesign,
         stage: stage,
-        startDate: startDate,
-        teamID: teamID,
+        startDate: start_date,
+        teamID: team,
         status: status,
         tools: tools,
+        endDate: end_date,
       },
     });
+
+    const projects = JSON.parse(await client.get("allprojects"));
+    projects.push(project);
+
+    await client.set("allprojects", JSON.stringify(projects));
+
+    console.log(project);
 
     return sendResponse({
       message: "Project created successfully",
@@ -74,8 +88,9 @@ const AddProject = async (req, res) => {
       data: project,
     });
   } catch (error) {
+    console.log(error.message);
     return sendResponse({
-      message: "Somethings went wrong!!",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -86,7 +101,6 @@ const AddProject = async (req, res) => {
 
 const Uploadfiles = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
 
   if (!isValidUUID(id)) {
     return sendResponse({
@@ -144,6 +158,21 @@ const Uploadfiles = async (req, res) => {
       },
     });
 
+    // Step 2: Get the cached projects from Redis
+    const cachedProjects = await client.get("allprojects");
+
+    // Step 3: Parse the cached projects
+    let projects = JSON.parse(cachedProjects);
+
+    // Step 4: Find and update the files field in the cached project by ID
+    const projectIndex = projects.findIndex((project) => project.id === id);
+    if (projectIndex !== -1) {
+      projects[projectIndex].files = updatedFilesProject.files; // Replace files
+    }
+
+    // Step 5: Set the updated projects back to Redis
+    await client.set("allprojects", JSON.stringify(projects));
+
     return sendResponse({
       message: "Files Upload Complete",
       res,
@@ -176,31 +205,34 @@ const UpdateProject = async (req, res) => {
     });
   }
 
+  console.log(req.body);
+
+  req.body = { ...req.body, fabricator: null };
+
   try {
-    if (req.body.fabricatorID) {
+    if (req.body.fabricator) {
       // Check whether the ID is a fabricator ID
       const fabricator = await prisma.fabricator.findUnique({
         where: {
-          id: req.body.fabricatorID,
+          id: req.body.fabricator,
         },
       });
-      console.log("Gbrica=", fabricator);
-      if (!fabricator) {
-        return sendResponse({
-          message: "Invalid Fabricator",
-          res,
-          statusCode: 400,
-          success: false,
-          data: null,
-        });
-      }
+      // if (!fabricator) {
+      //   return sendResponse({
+      //     message: "Invalid Fabricator",
+      //     res,
+      //     statusCode: 400,
+      //     success: false,
+      //     data: null,
+      //   });
+      // }
     }
 
-    if (req.body.departmentID) {
+    if (req.body.department) {
       // Check whether such department exists
       const department = await prisma.department.findUnique({
         where: {
-          id: req.departmentID,
+          id: req.department,
         },
       });
       if (!department) {
@@ -214,11 +246,11 @@ const UpdateProject = async (req, res) => {
       }
     }
 
-    if (req.body.teamID) {
+    if (req.body.team) {
       // Check whether such team exists
       const team = await prisma.team.findUnique({
         where: {
-          id: req.teamID,
+          id: req.body.team,
         },
       });
       if (!team) {
@@ -232,11 +264,11 @@ const UpdateProject = async (req, res) => {
       }
     }
 
-    if (req.body.managerID) {
+    if (req.body.manager) {
       // Check the provided user ID is a manager or not
       const { is_manager } = await prisma.users.findUnique({
         where: {
-          id: req.managerID,
+          id: req.manager,
         },
         select: {
           is_manager: true,
@@ -253,12 +285,53 @@ const UpdateProject = async (req, res) => {
         });
     }
 
+    const updateData = {};
+    const fieldsToUpdate = [
+      "name",
+      "fabricator",
+      "description",
+      "duration",
+      "startDate",
+      "endDate",
+      "status",
+      "stage",
+      "manager",
+      "approvalDate",
+    ];
+
+    fieldsToUpdate.forEach((field) => {
+      if (
+        req.body[field] !== null &&
+        req.body[field] !== undefined &&
+        req.body[field] !== ""
+      ) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    console.log(updateData);
+
     const updatedProject = await prisma.project.update({
       where: {
         id: id,
       },
-      data: req.body, // req.body must contains only fields present in the project schema
+      data: updateData, // req.body must contains only fields present in the project schema
     });
+
+    // // Step 2: Get the cached projects from Redis
+    // const cachedProjects = await client.get("allprojects");
+
+    // // Step 3: Parse the cached projects
+    // let projects = JSON.parse(cachedProjects);
+
+    // // Step 4: Find and update the project in the cached list
+    // const projectIndex = projects.findIndex((project) => project.id === id);
+    // if (projectIndex !== -1) {
+    //   projects[projectIndex] = updatedProject; // Replace the old project with the updated one
+    // }
+
+    // // Step 5: Set the updated projects back to Redis
+    // await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Project Update Successfully",
@@ -268,9 +341,9 @@ const UpdateProject = async (req, res) => {
       data: updatedProject,
     });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     return sendResponse({
-      message: "Something went wrong",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -283,7 +356,49 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    const projects = await prisma.project.findMany();
+    const project = await client.get("allprojects");
+    console.log("I got hit");
+    // if (project) {
+    //   console.log("From Redis ");
+    //   return sendResponse({
+    //     message: "Projects retrived successfully",
+    //     res,
+    //     statusCode: 200,
+    //     success: true,
+    //     data: JSON.parse(project),
+    //   });
+    // }
+
+    const projects = await prisma.project.findMany({
+      include: {
+        fabricator: true,
+        manager: {
+          select: {
+            f_name: true,
+            l_name: true,
+          },
+        },
+        team: {
+          select: {
+            name: true,
+            members: true,
+          },
+        },
+        department: {
+          select: {
+            name: true,
+            manager: {
+              select: {
+                f_name: true,
+                l_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Projects retrived successfully",
@@ -295,7 +410,7 @@ const GetAllProjects = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return sendResponse({
-      message: "Something went wrong",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -317,18 +432,50 @@ const GetProjectByID = async (req, res) => {
     });
   }
 
+  // const projects = JSON.parse(await client.get("allprojects"));
+
+  // const pro = projects.filter((pros) => pros.id === id);
+
+  // if (pro.length !== 0) {
+  //   return sendResponse({
+  //     message: "Project Retrived Successfully",
+  //     res,
+  //     statusCode: 200,
+  //     success: true,
+  //     data: pro,
+  //   });
+  // }
+
   try {
     const project = await prisma.project.findUnique({
       where: {
         id,
       },
+      include: {
+        team: true,
+      },
     });
+
+    const ids = project.team.members.map((mem) => mem.id);
+
+    const data = await fetchTeamDetails({ ids });
+
+    const Data = project.team.members.map((m) => {
+      return { ...data[m.id], role: m.role };
+    });
+
     return sendResponse({
       message: "Project Retrived Successfully",
       res,
       statusCode: 200,
       success: true,
-      data: project,
+      data: {
+        ...project,
+        team: {
+          ...project.team,
+          members: Data,
+        },
+      },
     });
   } catch (error) {
     console.log(error.message);
@@ -462,6 +609,48 @@ const DownloadFile = async (req, res) => {
   }
 };
 
+const ViewFile = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id },
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const fileObject = project.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 export {
   AddProject,
   Uploadfiles,
@@ -471,4 +660,5 @@ export {
   GetAllFilesByProjectID,
   GetAllfiles,
   DownloadFile,
+  ViewFile,
 };

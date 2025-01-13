@@ -11,7 +11,7 @@ const AddFabricator = async (req, res) => {
 
   const { name, headquater, website, drive } = req.body;
 
-  if (!name || !headquater || !website || !drive) {
+  if (!name || !headquater) {
     return sendResponse({
       message: "Fields are emmpty",
       res,
@@ -22,14 +22,15 @@ const AddFabricator = async (req, res) => {
   }
 
   // Checking the user is a super user.
+
   try {
     const fabricator = await prisma.fabricator.create({
       data: {
         createdById: id,
         fabName: name,
-        headquaters: headquater,
-        drive: drive,
-        website: website,
+        headquaters: { ...headquater, id: uuidv4() },
+        drive: drive ? drive : " ",
+        website: website ? website : "",
       },
     });
 
@@ -56,6 +57,8 @@ const AddFabricator = async (req, res) => {
 const AddBranch = async (req, res) => {
   const { fid } = req.params;
 
+  console.log(req.body);
+
   if (!isValidUUID(fid)) {
     return sendResponse({
       message: "Invalid fabricator",
@@ -66,7 +69,7 @@ const AddBranch = async (req, res) => {
     });
   }
 
-  const { city, state, country, zip_code, address } = req.body;
+  const { city, state, country, zip_code, address } = req.body.branch;
 
   const { id } = req.user;
 
@@ -262,6 +265,8 @@ const GetFabricatorByID = async (req, res) => {
       },
     });
 
+    console.log(fabricator);
+
     if (!fabricator) {
       return sendResponse({
         message: "Fabricator not found",
@@ -291,6 +296,67 @@ const GetFabricatorByID = async (req, res) => {
   }
 };
 
+const DeleteBranch = async (req, res) => {
+  const { fid, bid } = req.params;
+
+  if (!isValidUUID(fid) || !isValidUUID(bid)) {
+    return sendResponse({
+      message: "Invalid Ids",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  const fabricator = await prisma.fabricator.findUnique({
+    where: {
+      id: fid,
+    },
+  });
+
+  if (!fabricator) {
+    return sendResponse({
+      message: "Cannot find fabricator",
+      res,
+      statusCode: 409,
+      success: false,
+      data: null,
+    });
+  }
+
+  const branches = fabricator.branches;
+
+  if (branches.length === 0) {
+    return sendResponse({
+      message: "Branches are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  const newBranches = branches.filter((item) => item.id != bid);
+
+  const newFabricator = await prisma.fabricator.update({
+    where: {
+      id: fid,
+    },
+    data: {
+      branches: newBranches,
+    },
+  });
+
+  return sendResponse({
+    message: "Branch Deletion Success",
+    res,
+    statusCode: 200,
+    success: true,
+    data: newFabricator,
+  });
+};
+
 export {
   AddBranch,
   AddFabricator,
@@ -298,4 +364,5 @@ export {
   GetAllFabricator,
   UpdateFabricator,
   GetFabricatorByID,
+  DeleteBranch,
 };

@@ -7,7 +7,6 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 import { areUsers } from "../models/areUsers.js";
 
 const isMember = ({ members, id }) => {
-
   for (let member of members) {
     if (member.id === id) {
       return true; // Exit early if member is found
@@ -18,10 +17,11 @@ const isMember = ({ members, id }) => {
 };
 
 const AddTeam = async (req, res) => {
-
   const { name, manager, teammembers } = req.body;
 
-  if (!name || !manager || !teammembers) {
+  console.log(req.body);
+
+  if (!name || !manager) {
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -44,9 +44,9 @@ const AddTeam = async (req, res) => {
       });
     }
 
-    const { is_active, is_staff } = isManager;
+    const { is_manager } = isManager;
 
-    if (!is_active || !is_staff) {
+    if (!is_manager) {
       return sendResponse({
         message: "Person assigned is not a manager",
         res,
@@ -72,7 +72,6 @@ const AddTeam = async (req, res) => {
       data: teams,
     });
   } catch (error) {
-
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -84,11 +83,9 @@ const AddTeam = async (req, res) => {
 };
 
 const GetTeam = async (req, res) => {
-
   const { tid } = req.params;
 
   if (!tid) {
-
     return sendResponse({
       message: "Team ID not found",
       res,
@@ -99,7 +96,6 @@ const GetTeam = async (req, res) => {
   }
 
   if (!isValidUUID(tid)) {
-
     return sendResponse({
       message: "Invalid Team UUID",
       res,
@@ -117,7 +113,6 @@ const GetTeam = async (req, res) => {
     });
 
     if (!teams) {
-
       return sendResponse({
         message: "Invalid team ID",
         res,
@@ -141,7 +136,6 @@ const GetTeam = async (req, res) => {
       data: { data: newTeams, missingUsers },
     });
   } catch (error) {
-
     return sendResponse({
       message: "Somethings went wrong",
       res,
@@ -155,18 +149,16 @@ const GetTeam = async (req, res) => {
 };
 
 const GetTeamMembers = async (req, res) => {
-
   const { id } = req.params;
 
   try {
-    const team = await prisma.team.findUnique({ 
+    const team = await prisma.team.findUnique({
       where: {
         id,
       },
     });
 
     if (!team) {
-
       return sendResponse({
         message: "Team not found",
         res,
@@ -187,7 +179,6 @@ const GetTeamMembers = async (req, res) => {
       data: foundUsers,
     });
   } catch (error) {
-
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -200,8 +191,7 @@ const GetTeamMembers = async (req, res) => {
   }
 };
 
-const GetIndiviualTeamMembers = async (req, res) => { 
-
+const GetIndiviualTeamMembers = async (req, res) => {
   const { teamid, id } = req.params;
 
   try {
@@ -221,7 +211,8 @@ const GetIndiviualTeamMembers = async (req, res) => {
       });
     }
 
-    if (isMember({ id: id, members: team.members })) {  // This is to ensure that this id is in th members array to verify that he belong to this team or not and i will return members with there compplete data
+    if (isMember({ id: id, members: team.members })) {
+      // This is to ensure that this id is in th members array to verify that he belong to this team or not and i will return members with there compplete data
       const user = await getUserByID({ id: id });
       if (!user) {
         return sendResponse({
@@ -255,10 +246,10 @@ const GetIndiviualTeamMembers = async (req, res) => {
 };
 
 const DeleteTeam = async (req, res) => {
-
   const { id } = req.params;
 
-  if (!id) {  // Checking if the Team ID is not undefined
+  if (!id) {
+    // Checking if the Team ID is not undefined
     return sendResponse({
       message: "Invalid ID",
       res,
@@ -282,7 +273,6 @@ const DeleteTeam = async (req, res) => {
       data: response,
     });
   } catch (error) {
-
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -298,7 +288,8 @@ const DeleteTeam = async (req, res) => {
 const RemoveMember = async (req, res) => {
   const { id, mid, role } = req.params;
 
-  if (!id || !mid || !role) // Checking that all the necessary fields are not undefined
+  if (!id || !mid || !role)
+    // Checking that all the necessary fields are not undefined
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -308,7 +299,8 @@ const RemoveMember = async (req, res) => {
     });
 
   try {
-    const { members } = await prisma.team.findUnique({  // Select only members array using the Team ID
+    const { members } = await prisma.team.findUnique({
+      // Select only members array using the Team ID
       where: {
         id,
       },
@@ -327,7 +319,8 @@ const RemoveMember = async (req, res) => {
       });
     }
 
-    const newMembers = members.filter(  // Removing that particular member from the array and update it
+    const newMembers = members.filter(
+      // Removing that particular member from the array and update it
       (mem) => mem.id !== mid && mem.role !== role
     );
 
@@ -348,7 +341,6 @@ const RemoveMember = async (req, res) => {
       data: newTeam,
     });
   } catch (error) {
-
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -363,9 +355,13 @@ const RemoveMember = async (req, res) => {
 
 const AddMember = async (req, res) => {
   const { tid } = req.params;
-  const { id, role } = req.body;
+  const { employee, role } = req.body;
 
-  if (!tid || !id || !role) {  // Checking if the necessary data are not undefined.
+  console.log("Tid", tid)
+  console.log("body", req.body)
+
+  if (!tid || !employee || !role) {
+    // Checking if the necessary data are not undefined.
     return sendResponse({
       message: "Incomplete data",
       res,
@@ -376,7 +372,8 @@ const AddMember = async (req, res) => {
   }
 
   try {
-    const { members } = await prisma.team.findUnique({ // Selecting only members using th Team ID
+    const { members } = await prisma.team.findUnique({
+      // Selecting only members using th Team ID
       where: {
         id: tid,
       },
@@ -385,7 +382,8 @@ const AddMember = async (req, res) => {
       },
     });
 
-    if (!members) { // If members is undefined then it's a invalid Team. (If it's valid one we will get '[]')
+    if (!members) {
+      // If members is undefined then it's a invalid Team. (If it's valid one we will get '[]')
       return sendResponse({
         message: "Invalid Team ID",
         res,
@@ -395,10 +393,13 @@ const AddMember = async (req, res) => {
       });
     }
 
-    members.push({ // Push the new member to the array and update
-      id: id,
+    members.push({
+      // Push the new member to the array and update
+      id: employee.trim(),
       role: role,
     });
+
+    console.log(members)
 
     const newTeam = await prisma.team.update({
       where: {
@@ -417,7 +418,7 @@ const AddMember = async (req, res) => {
       data: newTeam,
     });
   } catch (error) {
-
+    console.log(error.message)
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -432,7 +433,11 @@ const AddMember = async (req, res) => {
 
 const GetAllTeams = async (req, res) => {
   try {
-    const Teams = await prisma.team.findMany(); // Getting all the teams irrespective of any conditions.
+    const Teams = await prisma.team.findMany({
+      include: {
+        manager: true,
+      },
+    }); // Getting all the teams irrespective of any conditions.
 
     return sendResponse({
       message: "Retrived All Teams",

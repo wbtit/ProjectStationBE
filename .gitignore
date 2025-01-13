@@ -53,6 +53,9 @@ web_modules/
 # Optional npm cache directory
 .npm
 
+# Docker
+docker-compose.yml
+
 # Optional eslint cache
 .eslintcache
 
