@@ -6,7 +6,7 @@ import prisma from "../lib/prisma.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import path from "path";
 import fs from "fs";
-import client from "../redis/index.js";
+// import client from "../redis/index.js";
 import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 
@@ -130,7 +130,7 @@ const Uploadfiles = async (req, res) => {
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
       path: `/public/projecttemp/${file.filename}`, // Relative path
-    }));
+    }));git pull origin test
 
     // Fetch the project
     const project = await prisma.project.findUnique({
