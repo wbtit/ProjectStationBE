@@ -130,7 +130,7 @@ const Uploadfiles = async (req, res) => {
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
       path: `/public/projecttemp/${file.filename}`, // Relative path
-    }));git pull origin test
+    }));
 
     // Fetch the project
     const project = await prisma.project.findUnique({
