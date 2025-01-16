@@ -1,7 +1,12 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { submittalsUploads } from "../../config/multer.js";
-import { AddSubmitals } from "../../controllers/subbmitals.js";
+import {
+  AddSubmitals,
+  RecievedSubmittals,
+  SentSubmittals,
+  SubmittalsSeen,
+} from "../../controllers/subbmitals.js";
 
 const router = Router();
 
@@ -12,4 +17,10 @@ router.post(
   AddSubmitals
 );
 
-export { router as Submittals};
+router.get("/submittals/sent", Authenticate, SentSubmittals);
+
+router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
+
+router.patch("/submittals/:id", Authenticate, SubmittalsSeen);
+
+export { router as Submittals };
