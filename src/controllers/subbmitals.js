@@ -36,6 +36,58 @@ const AddSubmitals = async (req, res) => {
         sender_id: id,
         status: true,
       },
+      include: {
+        recepients: true,
+      },
+    });
+
+    const htmlContent = `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            color: #333;
+          }
+          .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+          }
+          h1 {
+            color: #5b6e7d;
+          }
+          .content {
+            margin-top: 20px;
+          }
+          .description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Notification</h1>
+          <div class="content">
+            <p class="description">
+              ${description}
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+    sendEmail({
+      html: htmlContent,
+      to: submitals.recepients.email,
+      subject: subject,
+      text: description,
     });
 
     return sendResponse({
