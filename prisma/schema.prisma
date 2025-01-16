@@ -77,6 +77,8 @@ datasource db {
     rfisender RFI[] @relation("senderRFI")
 
 
+
+
     @@map("users")
   }
 
@@ -335,7 +337,6 @@ model RFI{
 
   @@map("rfi")
 }
-
 
 
 enum UserRole {
