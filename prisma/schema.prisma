@@ -340,8 +340,6 @@ model RFI{
 }
 
 
-<<<<<<< HEAD
-=======
 model Notification {
   id String @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
@@ -353,7 +351,6 @@ model Notification {
   }
 
 
->>>>>>> 54f7509 (feat: email service done)
 enum UserRole {
   STAFF
   CLIENT
