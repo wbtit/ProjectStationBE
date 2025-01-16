@@ -9,6 +9,7 @@ import Team from "./team/route.js";
 import Employee from "./employee/route.js";
 import RFI from "./rfi/route.js"
 import { Submittals } from "./submittals/route.js";
+import Notifications from "./notifications/routes.js"
 
 const routes = express.Router();
 
@@ -22,5 +23,6 @@ routes.use("/team", Team);
 routes.use("/employee", Employee);
 routes.use("/RFI",RFI)
 routes.use("/submittals", Submittals);
+routes.use("/notifications",Notifications)
 
 export { routes };

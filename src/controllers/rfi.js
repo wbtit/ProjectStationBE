@@ -104,6 +104,26 @@ const addRFI = async (req, res) => {
         data: null,
       });
     }
+
+    
+    const notification= await prisma.notification.create({
+      data:{
+        userID:id,
+        subject:subject,
+        isRead:false
+      }
+    })
+if(!notification){
+  return sendResponse({
+    message:"Failed to add the notifications",
+    res,
+    statusCode:400,
+    success:false,
+    data:null
+
+  })
+}
+
     return sendResponse({
       message: "RFI added successfully",
       res,
