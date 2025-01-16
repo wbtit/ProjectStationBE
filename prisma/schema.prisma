@@ -37,8 +37,8 @@ datasource db {
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
 
-    fabricator    Fabricator? @relation("UserFabricator", fields: [fabricatorId], references: [id])
-    fabricatorId  String?     @db.Uuid @unique // Make fabricatorId unique for a one-to-one relation
+    fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
+    fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")
 
     fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
 
@@ -66,6 +66,18 @@ datasource db {
     assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
     approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
 
+    messageSentBy Message[] @relation("messageSentBy")
+    messageReceivedBy Message[] @relation("messageReceivedBy")
+
+    submittalRecepients Submittals[] @relation("UsersSubmittals")
+    submittalsender Submittals[] @relation("senderSubmittals")
+
+
+    rfiRecepients RFI[] @relation("UsersRFI")
+    rfisender RFI[] @relation("senderRFI")
+
+
+
 
     @@map("users")
   }
@@ -76,8 +88,8 @@ model Fabricator {
   createdBy   Users    @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   fabName     String   @default("")
   headquaters Json     @default("{}")
-  website     String   @default("")
-  drive       String   @default("")
+  website     String?   @default("")
+  drive       String?   @default("")
   branches    Json     @default("[]")
   files       String[] @default([])
   is_bin      Boolean  @default(true)
@@ -85,11 +97,13 @@ model Fabricator {
   updatedAt   DateTime @updatedAt
 
   users       Users[] @relation("FabricatorUsers") // Relation for multiple users
-  singleUser  Users?  @relation("UserFabricator") // Opposite relation for fabricator in Users
+  userss       Users[] @relation("UsersFabricator")
 
   project    Project[] @relation("projectFabricator")
-  tasks Task[] @relation("fabricatorTask")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
+  submittals Submittals[] @relation("FabricatorSubmittals")
+  rfi RFI[] @relation("FabricatorRFI")
+
 
   @@map("fabricators")
 }
@@ -142,11 +156,16 @@ model Team {
   connectionDesign Boolean @default(true) // Not sure about the default value
   miscDesign Boolean @default(true) // Not sure about the default value
   customerDesign Boolean @default(false) // Not sure about the default value
-  startDate DateTime @default(now()) // Not sure about the default value
-  approvalDate DateTime @default(now()) // Not sure about the default value
+  startDate String  // Not sure about the default value
+  endDate String 
+  approvalDate String
   estimatedHours Int 
   tasks Task[] @relation("projectTask")
   accepttasks AcceptTask[] @relation("acceptTaskProject")
+
+   submittals Submittals[] @relation("ProjectSubmittals")
+  rfi RFI[] @relation("ProjectRFI")
+
 
   @@map("project")
 } 
@@ -156,15 +175,13 @@ model Task {
   name        String
   description String
   status      String   
-  attachment  String
   priority    Int
   created_on  DateTime  @default(now())
-  due_date    DateTime
+  due_date    String
+  start_date  String
   duration    String
   project_id String @db.Uuid
   project Project @relation(fields: [project_id], references: [id], name: "projectTask", onDelete: Cascade)
-  fabricator_id String @db.Uuid
-  fabricator Fabricator @relation(fields: [fabricator_id], references: [id], name: "fabricatorTask", onDelete: Cascade)
   user_id String @db.Uuid
   user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
 
@@ -258,6 +275,69 @@ model Comment{
   @@map("comment")
 
 }
+model Message {
+  id String @id @default(uuid()) @db.Uuid
+  sender_id String @db.Uuid
+  user Users @relation(fields: [sender_id], references: [id], onDelete: Cascade, name: "messageSentBy")
+  receiver_id String @db.Uuid
+  users Users @relation(fields: [receiver_id], references: [id], onDelete: Cascade, name: "messageReceivedBy")
+  subject String
+  body String
+  timeStamp DateTime @default(now())
+  status Boolean
+  attachment Attachment[] @relation("fileAttachment")
+  @@map("message")
+}
+
+model Attachment {
+  id String @id @default(uuid()) @db.Uuid
+  message_id String @db.Uuid
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade, name: "fileAttachment")
+  file_path String
+  file_name String
+  @@map("attachment")
+}
+
+
+
+model Submittals{
+  id String @id @default(uuid()) @db.Uuid
+  fabricator_id String @db.Uuid
+  date DateTime @default(now())
+  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorSubmittals",onDelete: Cascade)
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id],references: [id],name:"ProjectSubmittals",onDelete: Cascade)
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersSubmittals",onDelete: Cascade)
+  sender_id String @db.Uuid
+  sender Users @relation(fields: [sender_id],references: [id],name: "senderSubmittals",onDelete: Cascade)
+  status Boolean @default(false)
+  subject String
+  description String
+  files Json[] @default([])
+
+
+  @@map("submittals")
+}
+model RFI{
+  id String @id @default(uuid()) @db.Uuid
+  fabricator_id String @db.Uuid
+  date DateTime @default(now())
+  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorRFI",onDelete: Cascade)
+  project_id String @db.Uuid
+  project Project @relation(fields: [project_id],references: [id],name:"ProjectRFI",onDelete: Cascade)
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersRFI",onDelete: Cascade)
+  sender_id String @db.Uuid
+  sender Users @relation(fields: [sender_id],references: [id],name: "senderRFI",onDelete: Cascade)
+  status Boolean @default(false)
+  subject String
+  description String
+  files Json[] @default([])
+
+  @@map("rfi")
+}
+
 
 enum UserRole {
   STAFF
@@ -268,10 +348,11 @@ enum UserRole {
 //task
 enum Status {
   ACTIVE
-  ON_HOLD
+  ONHOLD
   INACTIVE
   DELAY
   COMPLETE
+  ASSIGNED
 }
 
 //PROJECT AND TASK

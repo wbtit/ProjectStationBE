@@ -4,8 +4,11 @@ import { getUsers } from "./src/models/userAllModel.js";
 import cors from "cors";
 import { routes } from "./src/routes/index.js";
 import { app } from "./src/app.js";
+import http from 'http';
+import WebSocket from 'ws'; // Correct WebSocket import
 
 dotenv.config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(
@@ -16,7 +19,7 @@ app.use(
 
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "You Summoned WBT Sever",
+    message: "You Summoned WBT Server",
     data: {
       reward: "Summon Success",
     },
@@ -24,7 +27,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/getall", async (req, res) => {
-
   try {
     const users = await getUsers();
     console.log(users);
@@ -42,7 +44,34 @@ app.get("/getall", async (req, res) => {
 
 app.use("/api", routes);
 
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server }); // Initialize WebSocket Server correctly
+
+const userSockets = {};
+
+// WebSocket connection setup
+wss.on('connection', (ws, req) => {
+  const userId = req.url?.split('?userId=')[1];
+  if (userId) {
+    userSockets[userId] = ws;
+    console.log(`User ${userId} connected`);
+
+    ws.on('message', (message) => {
+      console.log(`Message from user ${userId}: ${message}`);
+    });
+
+    ws.on('close', () => {
+      console.log(`User ${userId} disconnected`);
+      delete userSockets[userId];
+    });
+  }
+});
+
+// Add WebSocket instances to app locals
+app.locals.wss = wss;
+app.locals.userSockets = userSockets;
+
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("Server is active on port ", PORT);
 });

@@ -1,16 +1,16 @@
-
 // Please navigate to very bottom of the file to know the logics in this file.
-
 
 import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 import { hashPassword } from "../utils/crypter.js";
 import { getUserByUsername } from "../models/userUniModel.js";
+import { isValidUUID } from "../utils/isValiduuid.js";
 
 const addClient = async (req, res) => {
   const { fid } = req.params;
 
-    
+  console.log(req.body);
+
   const {
     username,
     password,
@@ -25,6 +25,7 @@ const addClient = async (req, res) => {
     designation,
     address,
     fabricator,
+    is_superuser,
   } = req.body;
 
   if (
@@ -55,8 +56,39 @@ const addClient = async (req, res) => {
     });
   }
 
-  const { headquaters } = fabricator;
-  const { city, state, country, zip_code } = headquaters;
+  const fab = await prisma.fabricator.findUnique({
+    where: {
+      id: fabricator,
+    },
+  });
+
+  if (!fab) {
+    return sendResponse({
+      message: "Cannot find fabricator",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  let city, state, country, zip_code;
+
+  if (address === fab.headquaters.id) {
+    city = fab.headquaters.city;
+    state = fab.headquaters.state;
+    country = fab.headquaters.country;
+    zip_code = fab.headquaters.zip_code;
+  } else {
+    fab.branches.map((branch) => {
+      if (branch.id === address) {
+        city = branch.city;
+        state = branch.state;
+        country = branch.country;
+        zip_code = branch.zip_code;
+      }
+    });
+  }
 
   const hashedPassword = await hashPassword(password);
 
@@ -90,6 +122,7 @@ const addClient = async (req, res) => {
         country: country,
         state: state,
         zip_code: zip_code,
+        is_superuser: is_superuser,
       },
     });
 
@@ -101,9 +134,8 @@ const addClient = async (req, res) => {
       data: newclient,
     });
   } catch (error) {
-    
     sendResponse({
-      message: "Something went wrong!!",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -138,7 +170,7 @@ const updateClient = async (req, res) => {
   }
 
   try {
-    const updateclient = await prisma.client.update({
+    const updateclient = await prisma.users.update({
       where: {
         id: cid,
       },
@@ -153,7 +185,6 @@ const updateClient = async (req, res) => {
       data: updateclient,
     });
   } catch (error) {
-
     sendResponse({
       message: "Something went wrong!!",
       res,
@@ -166,4 +197,142 @@ const updateClient = async (req, res) => {
   }
 };
 
-export { addClient, updateClient };
+const deleteClient = async (req, res) => {
+  const { cid } = req?.params;
+  if (!cid) {
+    return sendResponse({
+      message: "Failed to get clientId",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+  try {
+    const deleteClient = await prisma.users.delete({
+      where: {
+        id: cid,
+      },
+    });
+    if (!deleteClient) {
+      return sendResponse({
+        message: "No client found with ID",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Client deleted Success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: deleteClient,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const getAllClients = async (req, res) => {
+  try {
+    const clients = await prisma.users.findMany({
+      where: {
+        role: "CLIENT",
+      },
+      include: {
+        fabricator: true,
+      },
+    });
+    console.log(clients);
+    if (!clients) {
+      return sendResponse({
+        message: "No clients found",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Clients Fetched Successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: clients,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+const GetClientBYID = async (req, res) => {
+  const { cid } = req.params;
+
+  if (!isValidUUID(cid)) {
+    return sendResponse({
+      message: "Invalid client ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const client = await prisma.users.findUnique({
+      where: {
+        id: cid,
+      },
+    });
+
+    if (!client) {
+      return sendResponse({
+        message: "No client found",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    console.log(client);
+
+    return sendResponse({
+      message: "Client fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: client,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export { addClient, updateClient, deleteClient, getAllClients, GetClientBYID };

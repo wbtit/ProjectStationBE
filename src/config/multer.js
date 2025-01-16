@@ -3,6 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 
 const fileDataMap = {}; // Object to store file data (UUID and original name)
+const submittalsDataMap = {};
+const rfiDataMap = {};
+const fabricatorDataMap = {};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -47,5 +50,143 @@ const uploads = multer({
   },
 });
 
+const storageSubmittals = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/submittalstemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    submittalsDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const submittalsUploads = multer({
+  storage: storageSubmittals,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/avif",
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+        )
+      );
+    }
+  },
+});
+
+const storageRfi = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/rfitemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    rfiDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const rfiUploads = multer({
+  storage: storageRfi,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/avif",
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+        )
+      );
+    }
+  },
+});
+
+const storageFabricator = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/fabricatortemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    fabricatorDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const fabricatorsUploads = multer({
+  storage: storageFabricator,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/avif",
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+        )
+      );
+    }
+  },
+});
+
 // Export the uploader and file data object
-export { uploads, fileDataMap };
+export {
+  uploads,
+  fileDataMap,
+  fabricatorDataMap,
+  fabricatorsUploads,
+  rfiDataMap,
+  rfiUploads,
+  submittalsDataMap,
+  submittalsUploads,
+};
