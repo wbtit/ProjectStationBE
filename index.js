@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 app.get("/getall", async (req, res) => {
   try {
     const users = await getUsers();
-    console.log(users);
+    // console.log(users);
     res.status(200).json({
       message: "Success",
       data: users,
@@ -52,7 +52,7 @@ const userSockets = {};
 
 // WebSocket connection setup
 wss.on("connection", (ws, req) => {
-  const userId = req.url?.split("?userId=")[1];
+  const userId = new URLSearchParams(req.url.split('?')[1]).get('userId');
   if (userId) {
     userSockets[userId] = ws;
     console.log(`User ${userId} connected`);
