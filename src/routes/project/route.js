@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { BroadAccess } from "../../middlewares/broadaccess.js";
+import { isStaff } from "../../middlewares/isstaff.js";
 import {
   AddProject,
   Uploadfiles,
@@ -23,21 +24,21 @@ router.post(
   Authenticate,
   BroadAccess,
   uploads.array("files"),
-  Uploadfiles
+  Uploadfiles                                           
 ); // Upload Files To Project+
 
-router.get("/projects/project-files", Authenticate, BroadAccess, GetAllfiles);
+router.get("/projects/project-files", Authenticate, isStaff, GetAllfiles);
 
 router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Update Projects
 
-router.get("/projects", Authenticate, BroadAccess, GetAllProjects); // Get All Projects
+router.get("/projects", Authenticate, isStaff, GetAllProjects); // Get All Projects
 
-router.get("/projects/:id", Authenticate, BroadAccess, GetProjectByID); // Get Project by ID
+router.get("/projects/:id", Authenticate, isStaff, GetProjectByID); // Get Project by ID
 
 router.get(
   "/projects/:id/files",
   Authenticate,
-  BroadAccess,
+  isStaff,
   GetAllFilesByProjectID
 ); // Get project files by project id
 
