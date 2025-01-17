@@ -5,6 +5,7 @@ import { isAdmin } from "../../middlewares/isadmin.js";
 import { isManager } from "../../middlewares/ismanager.js";
 import { isProjectManager } from "../../middlewares/isprojectmanager.js";
 import { isSales } from "../../middlewares/issales.js";
+import { commentUploads } from "../../config/multer.js";
 
 import {
   AddTask,
@@ -75,11 +76,27 @@ router.get("/tasks/:id/get_assignes", Authenticate, GetTaskByIDAssignes); //get 
 
 router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes); //update assignes
 
-router.post("/tasks/add_comment", Authenticate, addComment); //add comment
+
+
+
+
+
+router.post("/tasks/add_comment/:task_id", Authenticate, commentUploads.array("files"), addComment); //add comment
 
 router.get("/tasks/:id/get_comment", Authenticate, getCommentById); //get comment
 
 router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID); //update comment
+
+
+
+
+
+
+
+
+
+
+
 
 router.post("/add_assigned-list", Authenticate, addAssignedList); // add assigned-list
 

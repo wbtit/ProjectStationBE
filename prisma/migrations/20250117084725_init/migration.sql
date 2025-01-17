@@ -1,3 +1,15 @@
+/*
+  Warnings:
+
+  - You are about to drop the `notification` table. If the table is not empty, all the data it contains will be lost.
+
+*/
+-- DropForeignKey
+ALTER TABLE "notification" DROP CONSTRAINT "notification_userID_fkey";
+
+-- DropTable
+DROP TABLE "notification";
+
 -- CreateTable
 CREATE TABLE "Notification" (
     "id" UUID NOT NULL,

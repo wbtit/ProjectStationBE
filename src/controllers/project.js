@@ -74,7 +74,7 @@ const AddProject = async (req, res) => {
     });
 
     // const projects = JSON.parse(await client.get("allprojects"));
-    projects.push(project);
+    // projects.push(project);
 
     // await client.set("allprojects", JSON.stringify(projects));
 

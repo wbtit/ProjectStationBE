@@ -8,6 +8,9 @@ CREATE TYPE "UserRole" AS ENUM ('STAFF', 'CLIENT', 'VENDOR');
 CREATE TYPE "Status" AS ENUM ('ACTIVE', 'ONHOLD', 'INACTIVE', 'DELAY', 'COMPLETE', 'ASSIGNED');
 
 -- CreateEnum
+CREATE TYPE "WorkHourStatus" AS ENUM ('START', 'END', 'PAUSE', 'RESUME');
+
+-- CreateEnum
 CREATE TYPE "Stage" AS ENUM ('RFI', 'IFA', 'BFA', 'BFA_M', 'RIFA', 'RBFA', 'IFC', 'BFC', 'RJFC', 'REV', 'CO');
 
 -- CreateEnum
@@ -114,14 +117,13 @@ CREATE TABLE "task" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" TEXT NOT NULL,
-    "attachment" TEXT NOT NULL,
     "priority" INTEGER NOT NULL,
     "created_on" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "due_date" TIMESTAMP(3) NOT NULL,
+    "due_date" TEXT NOT NULL,
     "duration" TEXT NOT NULL,
     "project_id" UUID NOT NULL,
-    "fabricator_id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
+    "start_date" TEXT NOT NULL,
 
     CONSTRAINT "task_pkey" PRIMARY KEY ("id")
 );
@@ -201,6 +203,84 @@ CREATE TABLE "comment" (
 );
 
 -- CreateTable
+CREATE TABLE "message" (
+    "id" UUID NOT NULL,
+    "sender_id" UUID NOT NULL,
+    "receiver_id" UUID NOT NULL,
+    "subject" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "timeStamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" BOOLEAN NOT NULL,
+
+    CONSTRAINT "message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "attachment" (
+    "id" UUID NOT NULL,
+    "message_id" UUID NOT NULL,
+    "file_path" TEXT NOT NULL,
+    "file_name" TEXT NOT NULL,
+
+    CONSTRAINT "attachment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "submittals" (
+    "id" UUID NOT NULL,
+    "fabricator_id" UUID NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "project_id" UUID NOT NULL,
+    "recepient_id" UUID NOT NULL,
+    "sender_id" UUID NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT false,
+    "subject" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "files" JSONB[] DEFAULT ARRAY[]::JSONB[],
+
+    CONSTRAINT "submittals_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "rfi" (
+    "id" UUID NOT NULL,
+    "fabricator_id" UUID NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "project_id" UUID NOT NULL,
+    "recepient_id" UUID NOT NULL,
+    "sender_id" UUID NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT false,
+    "subject" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "files" JSONB[] DEFAULT ARRAY[]::JSONB[],
+
+    CONSTRAINT "rfi_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "notification" (
+    "id" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userID" UUID NOT NULL,
+    "subject" TEXT NOT NULL,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "workinghour" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "task_id" UUID NOT NULL,
+    "status" "WorkHourStatus" NOT NULL,
+    "start" TIMESTAMP(3) NOT NULL,
+    "duration" INTEGER NOT NULL,
+
+    CONSTRAINT "workinghour_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_FabricatorUsers" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
@@ -231,55 +311,52 @@ ALTER TABLE "users" ADD CONSTRAINT "users_fabricatorId_fkey" FOREIGN KEY ("fabri
 ALTER TABLE "fabricators" ADD CONSTRAINT "fabricators_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "department" ADD CONSTRAINT "department_managerId_fkey" FOREIGN KEY ("managerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "department" ADD CONSTRAINT "department_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "department" ADD CONSTRAINT "department_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "department" ADD CONSTRAINT "department_managerId_fkey" FOREIGN KEY ("managerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "team" ADD CONSTRAINT "team_managerID_fkey" FOREIGN KEY ("managerID") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "project" ADD CONSTRAINT "project_fabricatorID_fkey" FOREIGN KEY ("fabricatorID") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "project" ADD CONSTRAINT "project_departmentID_fkey" FOREIGN KEY ("departmentID") REFERENCES "department"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "project" ADD CONSTRAINT "project_teamID_fkey" FOREIGN KEY ("teamID") REFERENCES "team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "project" ADD CONSTRAINT "project_fabricatorID_fkey" FOREIGN KEY ("fabricatorID") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "project" ADD CONSTRAINT "project_managerID_fkey" FOREIGN KEY ("managerID") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task" ADD CONSTRAINT "task_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "project" ADD CONSTRAINT "project_teamID_fkey" FOREIGN KEY ("teamID") REFERENCES "team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task" ADD CONSTRAINT "task_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "task" ADD CONSTRAINT "task_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task" ADD CONSTRAINT "task_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "accepttask" ADD CONSTRAINT "accepttask_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assigendlist" ADD CONSTRAINT "assigendlist_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assignes" ADD CONSTRAINT "assignes_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "assignes" ADD CONSTRAINT "assignes_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -288,25 +365,67 @@ ALTER TABLE "assignes" ADD CONSTRAINT "assignes_assigned_by_fkey" FOREIGN KEY ("
 ALTER TABLE "assignes" ADD CONSTRAINT "assignes_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assignes" ADD CONSTRAINT "assignes_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assignes" ADD CONSTRAINT "assignes_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_task_id_fkey" FOREIGN KEY ("assigned_task_id") REFERENCES "assigendlist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_by_fkey" FOREIGN KEY ("assigned_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_task_id_fkey" FOREIGN KEY ("assigned_task_id") REFERENCES "assigendlist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "confirm" ADD CONSTRAINT "confirm_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "confirm" ADD CONSTRAINT "confirm_assigned_to_fkey" FOREIGN KEY ("assigned_to") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "comment" ADD CONSTRAINT "comment_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "comment" ADD CONSTRAINT "comment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "message" ADD CONSTRAINT "message_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "message" ADD CONSTRAINT "message_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "attachment" ADD CONSTRAINT "attachment_message_id_fkey" FOREIGN KEY ("message_id") REFERENCES "message"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "submittals" ADD CONSTRAINT "submittals_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "submittals" ADD CONSTRAINT "submittals_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "submittals" ADD CONSTRAINT "submittals_recepient_id_fkey" FOREIGN KEY ("recepient_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "submittals" ADD CONSTRAINT "submittals_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rfi" ADD CONSTRAINT "rfi_fabricator_id_fkey" FOREIGN KEY ("fabricator_id") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rfi" ADD CONSTRAINT "rfi_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rfi" ADD CONSTRAINT "rfi_recepient_id_fkey" FOREIGN KEY ("recepient_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rfi" ADD CONSTRAINT "rfi_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notification" ADD CONSTRAINT "notification_userID_fkey" FOREIGN KEY ("userID") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workinghour" ADD CONSTRAINT "workinghour_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workinghour" ADD CONSTRAINT "workinghour_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_FabricatorUsers" ADD CONSTRAINT "_FabricatorUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "fabricators"("id") ON DELETE CASCADE ON UPDATE CASCADE;

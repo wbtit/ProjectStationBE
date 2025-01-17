@@ -42,8 +42,9 @@ const AddFabricator = async (req, res) => {
       data: fabricator,
     });
   } catch (error) {
+    console.log(error)
     return sendResponse({
-      message: "Sorry something went wrong.",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,

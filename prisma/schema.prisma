@@ -1,7 +1,9 @@
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
+
 
 datasource db {
   provider = "postgresql"
@@ -9,10 +11,11 @@ datasource db {
   extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
+
   model Users {
     id            String   @id @default(uuid()) @db.Uuid
     username      String   @unique
-    password      String   
+    password      String  
     email         String?  @db.VarChar(150)
     f_name        String   @db.VarChar(50)
     m_name        String?  @db.VarChar(50)
@@ -32,24 +35,31 @@ datasource db {
     department    Json?    @default("{}")
     is_sales      Boolean? @default(false)
     is_manager    Boolean @default(false)
-    is_active     Boolean  @default(true) 
+    is_active     Boolean  @default(true)
     is_staff      Boolean  @default(false)
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
 
+
     fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
     fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")
 
+
     fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
+
 
     managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
     createdDepartments Department[] @relation("Creator") // Departments created by the user
 
+
     teamManager Team[] @relation("TeamManager")
+
 
     createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
 
+
     project Project[] @relation("projectManager")
+
 
     tasks Task[] @relation("userTask")
     taskAssignedby Assigned_list[] @relation("taskAssignedby")
@@ -58,16 +68,21 @@ datasource db {
     assignedToUser Assignes[] @relation("assignedToUser")
     approvedByUser Assignes[] @relation("approvedByUser")
 
+
     accepttasks AcceptTask[] @relation("acceptTaskUser")
 
+
     taskcommentuser Comment[] @relation("taskcommentuser")
+
 
     assignedByConfirm Confirm[] @relation("assignedByUserConfirm")
     assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
     approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
 
+
     messageSentBy Message[] @relation("messageSentBy")
     messageReceivedBy Message[] @relation("messageReceivedBy")
+
 
     submittalRecepients Submittals[] @relation("UsersSubmittals")
     submittalsender Submittals[] @relation("senderSubmittals")
@@ -78,10 +93,17 @@ datasource db {
 
 
 
+
+
+
     notification Notification[] @relation("Notification")
+
+    workingHourUser WorkingHours[] @relation("workingHourUser")
+
 
     @@map("users")
   }
+
 
 model Fabricator {
   id          String   @id @default(uuid()) @db.Uuid
@@ -97,8 +119,10 @@ model Fabricator {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+
   users       Users[] @relation("FabricatorUsers") // Relation for multiple users
   userss       Users[] @relation("UsersFabricator")
+
 
   project    Project[] @relation("projectFabricator")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
@@ -106,8 +130,12 @@ model Fabricator {
   rfi RFI[] @relation("FabricatorRFI")
 
 
+
+
   @@map("fabricators")
 }
+
+
 
 
 model Department {
@@ -119,29 +147,37 @@ model Department {
   createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator", onDelete: Cascade)
   isBin      Boolean  @default(false)
 
+
   project Project[] @relation("projectDepartment")
+
 
   @@map("department") // Optional: Matches the Django table name
 }
 
 
 
+
+
+
 model Team {
   id  String @id @default(uuid()) @db.Uuid
   name  String @unique
-  managerID String @db.Uuid 
+  managerID String @db.Uuid
   manager  Users @relation(fields: [managerID], references: [id], name: "TeamManager", onDelete: Cascade)
   members Json @default("[]")
 
+
   project Project[] @relation("projectTeam")
+
 
   @@map("team")
 }
 
+
   model Project {
     id String @id @default(uuid()) @db.Uuid
     name String @unique
-    description String 
+    description String
     fabricatorID String @db.Uuid
   fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
   departmentID String @db.Uuid
@@ -158,24 +194,28 @@ model Team {
   miscDesign Boolean @default(true) // Not sure about the default value
   customerDesign Boolean @default(false) // Not sure about the default value
   startDate String  // Not sure about the default value
-  endDate String 
+  endDate String
   approvalDate String
-  estimatedHours Int 
+  estimatedHours Int
   tasks Task[] @relation("projectTask")
   accepttasks AcceptTask[] @relation("acceptTaskProject")
+
 
    submittals Submittals[] @relation("ProjectSubmittals")
   rfi RFI[] @relation("ProjectRFI")
 
 
+
+
   @@map("project")
-} 
+}
+
 
 model Task {
   id          String    @id @default(uuid()) @db.Uuid
   name        String
   description String
-  status      String   
+  status      String  
   priority    Int
   created_on  DateTime  @default(now())
   due_date    String
@@ -186,11 +226,16 @@ model Task {
   user_id String @db.Uuid
   user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
 
+
   taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
   assignedTask Assignes[] @relation("assignedTask")
   taskcomment Comment[] @relation("taskcomment")
+
+  workingHourTask WorkingHours[] @relation("workingHourTask")
   @@map("task")
 }
+
+
 
 
 model AcceptTask{
@@ -210,8 +255,10 @@ model AcceptTask{
   user_id String @db.Uuid
   user Users @relation(fields: [user_id],references: [id],name: "acceptTaskUser",onDelete: Cascade)
 
+
   @@map("accepttask")
 }
+
 
 model Assigned_list{
   id  String @id @default(uuid()) @db.Uuid
@@ -229,6 +276,7 @@ model Assigned_list{
   @@map("assigendlist")
 }
 
+
 model Assignes {
  id String @id @default(uuid()) @db.Uuid
  approved_on DateTime @default(now())
@@ -243,7 +291,7 @@ model Assignes {
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
   approved_by String @db.Uuid
   userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
-  
+ 
   @@map("assignes")
 }
 model Confirm {
@@ -261,19 +309,22 @@ model Confirm {
   approved_by String @db.Uuid
   userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUserConfirm")
 
+
   @@map("confirm")
 }
 model Comment{
   id String @id @default(uuid()) @db.Uuid
   created_on DateTime @default(now())
   data String
-  file String
+  file Json @default("[]")
   task_id String @db.Uuid
   task Task @relation(fields: [task_id],references: [id],name: "taskcomment",onDelete: Cascade)
   user_id String @db.Uuid
   user Users @relation(fields: [user_id],references: [id],name: "taskcommentuser",onDelete: Cascade)
 
+
   @@map("comment")
+
 
 }
 model Message {
@@ -290,6 +341,7 @@ model Message {
   @@map("message")
 }
 
+
 model Attachment {
   id String @id @default(uuid()) @db.Uuid
   message_id String @db.Uuid
@@ -298,6 +350,9 @@ model Attachment {
   file_name String
   @@map("attachment")
 }
+
+
+
 
 
 
@@ -318,6 +373,8 @@ model Submittals{
   files Json[] @default([])
 
 
+
+
   @@map("submittals")
 }
 model RFI{
@@ -336,8 +393,11 @@ model RFI{
   description String
   files Json[] @default([])
 
+
   @@map("rfi")
 }
+
+
 
 
 model Notification {
@@ -345,17 +405,41 @@ model Notification {
   createdAt DateTime @default(now())
   userID String @db.Uuid
   user Users @relation(fields: [userID], references: [id], onDelete: Cascade, name: "Notification")
-  subject String 
+  subject String
   isRead Boolean @default(false)
 
+
   }
+
+
+model WorkingHours {
+  id       String         @id @default(uuid()) @db.Uuid
+  user_id  String         @db.Uuid
+  task_id  String         @db.Uuid
+  status   WorkHourStatus
+  start    DateTime
+  duration Int
+  task     Task           @relation("workingHourTask", fields: [task_id], references: [id], onDelete: Cascade)
+  user     Users          @relation("workingHourUser", fields: [user_id], references: [id], onDelete: Cascade)
+
+@@map("workinghour")
+
+}
+
+enum WorkHourStatus {
+  START
+  END
+  PAUSE
+  RESUME
+}
+
 
 
 enum UserRole {
   STAFF
   CLIENT
   VENDOR
-  
+ 
 }
 //task
 enum Status {
@@ -366,6 +450,7 @@ enum Status {
   COMPLETE
   ASSIGNED
 }
+
 
 //PROJECT AND TASK
 enum Stage {
@@ -381,6 +466,7 @@ enum Stage {
   REV
   CO // Not possible to use "#"
 }
+
 
 enum Tools {
   TEKLA
