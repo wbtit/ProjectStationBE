@@ -438,7 +438,16 @@ const GetProjectByID = async (req, res) => {
         id,
       },
       include: {
-        team: true,
+        team: {
+          include: {
+            manager: true,
+          },
+        },
+        department: true,
+        fabricator: true,
+        manager: true,
+        tasks: true,
+        accepttasks: true,
       },
     });
 
