@@ -26,11 +26,7 @@ import {
   updateTaskAssignes,
 } from "../../controllers/assignes.js";
 
-import {
-  addComment,
-  getCommentById,
-  updateCommentByID,
-} from "../../controllers/comment.js";
+import { addComment } from "../../controllers/comment.js";
 
 import {
   addAssignedList,
@@ -61,14 +57,9 @@ router.patch("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update
 
 router.put("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update Task By ID (METHOD PUT)
 
-
-
-
 router.get("/tasks/:id/accept", Authenticate, TaskByIDAccept); // Accept Task Using ID
 
 router.put("/tasks/:id/accept", Authenticate, UpdateTaskByIDs); // Update Accept Tasks By ID
-
-  
 
 router.post("/tasks/:task_id/add_assignes", Authenticate, addTaskAssignes); //add assignes
 
@@ -76,27 +67,7 @@ router.get("/tasks/:id/get_assignes", Authenticate, GetTaskByIDAssignes); //get 
 
 router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes); //update assignes
 
-
-
-
-
-
-router.post("/tasks/add_comment/:task_id", Authenticate, commentUploads.array("files"), addComment); //add comment
-
-router.get("/tasks/:id/get_comment", Authenticate, getCommentById); //get comment
-
-router.put("/tasks/:id/update_comment", Authenticate, updateCommentByID); //update comment
-
-
-
-
-
-
-
-
-
-
-
+router.post("/tasks/add_comment/:task_id", Authenticate, addComment); //add comment
 
 router.post("/add_assigned-list", Authenticate, addAssignedList); // add assigned-list
 

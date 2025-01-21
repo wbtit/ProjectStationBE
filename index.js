@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(
   cors({
     origin: "*",
+    credentials: true,
   })
 );
 
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 
 app.get("/getall", async (req, res) => {
   try {
+    //hello
     const users = await getUsers();
     // console.log(users);
     res.status(200).json({
@@ -52,7 +54,7 @@ const userSockets = {};
 
 // WebSocket connection setup
 wss.on("connection", (ws, req) => {
-  const userId = new URLSearchParams(req.url.split('?')[1]).get('userId');
+  const userId = new URLSearchParams(req.url.split("?")[1]).get("userId");
   if (userId) {
     userSockets[userId] = ws;
     console.log(`User ${userId} connected`);
@@ -72,7 +74,7 @@ wss.on("connection", (ws, req) => {
 app.locals.wss = wss;
 app.locals.userSockets = userSockets;
 
-const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
+const PORT = process.env.PORT || 5154;
 server.listen(PORT, () => {
   console.log("Server is active on port ", PORT);
 });
