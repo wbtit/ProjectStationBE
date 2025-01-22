@@ -6,6 +6,7 @@ const fileDataMap = {}; // Object to store file data (UUID and original name)
 const submittalsDataMap = {};
 const rfiDataMap = {};
 const fabricatorDataMap = {};
+const commentDataMap = {};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -179,6 +180,49 @@ const fabricatorsUploads = multer({
   },
 });
 
+const storageComment = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/commenttemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    commentDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const commentUploads = multer({
+  storage: storageComment,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/avif",
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+        )
+      );
+    }
+  },
+});
+
 // Export the uploader and file data object
 export {
   uploads,
@@ -189,4 +233,6 @@ export {
   rfiUploads,
   submittalsDataMap,
   submittalsUploads,
+  commentUploads,
+  commentDataMap,
 };

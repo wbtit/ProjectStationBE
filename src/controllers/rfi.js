@@ -1,184 +1,254 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import { sendEmail } from "../../service/gmailservice/index.js";
 
-const addRFI=async (req,res)=>{
-    const{id}=req.user
-    const {
-        fabricator_id,
-        project_id,
-        recepient_id,
-        subject,
-        description,
-}=req.body
-console.log(fabricator_id, project_id, recepient_id, subject, description)
-try {
-    if(!fabricator_id || !project_id || !recepient_id || !subject || !description){
-        return sendResponse({
-            message:"Fields are empty",
-            res,
-            statusCode:400,
-            success:false,
-            data:null
-        })
+const addRFI = async (req, res) => {
+  const { id } = req.user;
+  const { fabricator_id, project_id, recepient_id, subject, description } =
+    req.body;
+  console.log(fabricator_id, project_id, recepient_id, subject, description);
+  try {
+    if (
+      !fabricator_id ||
+      !project_id ||
+      !recepient_id ||
+      !subject ||
+      !description
+    ) {
+      return sendResponse({
+        message: "Fields are empty",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
     }
     const fileDetails = req.files.map((file) => ({
-        filename: file.filename, // UUID + extension
-        originalName: file.originalname, // Original name of the file
-        id: file.filename.split(".")[0], // Extract UUID from the filename
-        path: `/public/rfitemp/${file.filename}`, // Relative path
-      }));
+      filename: file.filename, // UUID + extension
+      originalName: file.originalname, // Original name of the file
+      id: file.filename.split(".")[0], // Extract UUID from the filename
+      path: `/public/rfitemp/${file.filename}`, // Relative path
+    }));
 
- const newrfi= await prisma.rFI.create({
-    data:{
+    const newrfi = await prisma.rFI.create({
+      data: {
         fabricator_id,
         project_id,
         recepient_id,
-        sender_id:id,
-        status:true,
+        sender_id: id,
+        status: true,
         subject,
         description,
-        files:fileDetails,
+        files: fileDetails,
+      },
+      include: {
+        recepients: true,
+      },
+    });
 
-    },
+    const htmlContent = `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            color: #333;
+          }
+          .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+          }
+          h1 {
+            color: #5b6e7d;
+          }
+          .content {
+            margin-top: 20px;
+          }
+          .description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Notification</h1>
+          <div class="content">
+            <p class="description">
+              ${description}
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
 
- })
- if(!newrfi){
-    return sendResponse({
-        message:"Failed to create RFI",
+    sendEmail({
+      html: htmlContent,
+      to: newrfi.recepients.email,
+      subject: subject,
+      text: description,
+    });
+
+    if (!newrfi) {
+      return sendResponse({
+        message: "Failed to create RFI",
         res,
-        statusCode:400,
-        success:false,
-        data:null
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    
+    const notification= await prisma.notification.create({
+      data:{
+        userID:id,
+        subject:subject,
+        isRead:false
+      }
     })
- }
- return sendResponse({
-    message:"RFI added successfully",
+if(!notification){
+  return sendResponse({
+    message:"Failed to add the notifications",
     res,
-    statusCode:200,
-    success:true,
-    data:newrfi
-})
+    statusCode:400,
+    success:false,
+    data:null
 
-} catch (error) {
+  })
+}
+
     return sendResponse({
-        message:error.message,
-        res,
-        statusCode:500,
-        success:false,
-        data:null
-    })
-}
-}
-
-const sentRFIByUser=async(req,res)=>{
-    const {id}=req.user
-try {
-    const sentRFI= await prisma.rFI.findMany({
-    where:{
-        sender_id:id
-    }
-    })
-
-    if(!sentRFI){
-        return sendResponse({
-            message:"Failed to get RFIs",
-            res,
-            statusCode:400,
-            success:false,
-            data:null
-        })
-    }
+      message: "RFI added successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: newrfi,
+    });
+  } catch (error) {
     return sendResponse({
-        message:"Sent RFIs fetched success",
-        res,
-        statusCode:200,
-        success:true,
-        data:sentRFI
-    })
-    
-} catch (error) {
-    return sendResponse({
-        message:error.message,
-        res,
-        statusCode:500,
-        success:false,
-        data:null
-    })
-}
-}
-const Inbox=async(req,res)=>{
-    const {id}=req.user
-try {
-    const sentRFI= await prisma.rFI.findMany({
-    where:{
-        recepient_id:id
-    }
-    })
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
 
-    if(!sentRFI){
-        return sendResponse({
-            message:"Failed to get RFIs",
-            res,
-            statusCode:400,
-            success:false,
-            data:null
-        })
+const sentRFIByUser = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const sentRFI = await prisma.rFI.findMany({
+      where: {
+        sender_id: id,
+      },
+    });
+
+    if (!sentRFI) {
+      return sendResponse({
+        message: "Failed to get RFIs",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
     }
     return sendResponse({
-        message:"Inbox RFIs fetched success",
-        res,
-        statusCode:200,
-        success:true,
-        data:sentRFI
-    })
-    
-} catch (error) {
+      message: "Sent RFIs fetched success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: sentRFI,
+    });
+  } catch (error) {
     return sendResponse({
-        message:error.message,
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+const Inbox = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const sentRFI = await prisma.rFI.findMany({
+      where: {
+        recepient_id: id,
+      },
+    });
+
+    if (!sentRFI) {
+      return sendResponse({
+        message: "Failed to get RFIs",
         res,
-        statusCode:500,
-        success:false,
-        data:null
-    })
-}
-}
-
-const RFIseen=async(req,res)=>{
-    const {id}=req?.params
-    try{
-        const rfiseen= await prisma.rFI.update({
-            where:{
-                id
-            },
-            data:{
-                status:false
-            }
-        })
-        if(!rfiseen){
-            return sendResponse({
-                message:"Failed to update",
-                res,
-                statusCode:500,
-                success:false,
-                data:null
-            })
-        }
-        return sendResponse({
-            message:"Status updated successfully",
-            res,
-            statusCode:200,
-            success:true,
-            data:rfiseen
-        })
-    }catch(error){
-        return sendResponse({
-            message:error.message,
-            res,
-            statusCode:500,
-            success:false,
-            data:null
-        })
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
     }
-}
+    return sendResponse({
+      message: "Inbox RFIs fetched success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: sentRFI,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
 
-export{addRFI,sentRFIByUser,Inbox,RFIseen}
+const RFIseen = async (req, res) => {
+  const { id } = req?.params;
+  try {
+    const rfiseen = await prisma.rFI.update({
+      where: {
+        id,
+      },
+      data: {
+        status: false,
+      },
+    });
+    if (!rfiseen) {
+      return sendResponse({
+        message: "Failed to update",
+        res,
+        statusCode: 500,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Status updated successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: rfiseen,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+export { addRFI, sentRFIByUser, Inbox, RFIseen };

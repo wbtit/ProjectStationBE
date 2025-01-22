@@ -111,7 +111,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     return sendResponse({
-      message: "Error in logging in",
+      message: error.message,
       res,
       statusCode: 500,
       success: false,

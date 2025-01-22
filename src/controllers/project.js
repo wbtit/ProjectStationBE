@@ -73,10 +73,10 @@ const AddProject = async (req, res) => {
       },
     });
 
-    const projects = JSON.parse(await client.get("allprojects"));
-    projects.push(project);
+    // const projects = JSON.parse(await client.get("allprojects"));
+    // projects.push(project);
 
-    await client.set("allprojects", JSON.stringify(projects));
+    // await client.set("allprojects", JSON.stringify(projects));
 
     console.log(project);
 
@@ -159,7 +159,7 @@ const Uploadfiles = async (req, res) => {
     });
 
     // Step 2: Get the cached projects from Redis
-    const cachedProjects = await client.get("allprojects");
+    // const cachedProjects = await client.get("allprojects");
 
     // Step 3: Parse the cached projects
     let projects = JSON.parse(cachedProjects);
@@ -171,7 +171,7 @@ const Uploadfiles = async (req, res) => {
     }
 
     // Step 5: Set the updated projects back to Redis
-    await client.set("allprojects", JSON.stringify(projects));
+    // await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Files Upload Complete",
@@ -356,7 +356,7 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    const project = await client.get("allprojects");
+    // const project = await client.get("allprojects");
     console.log("I got hit");
     // if (project) {
     //   console.log("From Redis ");
@@ -398,7 +398,7 @@ const GetAllProjects = async (req, res) => {
       },
     });
 
-    await client.set("allprojects", JSON.stringify(projects));
+    // await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Projects retrived successfully",
@@ -438,7 +438,16 @@ const GetProjectByID = async (req, res) => {
         id,
       },
       include: {
-        team: true,
+        team: {
+          include: {
+            manager: true,
+          },
+        },
+        department: true,
+        fabricator: true,
+        manager: true,
+        tasks: true,
+        accepttasks: true,
       },
     });
 

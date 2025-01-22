@@ -4,8 +4,9 @@ import { getUsers } from "./src/models/userAllModel.js";
 import cors from "cors";
 import { routes } from "./src/routes/index.js";
 import { app } from "./src/app.js";
-import http from 'http';
-import WebSocket from 'ws'; // Correct WebSocket import
+import http from "http";
+import pkg from "ws"; // Correct WebSocket import
+import { WebSocketServer } from "ws";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(
   cors({
     origin: "*",
+    credentials: true,
   })
 );
 
@@ -28,8 +30,9 @@ app.get("/", (req, res) => {
 
 app.get("/getall", async (req, res) => {
   try {
+    //hello
     const users = await getUsers();
-    console.log(users);
+    // console.log(users);
     res.status(200).json({
       message: "Success",
       data: users,
@@ -45,22 +48,22 @@ app.get("/getall", async (req, res) => {
 app.use("/api", routes);
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server }); // Initialize WebSocket Server correctly
+const wss = new WebSocketServer({ server });
 
 const userSockets = {};
 
 // WebSocket connection setup
-wss.on('connection', (ws, req) => {
-  const userId = req.url?.split('?userId=')[1];
+wss.on("connection", (ws, req) => {
+  const userId = new URLSearchParams(req.url.split("?")[1]).get("userId");
   if (userId) {
     userSockets[userId] = ws;
     console.log(`User ${userId} connected`);
 
-    ws.on('message', (message) => {
+    ws.on("message", (message) => {
       console.log(`Message from user ${userId}: ${message}`);
     });
 
-    ws.on('close', () => {
+    ws.on("close", () => {
       console.log(`User ${userId} disconnected`);
       delete userSockets[userId];
     });
@@ -71,7 +74,7 @@ wss.on('connection', (ws, req) => {
 app.locals.wss = wss;
 app.locals.userSockets = userSockets;
 
-const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
+const PORT = process.env.PORT || 5154;
 server.listen(PORT, () => {
   console.log("Server is active on port ", PORT);
 });

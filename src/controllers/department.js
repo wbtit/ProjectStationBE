@@ -51,8 +51,9 @@ const AddDepartment = async (req, res) => {
         data: department,
       });
     } catch (error) {
+      console.log(error.message);
       return sendResponse({
-        message: "Something went wrong!!",
+        message: error.message,
         res,
         statusCode: 500,
         success: false,

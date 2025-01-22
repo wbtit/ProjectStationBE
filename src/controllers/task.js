@@ -18,13 +18,31 @@ const AddTask = async (req, res) => {
     project,
     user,
     status,
-    start_date
+    start_date,
   } = req.body;
 
-  console.log(description, due_date, duration, name, priority, project, user, status, start_date)
+  console.log(
+    description,
+    due_date,
+    duration,
+    name,
+    priority,
+    project,
+    user,
+    status,
+    start_date
+  );
 
   if (
-   !description || !name || !due_date || !duration || !priority || !start_date || !status || !project || !user
+    !description ||
+    !name ||
+    !due_date ||
+    !duration ||
+    !priority ||
+    !start_date ||
+    !status ||
+    !project ||
+    !user
   ) {
     return sendResponse({
       message: "Fields are empty!!",
@@ -130,31 +148,16 @@ const GetTask = async (req, res) => {
       });
     }
     const tasks = await prisma.task.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        status: true,
-        priority: true,
-        created_on: true,
-        due_date: true,
-        duration: true,
-        assignedTask: true,
+      include: {
         project: {
-          select: {
-            name: true,
-            manager: {
-              select: {
-                f_name: true,
-              },
-            },
+          include: {
+            manager: true,
           },
         },
-        user: {
-          select: {
-            f_name: true,
-          },
-        },
+        user: true,
+        taskcomment: true,
+        assignedTask: true,
+        taskInAssignedList: true,
       },
     });
 
@@ -223,20 +226,12 @@ const GetTaskByID = async (req, res) => {
     const task = await prisma.task.findUnique({
       where: {
         id,
-      }, include: {
-        project: {
-          include: {
-            fabricator: true,
-            manager: true,
-            team: true,
-         }
-        },
-        taskInAssignedList:true
-        
-      }
+      },
+      include: {
+        project: true,
+      },
     });
 
-    
     if (!task) {
       return sendResponse({
         message: "error in fetching task by id",
@@ -255,7 +250,6 @@ const GetTaskByID = async (req, res) => {
         task,
       },
     });
-  
   } catch (error) {
     return sendResponse({
       message: "Error in fetching task by id",
@@ -398,7 +392,7 @@ const calender = async (req, res) => {
     await prisma.$disconnect();
   }
 };
-  
+
 const getMyTaskByIdAndStatus = async (req, res) => {
   const { id: user_id } = req?.user;
 
@@ -482,7 +476,7 @@ const getAllTasksByUserId = async (req, res) => {
   try {
     const tasks = await prisma.task.findMany({
       where: {
-        user_id : id,
+        user_id: id,
       },
     });
     if (!tasks) {
