@@ -20,6 +20,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
+  console.log("hitting");
   res.status(200).json({
     message: "You Summoned WBT Server",
     data: {

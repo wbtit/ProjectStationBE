@@ -12,6 +12,7 @@ import {
   GetAllfiles,
   DownloadFile,
   ViewFile,
+  getProjectsByUser,
 } from "../../controllers/project.js";
 import { uploads } from "../../config/multer.js";
 
@@ -24,7 +25,7 @@ router.post(
   Authenticate,
   BroadAccess,
   uploads.array("files"),
-  Uploadfiles                                           
+  Uploadfiles
 ); // Upload Files To Project+
 
 router.get("/projects/project-files", Authenticate, isStaff, GetAllfiles);
@@ -49,5 +50,7 @@ router.get(
 ); // Download specific file
 
 router.get("/projects/viewfile/:id/:fid", ViewFile);
+
+router.get("/projects/u/user", Authenticate, isStaff, getProjectsByUser);
 
 export default router;

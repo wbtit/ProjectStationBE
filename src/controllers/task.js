@@ -264,6 +264,8 @@ const GetTaskByID = async (req, res) => {
 const UpdateTaskByID = async (req, res) => {
   const { id } = req?.params;
 
+  console.log(req.body)
+
   try {
     if (!isValidUUID(id)) {
       return sendResponse({
@@ -279,7 +281,7 @@ const UpdateTaskByID = async (req, res) => {
       where: {
         id,
       },
-      data: req?.body,
+      data: req.body,
     });
     if (!task) {
       return sendResponse({
@@ -299,7 +301,7 @@ const UpdateTaskByID = async (req, res) => {
     });
   } catch (error) {
     return sendResponse({
-      message: "Error in fetching tasks",
+      message: error.message,
       res,
       statusCode: 500,
     });

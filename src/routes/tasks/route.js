@@ -57,9 +57,13 @@ router.patch("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update
 
 router.put("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update Task By ID (METHOD PUT)
 
+
+
 router.get("/tasks/:id/accept", Authenticate, TaskByIDAccept); // Accept Task Using ID
 
 router.put("/tasks/:id/accept", Authenticate, UpdateTaskByIDs); // Update Accept Tasks By ID
+
+                                                                                                                                             
 
 router.post("/tasks/:task_id/add_assignes", Authenticate, addTaskAssignes); //add assignes
 

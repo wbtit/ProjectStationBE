@@ -6,7 +6,7 @@ const addRFI = async (req, res) => {
   const { id } = req.user;
   const { fabricator_id, project_id, recepient_id, subject, description } =
     req.body;
-  console.log(fabricator_id, project_id, recepient_id, subject, description);
+  console.log(fabricator_id, project_id, recepient_id, subject, description); 
   try {
     if (
       !fabricator_id ||

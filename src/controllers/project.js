@@ -646,6 +646,37 @@ const ViewFile = async (req, res) => {
   }
 };
 
+const getProjectsByUser = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    // Fetch tasks for a specific user
+    const tasks = await prisma.task.findMany({
+      where: {
+        user_id: id, // Filter tasks by user_id
+      },
+      include: {
+        project: true, // Include the related project details
+      },
+    });
+
+    // Extract project details from tasks
+    const projectDetails = tasks.map((task) => task.project);
+
+    // Return unique project details (to avoid duplicates)
+    const uniqueProjects = [...new Set(projectDetails.map((p) => p.id))].map(
+      (id) => projectDetails.find((p) => p.id === id)
+    );
+
+    console.log("Pros", uniqueProjects);
+
+    return res.json(uniqueProjects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
 export {
   AddProject,
   Uploadfiles,
@@ -656,4 +687,5 @@ export {
   GetAllfiles,
   DownloadFile,
   ViewFile,
+  getProjectsByUser,
 };
