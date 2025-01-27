@@ -158,6 +158,7 @@ const GetTask = async (req, res) => {
         taskcomment: true,
         assignedTask: true,
         taskInAssignedList: true,
+        workingHourTask: true,
       },
     });
 
