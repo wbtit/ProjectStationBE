@@ -229,6 +229,7 @@ const GetTaskByID = async (req, res) => {
       },
       include: {
         project: true,
+        taskcomment: true,
       },
     });
 
@@ -264,7 +265,7 @@ const GetTaskByID = async (req, res) => {
 const UpdateTaskByID = async (req, res) => {
   const { id } = req?.params;
 
-  console.log(req.body)
+  console.log(req.body);
 
   try {
     if (!isValidUUID(id)) {
@@ -421,9 +422,11 @@ const getMyTaskByIdAndStatus = async (req, res) => {
     const tasks = await prisma.task.findMany({
       where: {
         user_id: user_id,
-        status: "ASSIGNED",
       },
     });
+
+    const filteredTasks = tasks.filter((t) => t.status !== "IN REVIEW");
+
     if (!tasks) {
       return sendResponse({
         message: "Failed to fetch My_tasks",
@@ -447,7 +450,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: tasks,
+      data: filteredTasks,
     });
   } catch (error) {
     return sendResponse({
@@ -481,6 +484,7 @@ const getAllTasksByUserId = async (req, res) => {
         user_id: id,
       },
     });
+
     if (!tasks) {
       return sendResponse({
         message: "Failed to fetch My_tasks",

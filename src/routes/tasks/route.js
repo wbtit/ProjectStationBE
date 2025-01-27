@@ -57,13 +57,9 @@ router.patch("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update
 
 router.put("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update Task By ID (METHOD PUT)
 
-
-
 router.get("/tasks/:id/accept", Authenticate, TaskByIDAccept); // Accept Task Using ID
 
 router.put("/tasks/:id/accept", Authenticate, UpdateTaskByIDs); // Update Accept Tasks By ID
-
-                                                                                                                                             
 
 router.post("/tasks/:task_id/add_assignes", Authenticate, addTaskAssignes); //add assignes
 
@@ -102,8 +98,8 @@ router.delete(
 
 router.get("/tasks/:id/:date/calender", Authenticate, calender);
 
-router.get("/tasks/:id/my_tasks", Authenticate, getMyTaskByIdAndStatus);
+router.get("/tasks/my_tasks", Authenticate, getMyTaskByIdAndStatus); // Fetching usres non ended tasks
 
-router.get("/task/my_tasks", Authenticate, getAllTasksByUserId);
+router.get("/task/all_my_tasks", Authenticate, getAllTasksByUserId); // Fetching Users all tasks
 
 export default router;

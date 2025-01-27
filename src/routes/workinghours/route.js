@@ -14,6 +14,6 @@ router.post("/wh/start", Authenticate, Start);
 router.patch("/wh/pause", Authenticate, Pause);
 router.patch("/wh/resume", Authenticate, Resume);
 router.patch("/wh/end", Authenticate, End);
-router.get("/wh", Authenticate, getWork);
+router.get("/wh/:task_id", Authenticate, getWork);
 
 export default router;

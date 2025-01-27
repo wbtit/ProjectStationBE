@@ -5,13 +5,34 @@ const Start = async (req, res) => {
   const { id } = req.user;
   const { task_id } = req.body;
 
+  console.log(req.body);
+
+  if (!task_id) {
+    return sendResponse({
+      message: "Invalid task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
   try {
     const workinghour = await prisma.workingHours.create({
       data: {
-        start: Date.now(),
+        start: new Date(),
         status: "START",
         task_id: task_id,
         user_id: id,
+      },
+    });
+
+    await prisma.task.update({
+      where: {
+        id: task_id,
+      },
+      data: {
+        status: "IN PROGRESS",
       },
     });
 
@@ -35,9 +56,19 @@ const Start = async (req, res) => {
 
 const Pause = async (req, res) => {
   const { id } = req.user;
-  const { work_id } = req.body;
+  const { work_id, task_id } = req.body;
 
-  console.log(work_id);
+  console.log(req.body);
+
+  if (!work_id || !task_id) {
+    return sendResponse({
+      message: "Invalid work_id or task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
 
   try {
     // Fetch the current `start` value from the database
@@ -81,6 +112,15 @@ const Pause = async (req, res) => {
       },
     });
 
+    await prisma.task.update({
+      where: {
+        id: task_id,
+      },
+      data: {
+        status: "BREAK",
+      },
+    });
+
     return sendResponse({
       message: `Work paused, Total time : ${
         workingHourRecord.duration + durationInMinutes
@@ -91,7 +131,7 @@ const Pause = async (req, res) => {
       data: updatedWorkingHour,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -103,8 +143,18 @@ const Pause = async (req, res) => {
 };
 
 const Resume = async (req, res) => {
-  const { work_id } = req.body;
+  const { work_id, task_id } = req.body;
   const { id } = req.user;
+
+  if (!work_id || !task_id) {
+    return sendResponse({
+      message: "Invalid work_id or task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
 
   try {
     const work = await prisma.workingHours.findUnique({
@@ -113,7 +163,9 @@ const Resume = async (req, res) => {
       },
     });
 
-    if (work.user_id !== id) {
+    console.log(work);
+
+    if (work?.user_id !== id) {
       return sendResponse({
         message: "Work not associated with the user",
         res,
@@ -128,8 +180,17 @@ const Resume = async (req, res) => {
         id: work_id,
       },
       data: {
-        start: Date.now(),
+        start: new Date(),
         status: "RESUME",
+      },
+    });
+
+    await prisma.task.update({
+      where: {
+        id: task_id,
+      },
+      data: {
+        status: "IN PROGRESS",
       },
     });
 
@@ -143,7 +204,7 @@ const Resume = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return sendResponse({
-      message: error,
+      message: error.message,
       res,
       statusCode: 500,
       success: false,
@@ -153,8 +214,18 @@ const Resume = async (req, res) => {
 };
 
 const End = async (req, res) => {
-  const { work_id } = req.body;
+  const { work_id, task_id } = req.body;
   const { id } = req.user;
+
+  if (!work_id || !task_id) {
+    return sendResponse({
+      message: "Invalid work_id or task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
 
   try {
     const workingHourRecord = await prisma.workingHours.findUnique({
@@ -162,6 +233,16 @@ const End = async (req, res) => {
         id: work_id,
       },
     });
+
+    if (workingHourRecord.status === "END") {
+      return sendResponse({
+        message: `Work Ended, Total time : ${workingHourRecord.duration} mins`,
+        res,
+        statusCode: 200,
+        success: true,
+        data: workingHourRecord,
+      });
+    }
 
     if (workingHourRecord.user_id !== id) {
       return sendResponse({
@@ -197,6 +278,15 @@ const End = async (req, res) => {
       },
     });
 
+    await prisma.task.update({
+      where: {
+        id: task_id,
+      },
+      data: {
+        status: "IN REVIEW",
+      },
+    });
+
     return sendResponse({
       message: `Work Ended, Total time : ${
         workingHourRecord.duration + durationInMinutes
@@ -220,15 +310,43 @@ const End = async (req, res) => {
 
 const getWork = async (req, res) => {
   const { id } = req.user;
-  const { task_id } = req.body;
+  const { task_id } = req.params;
+
+  console.log(task_id);
+
+  if (!task_id) {
+    return sendResponse({
+      message: "Invalid task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
 
   try {
-    const work = await prisma.workingHours.findUnique({
+    const works = await prisma.workingHours.findMany({
       where: {
-        user_id: id,
         task_id: task_id,
       },
     });
+
+    let work = works.find((item) => item.user_id === id);
+
+    if (work.status === "END" || work.status === "PAUSE") {
+      return sendResponse({
+        message: "Work fetch success",
+        res,
+        statusCode: 200,
+        success: true,
+        data: work,
+      });
+    }
+
+    const start = new Date(work.start).getTime(); // Convert start to timestamp in milliseconds
+    const durationInMinutes = Math.floor((Date.now() - start) / 60000); // Calculate duration in minutes
+
+    work = { ...work, duration: work.duration + durationInMinutes };
 
     return sendResponse({
       message: "Work fetch success",
