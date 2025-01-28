@@ -16,6 +16,7 @@ import {
   calender,
   getMyTaskByIdAndStatus,
   getAllTasksByUserId,
+  getMyTaskRecords
 } from "../../controllers/task.js";
 
 import { TaskByIDAccept, UpdateTaskByIDs } from "../../controllers/accept.js";
@@ -49,7 +50,7 @@ router.post("/tasks", Authenticate, BroadAccess, AddTask); // Adding Task
 
 router.delete("/tasks/:id", Authenticate, BroadAccess, DeleteTask); // Deleteing Task
 
-router.get("/tasks/:id", Authenticate, GetTaskByID); // Get Task By Task ID
+
 
 router.get("/tasks", Authenticate, GetTask); // Get All Task
 
@@ -101,5 +102,9 @@ router.get("/tasks/:id/:date/calender", Authenticate, calender);
 router.get("/tasks/my_tasks", Authenticate, getMyTaskByIdAndStatus); // Fetching usres non ended tasks
 
 router.get("/task/all_my_tasks", Authenticate, getAllTasksByUserId); // Fetching Users all tasks
+
+router.get("/tasks/my_task_records", Authenticate, getMyTaskRecords); // Fetching Users all tasks
+
+router.get("/tasks/:id", Authenticate, GetTaskByID); // Get Task By Task ID
 
 export default router;

@@ -162,13 +162,13 @@ const Uploadfiles = async (req, res) => {
     // const cachedProjects = await client.get("allprojects");
 
     // Step 3: Parse the cached projects
-    let projects = JSON.parse(cachedProjects);
+    // let projects = JSON.parse(cachedProjects);
 
     // Step 4: Find and update the files field in the cached project by ID
-    const projectIndex = projects.findIndex((project) => project.id === id);
-    if (projectIndex !== -1) {
-      projects[projectIndex].files = updatedFilesProject.files; // Replace files
-    }
+    // const projectIndex = project.findIndex((projects) => projects.id === id);
+    // if (projectIndex !== -1) {
+    //   project[projectIndex].files = updatedFilesProject.files; // Replace files
+    // }
 
     // Step 5: Set the updated projects back to Redis
     // await client.set("allprojects", JSON.stringify(projects));
@@ -183,7 +183,7 @@ const Uploadfiles = async (req, res) => {
   } catch (error) {
     console.error("Error uploading files:", error);
     return sendResponse({
-      message: "Something went wrong",
+      message: error?.message,
       res,
       statusCode: 500,
       success: false,

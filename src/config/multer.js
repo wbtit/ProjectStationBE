@@ -33,21 +33,21 @@ const storage = multer.diskStorage({
 const uploads = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/avif",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // const allowedTypes = [
+    //   "application/pdf",
+    //   "image/jpeg",
+    //   "image/png",
+    //   "image/avif",
+    // ];
+    // if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-        )
-      );
-    }
+    // } else {
+    //   cb(
+    //     new Error(
+    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+    //     )
+    //   );
+    // }
   },
 });
 
@@ -76,21 +76,21 @@ const storageSubmittals = multer.diskStorage({
 const submittalsUploads = multer({
   storage: storageSubmittals,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/avif",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // const allowedTypes = [
+    //   "application/pdf",
+    //   "image/jpeg",
+    //   "image/png",
+    //   "image/avif",
+    // ];
+    // if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-        )
-      );
-    }
+    // } else {
+    //   cb(
+    //     new Error(
+    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+    //     )
+    //   );
+    // }
   },
 });
 
@@ -119,21 +119,21 @@ const storageRfi = multer.diskStorage({
 const rfiUploads = multer({
   storage: storageRfi,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/avif",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // const allowedTypes = [
+    //   "application/pdf",
+    //   "image/jpeg",
+    //   "image/png",
+    //   "image/avif",
+    // ];
+    // if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-        )
-      );
-    }
+    // } else {
+    //   cb(
+    //     new Error(
+    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+    //     )
+    //   );
+    // }
   },
 });
 
@@ -162,21 +162,21 @@ const storageFabricator = multer.diskStorage({
 const fabricatorsUploads = multer({
   storage: storageFabricator,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/avif",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // const allowedTypes = [
+    //   "application/pdf",
+    //   "image/jpeg",
+    //   "image/png",
+    //   "image/avif",
+    // ];
+    // if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-        )
-      );
-    }
+    // } else {
+    //   cb(
+    //     new Error(
+    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+    //     )
+    //   );
+    // }
   },
 });
 
@@ -205,21 +205,21 @@ const storageComment = multer.diskStorage({
 const commentUploads = multer({
   storage: storageComment,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/avif",
-    ];
-    if (allowedTypes.includes(file.mimetype)) {
+    // const allowedTypes = [
+    //   "application/pdf",
+    //   "image/jpeg",
+    //   "image/png",
+    //   "image/avif",
+    // ];
+    // if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-        )
-      );
-    }
+    // } else {
+    //   cb(
+    //     new Error(
+    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
+    //     )
+    //   );
+    // }
   },
 });
 

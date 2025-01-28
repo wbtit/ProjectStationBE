@@ -3,6 +3,7 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
+import { isAdmin } from "../middlewares/isadmin.js";
 
 const AddTask = async (req, res) => {
   // Adding the task
@@ -467,7 +468,8 @@ const getMyTaskByIdAndStatus = async (req, res) => {
 };
 const getAllTasksByUserId = async (req, res) => {
   const { id } = req?.user;
-  console.log("user_id-=--", id);
+  const user = req.user;
+  console.log("user=--==-====-==-===--==-=-=-=-=-=-=-=", user.is_superuser);
 
   if (!id) {
     return sendResponse({
@@ -480,11 +482,20 @@ const getAllTasksByUserId = async (req, res) => {
   }
 
   try {
-    const tasks = await prisma.task.findMany({
-      where: {
-        user_id: id,
-      },
-    });
+    let tasks;
+    if (user.is_superuser && user.is_staff && user.is_active) {
+      tasks = await prisma.task.findMany();
+    } else {
+      tasks = await prisma.task.findMany({
+        where: {
+          user_id: id,
+        },
+        include: {
+          workingHourTask: true,
+          taskcomment: true,
+        },
+      });
+    }
 
     if (!tasks) {
       return sendResponse({
@@ -524,6 +535,68 @@ const getAllTasksByUserId = async (req, res) => {
   }
 };
 
+const getMyTaskRecords = async (req, res) => {
+  const { id } = req?.user;
+
+  if (!id) {
+    return sendResponse({
+      message: "Invalid userId",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const tasks = await prisma.task.findMany({
+      where: {
+        user_id: id,
+      },
+      include: {
+        project: true,
+        workingHourTask: true,
+      },
+    });
+
+    if (!tasks) {
+      return sendResponse({
+        message: "Failed to fetch My_tasks",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    if (tasks.length === 0) {
+      return sendResponse({
+        message: "No tasks found for this user",
+        res,
+        statusCode: 200,
+        success: true,
+        data: tasks,
+      });
+    }
+    return sendResponse({
+      message: "My_tasks fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: tasks,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
 export {
   AddTask,
   DeleteTask,
@@ -533,4 +606,5 @@ export {
   calender,
   getMyTaskByIdAndStatus,
   getAllTasksByUserId,
+  getMyTaskRecords,
 };
