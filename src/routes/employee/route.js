@@ -5,7 +5,6 @@ import {
   getAllEmployees,
 } from "../../controllers/employee.js";
 import Authenticate from "../../middlewares/authenticate.js";
-import { isAdmin } from "../../middlewares/isadmin.js";
 import { isStaff } from "../../middlewares/isstaff.js";
 
 const router = Router();
