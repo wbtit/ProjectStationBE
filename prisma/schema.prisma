@@ -100,6 +100,9 @@ datasource db {
 
     workingHourUser WorkingHours[] @relation("workingHourUser")
 
+    changeorderRecipients ChangeOrder[] @relation("ChangeOrderRecipients")
+    changeorderSender ChangeOrder[] @relation("ChangeOrderSender")
+
 
     @@map("users")
   }
@@ -204,7 +207,7 @@ model Team {
    submittals Submittals[] @relation("ProjectSubmittals")
   rfi RFI[] @relation("ProjectRFI")
 
-
+  changeOrder ChangeOrder[] @relation("ChangeOrderProject")
 
 
   @@map("project")
@@ -424,6 +427,23 @@ model WorkingHours {
 
 @@map("workinghour")
 
+}
+
+model ChangeOrder {
+  id String @id @default(uuid()) @db.Uuid
+  project String @db.Uuid
+  Project Project @relation(fields: [project], references: [id], onDelete: Cascade, name: "ChangeOrderProject")
+  recipients String @db.Uuid
+  Recipients Users @relation(fields: [recipients], references: [id], onDelete: Cascade, name: "ChangeOrderRecipients")
+  sender String @db.Uuid
+  senders Users @relation(fields: [sender], references: [id], onDelete: Cascade, name: "ChangeOrderSender")
+  remarks String @default("")
+  changeOrder Int @default(1)
+  description String @default("")
+  rows Json @default("[]")
+  files Json @default("[]")
+
+  @@map("changeorder")
 }
 
 enum WorkHourStatus {
