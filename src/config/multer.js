@@ -34,21 +34,7 @@ const storage = multer.diskStorage({
 const uploads = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    // const allowedTypes = [
-    //   "application/pdf",
-    //   "image/jpeg",
-    //   "image/png",
-    //   "image/avif",
-    // ];
-    // if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
-    // } else {
-    //   cb(
-    //     new Error(
-    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-    //     )
-    //   );
-    // }
   },
 });
 

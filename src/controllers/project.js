@@ -51,8 +51,6 @@ const AddProject = async (req, res) => {
     });
   }
 
-
-  
   try {
     const project = await prisma.project.create({
       data: {
@@ -358,28 +356,49 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    // const project = await client.get("allprojects");
-    console.log("I got hit");
-    // if (project) {
-    //   console.log("From Redis ");
-    //   return sendResponse({
-    //     message: "Projects retrived successfully",
-    //     res,
-    //     statusCode: 200,
-    //     success: true,
-    //     data: JSON.parse(project),
-    //   });
-    // }
+    console.log("Uer data", req.user);
 
     let projects;
 
     if (
-      (req.user.isstaff &&
-        req.user.role === "STAFF" &&
-        req.user.is_superuser) ||
-      req.user.role === "CLIENT"
+      req.user.isstaff &&
+      req.user.role === "STAFF" &&
+      req.user.is_superuser
     ) {
       projects = await prisma.project.findMany({
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    } else if (req.user.role === "CLIENT") {
+      console.log("Yeah this is for client");
+      projects = await prisma.project.findMany({
+        where: {
+          fabricatorID: req.user.fabricatorId,
+        },
         include: {
           fabricator: true,
           manager: {

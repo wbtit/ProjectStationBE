@@ -454,13 +454,10 @@ enum WorkHourStatus {
   RESUME
 }
 
-
-
 enum UserRole {
   STAFF
   CLIENT
   VENDOR
- 
 }
 //task
 enum Status {
