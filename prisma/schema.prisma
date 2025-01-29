@@ -442,6 +442,7 @@ model ChangeOrder {
   description String @default("")
   rows Json @default("[]")
   files Json @default("[]")
+  sentOn DateTime @default(now())
 
   @@map("changeorder")
 }

@@ -51,6 +51,8 @@ const AddProject = async (req, res) => {
     });
   }
 
+
+  
   try {
     const project = await prisma.project.create({
       data: {
@@ -369,34 +371,75 @@ const GetAllProjects = async (req, res) => {
     //   });
     // }
 
-    const projects = await prisma.project.findMany({
-      include: {
-        fabricator: true,
-        manager: {
-          select: {
-            f_name: true,
-            l_name: true,
+    let projects;
+
+    if (
+      (req.user.isstaff &&
+        req.user.role === "STAFF" &&
+        req.user.is_superuser) ||
+      req.user.role === "CLIENT"
+    ) {
+      projects = await prisma.project.findMany({
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
           },
-        },
-        team: {
-          select: {
-            name: true,
-            members: true,
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
           },
-        },
-        department: {
-          select: {
-            name: true,
-            manager: {
-              select: {
-                f_name: true,
-                l_name: true,
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
+    } else {
+      projects = await prisma.project.findMany({
+        where: {
+          managerID: req.user.id,
+        },
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    }
 
     // await client.set("allprojects", JSON.stringify(projects));
 
