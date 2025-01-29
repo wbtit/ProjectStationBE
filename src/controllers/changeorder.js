@@ -22,8 +22,85 @@ const changeOrderReceived=async(req,res)=>{
             select:{
                 remarks:true,
                 description:true,
-                changeOrder:true
+                changeOrder:true,
+                sentOn:true
+                
             }
+        })
+        if(receives.length===0){
+            return sendResponse({
+                message:"No changeOrder for this user",
+                res,
+                statusCode:201,
+                success:true,
+                data:receives
+            })
+        }
+        return sendResponse({
+            message:"Fetched all recived ChangeOrder for this user",
+            res,
+            statusCode:200,
+            success:true,
+            data:receives
+        })
+    }catch(error){
+        return sendResponse({
+            message:error.message,
+            res,
+            statusCode:500,
+            data:null,
+            success:false
+        })
+    }
+}
+const changeOrderSent=async(req,res)=>{
+    const {id}=req.user
+
+    try{
+        if(!id){
+            return sendResponse({
+                message:"Invalid userId",
+                res,
+                statusCode:411,
+                success:false,
+                data:null
+            })
+        }
+        const sents= await prisma.changeOrder.findMany({
+            where:{
+                sender:id
+            },
+            select:{
+                remarks:true,
+                description:true,
+                changeOrder:true,
+                sentOn:true
+                
+            }
+        })
+        if(receives.length===0){
+            return sendResponse({
+                message:"No sents changeOrders for this user",
+                res,
+                statusCode:201,
+                success:true,
+                data:sents
+            })
+        }
+        return sendResponse({
+            message:"Fetched all sent ChangeOrders for this user",
+            res,
+            statusCode:200,
+            success:true,
+            data:sents
+        })
+    }catch(error){
+        return sendResponse({
+            message:error.message,
+            res,
+            statusCode:500,
+            data:null,
+            success:false
         })
     }
 }
@@ -96,4 +173,4 @@ const AddChangeOrder = async (req, res) => {
   }
 };
 
-export { AddChangeOrder };
+export { AddChangeOrder ,changeOrderReceived,changeOrderSent};
