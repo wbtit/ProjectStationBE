@@ -15,6 +15,7 @@ import {
   getProjectsByUser,
 } from "../../controllers/project.js";
 import { uploads } from "../../config/multer.js";
+import { isStaffAndClient } from "../../middlewares/isstaffandclient.js";
 
 const router = Router();
 
@@ -32,7 +33,7 @@ router.get("/projects/project-files", Authenticate, isStaff, GetAllfiles);
 
 router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Update Projects
 
-router.get("/projects", Authenticate, isStaff, GetAllProjects); // Get All Projects
+router.get("/projects", Authenticate  , GetAllProjects); // Get All Projects
 
 router.get("/projects/:id", Authenticate, isStaff, GetProjectByID); // Get Project by ID
 
@@ -51,6 +52,6 @@ router.get(
 
 router.get("/projects/viewfile/:id/:fid", ViewFile);
 
-router.get("/projects/u/user", Authenticate, isStaff, getProjectsByUser);
+router.get("/projects/u/user", Authenticate, isStaffAndClient, getProjectsByUser);
 
 export default router;
