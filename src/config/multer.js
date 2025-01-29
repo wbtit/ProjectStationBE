@@ -7,6 +7,7 @@ const submittalsDataMap = {};
 const rfiDataMap = {};
 const fabricatorDataMap = {};
 const commentDataMap = {};
+const changeOrderDataMap = {};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -40,7 +41,7 @@ const uploads = multer({
     //   "image/avif",
     // ];
     // if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+    cb(null, true);
     // } else {
     //   cb(
     //     new Error(
@@ -83,7 +84,7 @@ const submittalsUploads = multer({
     //   "image/avif",
     // ];
     // if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+    cb(null, true);
     // } else {
     //   cb(
     //     new Error(
@@ -126,7 +127,7 @@ const rfiUploads = multer({
     //   "image/avif",
     // ];
     // if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+    cb(null, true);
     // } else {
     //   cb(
     //     new Error(
@@ -169,7 +170,7 @@ const fabricatorsUploads = multer({
     //   "image/avif",
     // ];
     // if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+    cb(null, true);
     // } else {
     //   cb(
     //     new Error(
@@ -205,21 +206,36 @@ const storageComment = multer.diskStorage({
 const commentUploads = multer({
   storage: storageComment,
   fileFilter: (req, file, cb) => {
-    // const allowedTypes = [
-    //   "application/pdf",
-    //   "image/jpeg",
-    //   "image/png",
-    //   "image/avif",
-    // ];
-    // if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    // } else {
-    //   cb(
-    //     new Error(
-    //       "Invalid file type. Only PDFs, JPEG, and PNG files are allowed."
-    //     )
-    //   );
-    // }
+    cb(null, true);
+  },
+});
+
+const storageChangeOrder = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/changeordertemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    changeOrderDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const changeorderUploads = multer({
+  storage: storageChangeOrder,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
   },
 });
 
@@ -235,4 +251,6 @@ export {
   submittalsUploads,
   commentUploads,
   commentDataMap,
+  changeorderUploads,
+  changeOrderDataMap,
 };

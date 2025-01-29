@@ -11,6 +11,7 @@ import RFI from "./rfi/route.js";
 import { Submittals } from "./submittals/route.js";
 import Notifications from "./notifications/routes.js";
 import WorkingHour from "./workinghours/route.js";
+import { ChangeOrderRouter } from "./changeorder/route.js";
 
 const routes = express.Router();
 
@@ -26,5 +27,6 @@ routes.use("/RFI", RFI);
 routes.use("/submittals", Submittals);
 routes.use("/notifications", Notifications);
 routes.use("/wh", WorkingHour);
+routes.use("/co", ChangeOrderRouter);
 
 export { routes };
