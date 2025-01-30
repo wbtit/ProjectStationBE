@@ -208,6 +208,7 @@ model Team {
   rfi RFI[] @relation("ProjectRFI")
 
   changeOrder ChangeOrder[] @relation("ChangeOrderProject")
+  Jobstudy JobStudy[] @relation("projectJobStudy")
 
 
   @@map("project")
@@ -429,6 +430,7 @@ model WorkingHours {
 
 }
 
+
 model ChangeOrder {
   id String @id @default(uuid()) @db.Uuid
   project String @db.Uuid
@@ -445,6 +447,43 @@ model ChangeOrder {
   sentOn DateTime @default(now())
 
   @@map("changeorder")
+}
+
+model JobStudy{
+  id String @id @default(uuid()) @db.Uuid
+  QtyNo Int
+  unitTime Int @default(0)
+  execTime Int @default(0)
+  projectId String @db.Uuid
+  projects Project @relation(fields: [projectId],references: [id],name: "projectJobStudy",onDelete: Cascade)
+  taskBreakdown TaskBreakdown[] @relation("JSTaskBreakdown")
+
+  @@map("jobStudy")
+}
+
+model TaskBreakdown{
+  id String @id @default(uuid()) @db.Uuid
+  description String
+  QtyNo Int @default(0)
+  execTime Int @default(0)
+  checkingHour Int @default(0)
+  jobstudyId String @db.Uuid
+  jobstudy JobStudy @relation(fields: [jobstudyId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
+  subTasks SubTasks[] @relation("taskBreakDownSubTasks")
+
+  @@map("taskBreakDown")
+}
+
+model SubTasks{
+  id String @id @default(uuid()) @db.Uuid
+  description String
+  Qty Int
+  unitTime Int @default(0)
+  CheckUnitTime Int @default(0)
+  taskBreakDownid String @db.Uuid
+  taskBreakDown TaskBreakdown @relation(fields: [taskBreakDownid],references: [id],name: "taskBreakDownSubTasks",onDelete: Cascade)
+
+  @@map("subTasks")
 }
 
 enum WorkHourStatus {
