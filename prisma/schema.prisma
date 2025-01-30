@@ -209,6 +209,7 @@ model Team {
 
   changeOrder ChangeOrder[] @relation("ChangeOrderProject")
   Jobstudy JobStudy[] @relation("projectJobStudy")
+  taskBreakdown TaskBreakdown[] @relation("JSTaskBreakdown")
 
 
   @@map("project")
@@ -456,8 +457,7 @@ model JobStudy{
   execTime Int @default(0)
   projectId String @db.Uuid
   projects Project @relation(fields: [projectId],references: [id],name: "projectJobStudy",onDelete: Cascade)
-  taskBreakdown TaskBreakdown[] @relation("JSTaskBreakdown")
-
+  
   @@map("jobStudy")
 }
 
@@ -468,7 +468,7 @@ model TaskBreakdown{
   execTime Int @default(0)
   checkingHour Int @default(0)
   jobstudyId String @db.Uuid
-  jobstudy JobStudy @relation(fields: [jobstudyId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
+  jobstudy Project @relation(fields: [jobstudyId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
   subTasks SubTasks[] @relation("taskBreakDownSubTasks")
 
   @@map("taskBreakDown")
