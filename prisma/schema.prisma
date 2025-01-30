@@ -467,8 +467,8 @@ model TaskBreakdown{
   QtyNo Int @default(0)
   execTime Int @default(0)
   checkingHour Int @default(0)
-  jobstudyId String @db.Uuid
-  jobstudy Project @relation(fields: [jobstudyId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
+  projectId String @db.Uuid
+  jobstudy Project @relation(fields: [projectId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
   subTasks SubTasks[] @relation("taskBreakDownSubTasks")
 
   @@map("taskBreakDown")
