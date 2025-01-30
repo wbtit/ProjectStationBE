@@ -452,9 +452,10 @@ model ChangeOrder {
 
 model JobStudy{
   id String @id @default(uuid()) @db.Uuid
-  QtyNo Int
-  unitTime Int @default(0)
-  execTime Int @default(0)
+  QtyNo Int 
+  unitTime Float @default(0.0) // Change from Int to Float
+  execTime Float @default(0.0) // Change from Int to Float
+  description String
   projectId String @db.Uuid
   projects Project @relation(fields: [projectId],references: [id],name: "projectJobStudy",onDelete: Cascade)
   
@@ -465,8 +466,8 @@ model TaskBreakdown{
   id String @id @default(uuid()) @db.Uuid
   description String
   QtyNo Int @default(0)
-  execTime Int @default(0)
-  checkingHour Int @default(0)
+  execTime Float @default(0.0) // Change from Int to Float
+  checkingHour Float @default(0.0) // Change from Int to Float
   projectId String @db.Uuid
   jobstudy Project @relation(fields: [projectId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
   subTasks SubTasks[] @relation("taskBreakDownSubTasks")
@@ -478,8 +479,8 @@ model SubTasks{
   id String @id @default(uuid()) @db.Uuid
   description String
   Qty Int
-  unitTime Int @default(0)
-  CheckUnitTime Int @default(0)
+  unitTime Float @default(0.0) // Change from Int to Float
+  CheckUnitTime Float @default(0.0) // Change from Int to Float
   taskBreakDownid String @db.Uuid
   taskBreakDown TaskBreakdown @relation(fields: [taskBreakDownid],references: [id],name: "taskBreakDownSubTasks",onDelete: Cascade)
 

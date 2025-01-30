@@ -11,21 +11,24 @@ import {
   putSubTasksput,
 } from "../../controllers/subTasks.js";
 
-import {addTaskBreakDown,getTaskBreakDown,putTaskBreakDown} from '../../controllers/taskBreakDown.js'
+import {
+  addTaskBreakDown,
+  getTaskBreakDown,
+  putTaskBreakDown,
+} from "../../controllers/taskBreakDown.js";
 
-const router =Router
+const router = Router();
 
 router.post("/addJobStudy", Authenticate, addJobStudy);
 router.post("/addTaskBreakDown", Authenticate, addTaskBreakDown);
 router.post("/addSubTasks", Authenticate, addSubTasks);
 
-router.get("/getTaskBreakDown", Authenticate, getTaskBreakDown);
-router.get("/getSubTasks", Authenticate, getSubTasks);
-router.get("/getJobStudy", Authenticate, getJobStudy);
+router.get("/getTaskBreakDown/:id", Authenticate, getTaskBreakDown);
+router.get("/getSubTasks/:id", Authenticate, getSubTasks);
+router.get("/getJobStudy/:id", Authenticate, getJobStudy);
 
 router.put("/putJobStudy/:id", Authenticate, putJobStudy);
 router.put("/putTaskBreakDown/:id", Authenticate, putTaskBreakDown);
 router.put("/putSubTasks/:id", Authenticate, putSubTasksput);
 
-
-export default router
+export { router as WorkBreakDown };

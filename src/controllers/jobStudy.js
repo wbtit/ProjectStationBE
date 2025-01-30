@@ -2,10 +2,10 @@ import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 
 const addJobStudy = async (req, res) => {
-  const { QtyNo, execTime, unitTime, projectId } = req.body;
+  console.log(req.body);
 
   try {
-    if (!QtyNo || !execTime || !unitTime || !projectId) {
+    if (!req.body) {
       return sendResponse({
         res,
         statusCode: 400,
@@ -15,13 +15,14 @@ const addJobStudy = async (req, res) => {
       });
     }
 
-    const jobstudy = await prisma.jobStudy.create({
-      data: {
-        QtyNo: QtyNo,
-        execTime: execTime,
-        unitTime: unitTime,
-        projectId: projectId,
-      },
+    const jobstudy = await prisma.jobStudy.createMany({
+      data: Object.values(req.body).map((task) => ({
+        description: task.description,
+        QtyNo: task.QtyNo, // Ensure QtyNo is an integer
+        unitTime: task.unitTime,
+        execTime: task.execTime,
+        projectId: task.projectId,
+      })),
     });
 
     return sendResponse({
@@ -32,6 +33,7 @@ const addJobStudy = async (req, res) => {
       data: jobstudy,
     });
   } catch (error) {
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -43,8 +45,22 @@ const addJobStudy = async (req, res) => {
 };
 
 const getJobStudy = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return sendResponse({
+      message: "Ivalid ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
   try {
-    const jobstudy = await prisma.jobStudy.findMany();
+    const jobstudy = await prisma.jobStudy.findMany({
+      where: {
+        projectId: id,
+      },
+    });
 
     return sendResponse({
       message: "Job study fetch success",

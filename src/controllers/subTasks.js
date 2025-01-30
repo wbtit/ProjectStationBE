@@ -84,8 +84,24 @@ const putSubTasksput = async (req, res) => {
 };
 
 const getSubTasks = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return sendResponse({
+      message: "Invalid ID",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
   try {
-    const subtasks = await prisma.subTasks.findMany();
+    const subtasks = await prisma.subTasks.findMany({
+      where: {
+        taskBreakDownid: id,
+      },
+    });
 
     return sendResponse({
       message: "subtasks feth succes",
