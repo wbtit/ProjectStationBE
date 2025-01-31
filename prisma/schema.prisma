@@ -209,7 +209,7 @@ model Team {
 
   changeOrder ChangeOrder[] @relation("ChangeOrderProject")
   Jobstudy JobStudy[] @relation("projectJobStudy")
-  taskBreakdown TaskBreakdown[] @relation("JSTaskBreakdown")
+  subTasks SubTasks[] @relation("subTasks")
 
 
   @@map("project")
@@ -462,27 +462,28 @@ model JobStudy{
   @@map("jobStudy")
 }
 
-model TaskBreakdown{
+model WBSActivity{
   id String @id @default(uuid()) @db.Uuid
-  description String
-  QtyNo Int @default(0)
-  execTime Float @default(0.0) // Change from Int to Float
-  checkingHour Float @default(0.0) // Change from Int to Float
-  projectId String @db.Uuid
-  jobstudy Project @relation(fields: [projectId],references: [id],name: "JSTaskBreakdown",onDelete: Cascade)
-  subTasks SubTasks[] @relation("taskBreakDownSubTasks")
+  type Activity 
+  name String
 
-  @@map("taskBreakDown")
+  subTasks SubTasks[] @relation("subTasks")
+
+  @@map("wbsactivity")
 }
 
 model SubTasks{
   id String @id @default(uuid()) @db.Uuid
   description String
-  Qty Int
+  QtyNo Int
   unitTime Float @default(0.0) // Change from Int to Float
+  execHr Float @default(0.0) // Change from Int to Float
   CheckUnitTime Float @default(0.0) // Change from Int to Float
-  taskBreakDownid String @db.Uuid
-  taskBreakDown TaskBreakdown @relation(fields: [taskBreakDownid],references: [id],name: "taskBreakDownSubTasks",onDelete: Cascade)
+  checkHr  Float @default(0.0) // Change from Int to Float
+  projectID String @db.Uuid
+  project Project @relation(fields: [projectID],references: [id],name: "subTasks",onDelete: Cascade)
+  wbsactivityID String @db.Uuid
+  WBSACTIVITY WBSActivity @relation(fields: [wbsactivityID],references: [id],name: "subTasks", onDelete: Cascade)
 
   @@map("subTasks")
 }
@@ -529,4 +530,10 @@ enum Stage {
 enum Tools {
   TEKLA
   SDS2
+}
+
+enum Activity {
+  MODELING
+  DETAILING
+  ERECTION  
 }

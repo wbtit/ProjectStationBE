@@ -2,10 +2,20 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 
 const addTaskBreakDown = async (req, res) => {
-  const { description, QtyNo, execTime, checkingHour, projectId } = req?.body;
+  const { description, QtyNo, execTime, checkingHour, projectId, activity } =
+    req?.body;
+  
+  console.log(req.body);
 
   try {
-    if (!description || !QtyNo || !execTime || !checkingHour || !projectId) {
+    if (
+      !description ||
+      !QtyNo ||
+      !execTime ||
+      !checkingHour ||
+      !projectId ||
+      !activity
+    ) {
       return sendResponse({
         message: "Empty inputs",
         res,
@@ -15,11 +25,14 @@ const addTaskBreakDown = async (req, res) => {
       });
     }
     const newtaskBreakDown = await prisma.taskBreakdown.create({
-      description,
-      QtyNo,
-      execTime,
-      checkingHour,
-      projectId,
+      data: {
+        description,
+        QtyNo,
+        execTime,
+        checkingHour,
+        projectId,
+        activity,
+      },
     });
     if (!newtaskBreakDown) {
       return sendResponse({
@@ -50,15 +63,15 @@ const addTaskBreakDown = async (req, res) => {
 
 const getTaskBreakDown = async (req, res) => {
   const { id } = req.params;
- if (!id) {
-   return sendResponse({
-     message: "Id not provided",
-     res,
-     statusCode: 400,
-     success: false,
-     data: null,
-   });
- }
+  if (!id) {
+    return sendResponse({
+      message: "Id not provided",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
   try {
     const gettaskBreakDown = await prisma.taskBreakdown.findMany({
       where: {
