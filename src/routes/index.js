@@ -14,6 +14,7 @@ import WorkingHour from "./workinghours/route.js";
 import { ChangeOrderRouter } from "./changeorder/route.js";
 import { WorkBreakDown } from "./workbreakdown/route.js";
 import WBSActivity from "./wbsactivity/route.js";
+import { SubTasksRouter } from "./subtasks/route.js";
 
 const routes = express.Router();
 
@@ -32,5 +33,6 @@ routes.use("/wh", WorkingHour);
 routes.use("/co", ChangeOrderRouter);
 routes.use("/br", WorkBreakDown);
 routes.use("/wbs", WBSActivity);
+routes.use("/st", SubTasksRouter);
 
 export { routes };
