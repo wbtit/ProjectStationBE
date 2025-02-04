@@ -9,6 +9,7 @@ import fs from "fs";
 // import client from "../redis/index.js";
 import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
+import { SubTasks } from "../../data/data.js";
 
 const AddProject = async (req, res) => {
   const {
@@ -16,9 +17,9 @@ const AddProject = async (req, res) => {
     description,
     fabricator,
     department,
-    team,
     manager,
     status,
+    team,
     stage,
     tools,
     connectionDesign,
@@ -36,7 +37,6 @@ const AddProject = async (req, res) => {
     !description ||
     !fabricator ||
     !department ||
-    !team ||
     !manager ||
     !start_date ||
     !end_date ||
@@ -66,11 +66,22 @@ const AddProject = async (req, res) => {
         miscDesign: miscDesign,
         stage: stage,
         startDate: start_date,
-        teamID: team,
+        teamID: team || null,
         status: status,
         tools: tools,
         endDate: end_date,
       },
+    });
+
+    const SubtasksData = SubTasks.map((task) => ({
+      ...task,
+      projectID: project.id,
+    }));
+
+    console.log(SubtasksData)
+
+    const subtasks = await prisma.subTasks.createMany({
+      data: SubtasksData,
     });
 
     // const projects = JSON.parse(await client.get("allprojects"));
@@ -85,7 +96,10 @@ const AddProject = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: project,
+      data: {
+        project,
+        subtasks,
+      },
     });
   } catch (error) {
     console.log(error.message);
@@ -361,10 +375,11 @@ const GetAllProjects = async (req, res) => {
     let projects;
 
     if (
-      req.user.isstaff &&
+      req.user.is_staff &&
       req.user.role === "STAFF" &&
       req.user.is_superuser
     ) {
+      console.log("ADMIN")
       projects = await prisma.project.findMany({
         include: {
           fabricator: true,
@@ -427,6 +442,7 @@ const GetAllProjects = async (req, res) => {
         },
       });
     } else {
+      console.log("Random")
       projects = await prisma.project.findMany({
         where: {
           managerID: req.user.id,
@@ -462,6 +478,7 @@ const GetAllProjects = async (req, res) => {
 
     // await client.set("allprojects", JSON.stringify(projects));
 
+    console.log(projects)
     return sendResponse({
       message: "Projects retrived successfully",
       res,

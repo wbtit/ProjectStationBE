@@ -20,14 +20,7 @@ const AddEmployee = async (req, res) => {
 
   console.log(req.body);
 
-  if (
-    !username ||
-    !password ||
-    !f_name ||
-    !email ||
-    !phone ||
-    !emp_code
-  ) {
+  if (!username || !password || !f_name || !email || !phone || !emp_code) {
     return sendResponse({
       message: "Fields are empty.",
       res,
@@ -66,6 +59,7 @@ const AddEmployee = async (req, res) => {
         department,
         emp_code,
         email,
+        is_staff: true,
       },
     });
 
@@ -178,4 +172,4 @@ const GetEmployeeBYID = async (req, res) => {
   }
 };
 
-export { AddEmployee , GetEmployeeBYID, getAllEmployees};
+export { AddEmployee, GetEmployeeBYID, getAllEmployees };

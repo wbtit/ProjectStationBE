@@ -185,8 +185,8 @@ model Team {
   fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
   departmentID String @db.Uuid
   department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
-  teamID String @db.Uuid
-  team Team @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
+  teamID String? @db.Uuid
+  team Team? @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
   managerID  String @db.Uuid
   manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
   status Status @default(ACTIVE)
@@ -475,7 +475,7 @@ model WBSActivity{
 model SubTasks{
   id String @id @default(uuid()) @db.Uuid
   description String
-  QtyNo Int
+  QtyNo Int @default(0)
   unitTime Float @default(0.0) // Change from Int to Float
   execHr Float @default(0.0) // Change from Int to Float
   CheckUnitTime Float @default(0.0) // Change from Int to Float
@@ -521,15 +521,17 @@ enum Stage {
   RBFA
   IFC
   BFC
-  RJFC
+  RIFC
   REV
   CO // Not possible to use "#"
+  COMPLETED
 }
 
 
 enum Tools {
   TEKLA
   SDS2
+  PEMB
 }
 
 enum Activity {
