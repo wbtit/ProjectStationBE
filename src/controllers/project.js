@@ -11,7 +11,7 @@ import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 import { SubTasks } from "../../data/data.js";
 
-const AddProject = async (req, res) => {
+const   AddProject = async (req, res) => {
   const {
     name,
     description,
@@ -73,12 +73,12 @@ const AddProject = async (req, res) => {
       },
     });
 
+    console.log("THe 20th data", subtasks[20])
+
     const SubtasksData = SubTasks.map((task) => ({
       ...task,
       projectID: project.id,
     }));
-
-    console.log(SubtasksData)
 
     const subtasks = await prisma.subTasks.createMany({
       data: SubtasksData,
