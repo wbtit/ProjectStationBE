@@ -30,4 +30,16 @@ const getWbsActivity = async (req, res) => {
   }
 };
 
-export { getWbsActivity };
+const getAcivity = async (req, res) => {
+  const activity = await prisma.wBSActivity.findMany();
+
+  return sendResponse({
+    message: "Success",
+    res,
+    statusCode: 200,
+    success: true,
+    data: activity,
+  });
+};
+
+export { getWbsActivity, getAcivity };

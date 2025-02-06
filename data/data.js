@@ -119,7 +119,6 @@ export const SubTasks = [
     execHr: 5.0,
     checkHr: 0,
   },
-  ,
   {
     wbsactivityID: "003c5d0d-fcf0-407b-be3e-8fe9109b8244",
     description: "Straight",
@@ -601,7 +600,7 @@ export const SubTasks = [
     checkHr: 1.0,
   },
   {
-    wbsactivityID: "a53f33ed-68d9961d49-24c6-4e64-8413-cd4b3d860084",
+    wbsactivityID: "d9961d49-24c6-4e64-8413-cd4b3d860084",
     description: "Simple Column Detailing",
     execHr: 8.0,
     checkHr: 2.7,
@@ -1249,3 +1248,5 @@ export const SubTasks = [
     checkHr: 0.0,
   },
 ];
+
+

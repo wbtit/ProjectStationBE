@@ -11,7 +11,7 @@ import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 import { SubTasks } from "../../data/data.js";
 
-const   AddProject = async (req, res) => {
+const AddProject = async (req, res) => {
   const {
     name,
     description,
@@ -73,12 +73,13 @@ const   AddProject = async (req, res) => {
       },
     });
 
-    console.log("THe 20th data", subtasks[20])
+    console.log("THe 20th data", SubTasks[20]);
 
     const SubtasksData = SubTasks.map((task) => ({
       ...task,
-      projectID: project.id,
+      projectID: project.id
     }));
+    console.log(SubtasksData);
 
     const subtasks = await prisma.subTasks.createMany({
       data: SubtasksData,
@@ -379,7 +380,7 @@ const GetAllProjects = async (req, res) => {
       req.user.role === "STAFF" &&
       req.user.is_superuser
     ) {
-      console.log("ADMIN")
+      console.log("ADMIN");
       projects = await prisma.project.findMany({
         include: {
           fabricator: true,
@@ -442,7 +443,7 @@ const GetAllProjects = async (req, res) => {
         },
       });
     } else {
-      console.log("Random")
+      console.log("Random");
       projects = await prisma.project.findMany({
         where: {
           managerID: req.user.id,
@@ -478,7 +479,7 @@ const GetAllProjects = async (req, res) => {
 
     // await client.set("allprojects", JSON.stringify(projects));
 
-    console.log(projects)
+    console.log(projects);
     return sendResponse({
       message: "Projects retrived successfully",
       res,
