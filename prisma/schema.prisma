@@ -117,7 +117,7 @@ model Fabricator {
   website     String?   @default("")
   drive       String?   @default("")
   branches    Json     @default("[]")
-  files       String[] @default([])
+  files       Json @default("[]")
   is_bin      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

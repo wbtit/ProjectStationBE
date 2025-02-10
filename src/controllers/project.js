@@ -77,7 +77,7 @@ const AddProject = async (req, res) => {
 
     const SubtasksData = SubTasks.map((task) => ({
       ...task,
-      projectID: project.id
+      projectID: project.id,
     }));
     console.log(SubtasksData);
 
@@ -444,9 +444,23 @@ const GetAllProjects = async (req, res) => {
       });
     } else {
       console.log("Random");
+      const teams = await prisma.team.findMany({
+        include: {
+          project: true,
+        },
+      });
+
+      const projectss = teams
+        .filter((team) =>
+          team.members.some((member) => member.id === req.user.id)
+        ) // Filters teams where user is a member
+        .map((team) => team.project.id); // Extracts project IDs
+
+      console.log(projectss)
+      
       projects = await prisma.project.findMany({
         where: {
-          managerID: req.user.id,
+          id: projects,
         },
         include: {
           fabricator: true,

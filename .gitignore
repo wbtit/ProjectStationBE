@@ -88,6 +88,8 @@ docker-compose.yml
 .next
 out
 
+public/
+
 # Nuxt.js build / generate output
 .nuxt
 dist
