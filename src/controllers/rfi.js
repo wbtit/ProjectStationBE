@@ -4,14 +4,19 @@ import { sendEmail } from "../../service/gmailservice/index.js";
 
 const addRFI = async (req, res) => {
   const { id } = req.user;
-  const { fabricator_id, project_id, recepient_id, subject, description } =
+  console.log("==",req.body)
+  const { fabricator_id, project_id, recipient_id, subject, description} =
     req.body;
-  console.log(fabricator_id, project_id, recepient_id, subject, description); 
+  
+  if (req.files.length > 0) {
+     files.map((file) => console.log(file))
+  }
+  
   try {
     if (
       !fabricator_id ||
       !project_id ||
-      !recepient_id ||
+      !recipient_id ||
       !subject ||
       !description
     ) {
@@ -34,7 +39,7 @@ const addRFI = async (req, res) => {
       data: {
         fabricator_id,
         project_id,
-        recepient_id,
+        recepient_id:recipient_id,
         sender_id: id,
         status: true,
         subject,
@@ -182,7 +187,7 @@ const Inbox = async (req, res) => {
   try {
     const sentRFI = await prisma.rFI.findMany({
       where: {
-        recepient_id: id,
+        recipient_id: id,
       },
     });
 
