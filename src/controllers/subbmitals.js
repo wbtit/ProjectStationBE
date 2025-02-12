@@ -140,6 +140,13 @@ const SentSubmittals = async (req, res) => {
         sender: true,
       },
     });
+    // Emit real-time notification using socket.io
+    if (global.io) {
+      global.io.to(recepient_id).emit("newNotification", {
+        message: `New submittal received: ${subject}`,
+        submittalId: submittals.id,
+      });
+    }
 
     return sendResponse({
       message: "Retrived all sent submittals",

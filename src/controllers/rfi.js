@@ -128,6 +128,13 @@ if(!notification){
 
   })
 }
+// Emit real-time notification using socket.io
+if (global.io) {
+  global.io.to(recipient_id).emit("newNotification", {
+    message: `New RFI received: ${subject}`,
+    rfiId: newrfi.id,
+  });
+}
 
     return sendResponse({
       message: "RFI added successfully",
