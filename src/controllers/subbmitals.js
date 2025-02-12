@@ -1,12 +1,22 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import { sendEmail } from "../../service/gmailservice/index.js";
 
 const AddSubmitals = async (req, res) => {
   const { id } = req?.user;
-  const { fabricator, project, recipient, subject, description } = req.body;
+  const { fabricator_id, project_id, recepient_id, subject, description } =
+    req.body;
+
+  console.log(fabricator_id, project_id, recepient_id, subject, description);
 
   try {
-    if (!fabricator || !project || !recipient || !subject || !description) {
+    if (
+      !fabricator_id ||
+      !project_id ||
+      !recepient_id ||
+      !subject ||
+      !description
+    ) {
       console.log("Fields are empty");
       return sendResponse({
         message: "Fields are empty",
@@ -29,10 +39,10 @@ const AddSubmitals = async (req, res) => {
       data: {
         description,
         subject,
-        fabricator_id: fabricator,
+        fabricator_id,
         files: fileDetails,
-        project_id: project,
-        recepient_id: recipient,
+        project_id,
+        recepient_id,
         sender_id: id,
         status: true,
       },
@@ -89,23 +99,31 @@ const AddSubmitals = async (req, res) => {
       subject: subject,
       text: description,
     });
-    const notification= await prisma.notification.create({
-      data:{
-        userID:id,
-        subject:subject,
-        isRead:false
-      }
-    })
-if(!notification){
-  return sendResponse({
-    message:"Failed to add the notifications",
-    res,
-    statusCode:400,
-    success:false,
-    data:null
+    const notification = await prisma.notification.create({
+      data: {
+        userID: id,
+        subject: subject,
+        isRead: false,
+      },
+    });
+    if (!notification) {
+      return sendResponse({
+        message: "Failed to add the notifications",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
 
-  })
-}
+    // Emit real-time notification using socket.io
+    if (global.io) {
+      global.io.to(recepient_id).emit("newNotification", {
+        message: `New RFI received: ${subject}`,
+        rfiId: newrfi.id,
+      });
+    }
+
     return sendResponse({
       message: "Submittals success",
       res,

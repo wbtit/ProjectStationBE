@@ -14,10 +14,6 @@ const router = Router();
 router.post(
   "/rfi/addrfi",
   Authenticate,
-  (req, res, next) => {
-    console.log("Hey This is the end, hold your breath and count to ten",req.files);
-    next();
-  },
   rfiUploads.array("files"),
   addRFI
 );

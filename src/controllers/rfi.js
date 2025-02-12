@@ -4,14 +4,14 @@ import { sendEmail } from "../../service/gmailservice/index.js";
 
 const addRFI = async (req, res) => {
   const { id } = req.user;
-  console.log("==",req.body)
-  const { fabricator_id, project_id, recipient_id, subject, description} =
+  console.log("==", req.body);
+  const { fabricator_id, project_id, recipient_id, subject, description } =
     req.body;
-  
+
   if (req.files.length > 0) {
-     files.map((file) => console.log(file))
+    files.map((file) => console.log(file));
   }
-  
+
   try {
     if (
       !fabricator_id ||
@@ -39,7 +39,7 @@ const addRFI = async (req, res) => {
       data: {
         fabricator_id,
         project_id,
-        recepient_id:recipient_id,
+        recepient_id: recipient_id,
         sender_id: id,
         status: true,
         subject,
@@ -110,31 +110,29 @@ const addRFI = async (req, res) => {
       });
     }
 
-    
-    const notification= await prisma.notification.create({
-      data:{
-        userID:id,
-        subject:subject,
-        isRead:false
-      }
-    })
-if(!notification){
-  return sendResponse({
-    message:"Failed to add the notifications",
-    res,
-    statusCode:400,
-    success:false,
-    data:null
-
-  })
-}
-// Emit real-time notification using socket.io
-if (global.io) {
-  global.io.to(recipient_id).emit("newNotification", {
-    message: `New RFI received: ${subject}`,
-    rfiId: newrfi.id,
-  });
-}
+    const notification = await prisma.notification.create({
+      data: {
+        userID: id,
+        subject: subject,
+        isRead: false,
+      },
+    });
+    if (!notification) {
+      return sendResponse({
+        message: "Failed to add the notifications",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    // Emit real-time notification using socket.io
+    if (global.io) {
+      global.io.to(recipient_id).emit("newNotification", {
+        message: `New RFI received: ${subject}`,
+        rfiId: newrfi.id,
+      });
+    }
 
     return sendResponse({
       message: "RFI added successfully",
