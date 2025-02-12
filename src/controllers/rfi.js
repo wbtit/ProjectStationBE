@@ -243,7 +243,7 @@ const Inbox = async (req, res) => {
   try {
     const sentRFI = await prisma.rFI.findMany({
       where: {
-        recipient_id: id,
+        recepient_id: id, 
       }, 
       include: {
         fabricator: true,
@@ -269,6 +269,7 @@ const Inbox = async (req, res) => {
       data: sentRFI,
     });
   } catch (error) {
+    console.log(error.message)
     return sendResponse({
       message: error.message,
       res,
