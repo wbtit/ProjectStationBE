@@ -159,6 +159,11 @@ const sentRFIByUser = async (req, res) => {
       where: {
         sender_id: id,
       },
+      include: {
+        fabricator: true,
+        project: true,
+        recepients : true
+      }
     });
 
     if (!sentRFI) {
@@ -187,13 +192,64 @@ const sentRFIByUser = async (req, res) => {
     });
   }
 };
+
+const RFIByID = async (req, res) => {
+  const { id } = req.params;
+
+  console.log(id, "This is rfi ID")
+
+  try {
+    const rfi = await prisma.rFI.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        recepients: {
+          include: {
+            fabricator: {
+              select: {
+                fabName: true,
+                headquaters: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    console.log(rfi, "This is rfi")
+
+    sendResponse({
+      message: "RFI fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: rfi,
+    });
+  } catch (error) {
+    console.log(error.message);
+    sendResponse({
+      message: error.message,
+      res,
+      statusCode: 200,
+      success: false,
+      data: null,
+    });
+  }
+};
+
 const Inbox = async (req, res) => {
   const { id } = req.user;
   try {
     const sentRFI = await prisma.rFI.findMany({
       where: {
         recipient_id: id,
-      },
+      }, 
+      include: {
+        fabricator: true,
+        project: true,
+        recepients : true
+      }
     });
 
     if (!sentRFI) {
@@ -261,4 +317,4 @@ const RFIseen = async (req, res) => {
   }
 };
 
-export { addRFI, sentRFIByUser, Inbox, RFIseen };
+export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID };

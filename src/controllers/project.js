@@ -6,7 +6,7 @@ import prisma from "../lib/prisma.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import path from "path";
 import fs from "fs";
-import client from "../redis/index.js";
+// import client from "../redis/index.js";
 import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 import { SubTasks } from "../../data/data.js";

@@ -7,6 +7,7 @@ import {
   sentRFIByUser,
   Inbox,
   RFIseen,
+  RFIByID
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -20,5 +21,6 @@ router.post(
 router.get("/rfi/sent", Authenticate, sentRFIByUser);
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);
+router.get("/rfi/:id", Authenticate, RFIByID);
 
 export default router;
