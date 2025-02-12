@@ -32,12 +32,12 @@ const AddSubmitals = async (req, res) => {
         fabricator_id: fabricator,
         files: fileDetails,
         project_id: project,
-        recepient_id: recipient,
+        recepient_id: recipient, // Make sure this matches your DB field
         sender_id: id,
         status: true,
       },
       include: {
-        recepients: true,
+        recipient: true, // Make sure this matches your Prisma schema
       },
     });
 
@@ -85,29 +85,39 @@ const AddSubmitals = async (req, res) => {
 
     sendEmail({
       html: htmlContent,
-      to: submitals.recepients.email,
+      to: submitals.recipient.email, // Ensure it's `recipient`, not `recepients`
       subject: subject,
       text: description,
     });
-    const notification= await prisma.notification.create({
-      data:{
-        userID:id,
-        subject:subject,
-        isRead:false
-      }
-    })
-if(!notification){
-  return sendResponse({
-    message:"Failed to add the notifications",
-    res,
-    statusCode:400,
-    success:false,
-    data:null
 
-  })
-}
+    const notification = await prisma.notification.create({
+      data: {
+        userID: recipient, // Notify the recipient instead of sender
+        subject: subject,
+        isRead: false,
+      },
+    });
+
+    if (!notification) {
+      return sendResponse({
+        message: "Failed to add the notification",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Emit real-time notification using socket.io
+    if (global.io) {
+      global.io.to(recipient).emit("newNotification", {
+        message: `New submittal received: ${subject}`,
+        submittalId: submitals.id,
+      });
+    }
+
     return sendResponse({
-      message: "Submittals success",
+      message: "Submittals added successfully",
       res,
       statusCode: 200,
       success: true,
@@ -124,6 +134,8 @@ if(!notification){
     });
   }
 };
+
+
 
 const SentSubmittals = async (req, res) => {
   const { id } = req.user;

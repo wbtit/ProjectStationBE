@@ -105,6 +105,8 @@ const addRFI = async (req, res) => {
       });
     }
 
+  
+
     
     const notification= await prisma.notification.create({
       data:{
@@ -123,7 +125,13 @@ if(!notification){
 
   })
 }
-
+    // Emit real-time notification using socket.io
+    if (global.io) {
+      global.io.to(recepient_id).emit("newNotification", {
+        message: `New RFI received: ${subject}`,
+        rfiId: newrfi.id,
+      });
+    }
     return sendResponse({
       message: "RFI added successfully",
       res,
@@ -177,6 +185,9 @@ const sentRFIByUser = async (req, res) => {
     });
   }
 };
+
+
+
 const Inbox = async (req, res) => {
   const { id } = req.user;
   try {
