@@ -3,29 +3,19 @@ import { sendResponse } from "../utils/responder.js";
 import { sendEmail } from "../../service/gmailservice/index.js";
 
 const addRFI = async (req, res) => {
-  const { id } = req.user;
+  const { id, fabricatorId } = req.user;
   console.log("==", req.body);
   const { fabricator_id, project_id, recipient_id, subject, description } =
     req.body;
 
-  if (req.files.length > 0) {
-    files.map((file) => console.log(file));
-  }
-
   try {
-    if (
-      !fabricator_id ||
-      !project_id ||
-      !recipient_id ||
-      !subject ||
-      !description
-    ) {
+    if (!project_id || !recipient_id || !subject || !description) {
       return sendResponse({
         message: "Fields are empty",
         res,
         statusCode: 400,
         success: false,
-        data: null,
+        data: null, 
       });
     }
     const fileDetails = req.files.map((file) => ({
@@ -37,7 +27,7 @@ const addRFI = async (req, res) => {
 
     const newrfi = await prisma.rFI.create({
       data: {
-        fabricator_id,
+        fabricator_id: fabricator_id !== 'undefined' ? fabricator_id : fabricatorId,
         project_id,
         recepient_id: recipient_id,
         sender_id: id,
@@ -141,7 +131,8 @@ const addRFI = async (req, res) => {
       success: true,
       data: newrfi,
     });
-  } catch (error) {
+  } catch (error){
+  console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -162,8 +153,8 @@ const sentRFIByUser = async (req, res) => {
       include: {
         fabricator: true,
         project: true,
-        recepients : true
-      }
+        recepients: true,
+      },
     });
 
     if (!sentRFI) {
@@ -196,7 +187,7 @@ const sentRFIByUser = async (req, res) => {
 const RFIByID = async (req, res) => {
   const { id } = req.params;
 
-  console.log(id, "This is rfi ID")
+  console.log(id, "This is rfi ID");
 
   try {
     const rfi = await prisma.rFI.findUnique({
@@ -217,7 +208,7 @@ const RFIByID = async (req, res) => {
       },
     });
 
-    console.log(rfi, "This is rfi")
+    console.log(rfi, "This is rfi");
 
     sendResponse({
       message: "RFI fetch success",
@@ -243,13 +234,13 @@ const Inbox = async (req, res) => {
   try {
     const sentRFI = await prisma.rFI.findMany({
       where: {
-        recepient_id: id, 
-      }, 
+        recepient_id: id,
+      },
       include: {
         fabricator: true,
         project: true,
-        recepients : true
-      }
+        recepients: true,
+      },
     });
 
     if (!sentRFI) {
@@ -269,7 +260,7 @@ const Inbox = async (req, res) => {
       data: sentRFI,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

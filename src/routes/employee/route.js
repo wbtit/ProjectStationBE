@@ -11,7 +11,7 @@ const router = Router();
 
 router.post("/employee", Authenticate, isStaff, AddEmployee); // Adding employee
 
-router.get("/employee", Authenticate, isStaff, getAllEmployees); // Get all employee
+router.get("/employee", Authenticate, getAllEmployees); // Get all employee
 
 router.get("/employee/:eid", Authenticate, isStaff, GetEmployeeBYID); // Get employee by id
 
