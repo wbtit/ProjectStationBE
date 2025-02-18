@@ -86,9 +86,10 @@ const login = async (req, res) => {
 
     // Compare the provided password with the stored hashed password
     password = typeof password === "number" ? password.toString() : password;
-
+    console.log("Password:",password)
+    console.log("userPassword:",user.password)
     const isPasswordValid = await comparePassword(password, user.password);
-
+    
     if (!isPasswordValid) {
       return sendResponse({
         message: "Invalid password",
