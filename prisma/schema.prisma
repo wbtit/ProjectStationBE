@@ -32,7 +32,8 @@ datasource db {
     address       String?  @default("")
     role          UserRole
     emp_code      String?   @default("WBT")
-    department    Json?    @default("{}")
+    department    String?   @db.Uuid
+    departmentId Department? @relation(fields: [department], references: [id], onDelete: Cascade,name: "userDepartment")
     is_sales      Boolean? @default(false)
     is_manager    Boolean @default(false)
     is_active     Boolean  @default(true)
@@ -149,6 +150,7 @@ model Department {
   createdById String? @db.Uuid // Foreign key to the Users model (UUID)
   createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator", onDelete: Cascade)
   isBin      Boolean  @default(false)
+  users Users[] @relation("userDepartment")
 
 
   project Project[] @relation("projectDepartment")
