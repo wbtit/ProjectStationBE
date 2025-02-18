@@ -16,6 +16,6 @@ router.get("/employee", Authenticate, getAllEmployees); // Get all employee
 
 router.get("/employee/:eid", Authenticate, isStaff, GetEmployeeBYID); // Get employee by id
 
-router.patch("/employee/:eid", Authenticate, isStaff, UpdateEmployee)//
+router.patch("/employee/:id", Authenticate, isStaff, UpdateEmployee)//
 
 export default router;

@@ -94,4 +94,42 @@ const GetDepartment = async (req, res) => {
   }
 };
 
-export { AddDepartment, GetDepartment };
+const updateDepartment=async(req,res)=>{
+ const{id}=req?.params
+ if(!id) {
+  return sendResponse({
+    message : "Cannot find Department",
+    res,
+    statusCode : 400,
+    success : false,
+    data : null
+  })
+}
+
+if(!req.body) {
+  return sendResponse({
+    message : "Invalid Data",
+    res ,
+    statusCode : 400,
+    success : false,
+    data : null
+  })
+}
+
+const updatedEmployee = await prisma.department.update({
+  where : {
+    id
+  },
+  data : req.body
+})
+
+return sendResponse({
+  message : "Department updated success",
+  res,
+  statusCode : 200,
+success : true,
+data : updatedEmployee
+})
+}
+
+export { AddDepartment, GetDepartment ,updateDepartment};
