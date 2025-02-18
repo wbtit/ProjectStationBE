@@ -8,7 +8,6 @@ import { sendResponse } from "../utils/responder.js";
 
 const createUser = async ({
   username,
-  password,
   email,
   f_name,
   m_name,
@@ -26,7 +25,7 @@ const createUser = async ({
 }) => {
   try {
     // Hash the password before storing
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword("Qwerty!23456");
     // Create user in the database
     const newUser = await prisma.users.create({
       data: {
@@ -123,7 +122,6 @@ const login = async (req, res) => {
 const signup = async (req, res) => {
   const {
     username,
-    password,
     email,
     f_name,
     m_name,
@@ -131,7 +129,6 @@ const signup = async (req, res) => {
     phone,
     role,
     is_active,
-    is_staff,
     is_superuser,
     is_firstLogin,
     emp_code,
@@ -141,7 +138,7 @@ const signup = async (req, res) => {
     sales,
   } = req.body;
 
-  if (!username || !password || !f_name || !phone || !role) {
+  if (!username || !f_name || !phone || !role) {
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -168,7 +165,6 @@ const signup = async (req, res) => {
 
     const newUser = await createUser({
       username,
-      password,
       email,
       f_name,
       m_name,

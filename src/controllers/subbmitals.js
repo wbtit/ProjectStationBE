@@ -123,7 +123,7 @@ const AddSubmitals = async (req, res) => {
       }
 
       h2 {
-        font-size: 20px;
+        font-size: 20px;n
         color: #333;
         margin-top: 20px;
       }

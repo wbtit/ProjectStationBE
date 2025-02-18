@@ -15,7 +15,7 @@ datasource db {
   model Users {
     id            String   @id @default(uuid()) @db.Uuid
     username      String   @unique
-    password      String  
+    password      String   
     email         String?  @db.VarChar(150)
     f_name        String   @db.VarChar(50)
     m_name        String?  @db.VarChar(50)
