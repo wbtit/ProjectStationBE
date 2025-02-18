@@ -6,7 +6,6 @@ import { getUserByUsername } from "../models/userUniModel.js";
 const AddEmployee = async (req, res) => {
   const {
     username,
-    password,
     email,
     f_name,
     m_name,
@@ -20,7 +19,7 @@ const AddEmployee = async (req, res) => {
 
   console.log(req.body);
 
-  if (!username || !password || !f_name || !email || !phone || !emp_code) {
+  if (!username || !f_name || !email || !phone || !emp_code) {
     return sendResponse({
       message: "Fields are empty.",
       res,
@@ -30,7 +29,7 @@ const AddEmployee = async (req, res) => {
     });
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword("Qwerty!23456");
 
   try {
     const isExist = await getUserByUsername(username);
