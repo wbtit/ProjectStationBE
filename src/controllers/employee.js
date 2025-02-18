@@ -171,4 +171,45 @@ const GetEmployeeBYID = async (req, res) => {
   }
 };
 
-export { AddEmployee, GetEmployeeBYID, getAllEmployees };
+const UpdateEmployee = async(req, res) => {
+
+  const {id} = req.user
+
+  if(!id) {
+    return sendResponse({
+      message : "Cannot find user",
+      res,
+      statusCode : 400,
+      success : false,
+      data : null
+    })
+  }
+
+  if(!req.body) {
+    return sendResponse({
+      message : "Invalid Data",
+      res ,
+      statusCode : 400,
+      success : false,
+      data : null
+    })
+  }
+
+  const updatedEmployee = await prisma.users.update({
+    where : {
+      id
+    },
+    data : req.body
+  })
+
+  return sendResponse({
+    message : "User updated success",
+    res,
+    statusCode : 200,
+  success : true,
+  data : updatedEmployee
+  })
+
+}
+
+export { AddEmployee, GetEmployeeBYID, getAllEmployees, UpdateEmployee };
