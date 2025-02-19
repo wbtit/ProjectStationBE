@@ -7,6 +7,7 @@ export const getDepartments = async () => {
       include: {
         manager: true,
         createdBy: true,
+        users:true
       },
     });
     return departments;
