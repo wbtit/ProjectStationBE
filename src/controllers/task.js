@@ -167,7 +167,12 @@ const GetTask = async (req, res) => {
           },
         },
         user: true,
-        taskcomment: true,
+        taskcomment: {
+          include : {
+            user : true,
+            task : true
+          }
+        },
         assignedTask: true,
         taskInAssignedList: true,
         workingHourTask: true,
