@@ -78,7 +78,7 @@ router.get("/get_assigned-list/:id", Authenticate, getAssignedListById); // get 
 
 router.put("/update_assigned-list/:id", Authenticate, updateAssignedList); // update assigned-list
 
-router.patch("/update_assigned-list/:id", Authenticate, updateAssignedList); // patchUpdate assigned-list
+router.patch("/update_assigned-list/:aid", Authenticate, updateAssignedList); // patchUpdate assigned-list
 
 router.delete("/delete_assigned-list/:id", Authenticate, deleteAssignedList); //delete assigned-list
 

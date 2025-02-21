@@ -278,7 +278,7 @@ const End = async (req, res) => {
       },
     });
 
-    await prisma.task.update({
+    const task = await prisma.task.update({
       where: {
         id: task_id,
       },
@@ -286,6 +286,14 @@ const End = async (req, res) => {
         status: "IN REVIEW",
       },
     });
+
+    await prisma.project.update({
+      where : {
+        id : task.project_id
+      }, data : {
+        status : "ACTIVE"
+      }
+    })
 
     return sendResponse({
       message: `Work Ended, Total time : ${

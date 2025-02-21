@@ -13,7 +13,6 @@ const addClient = async (req, res) => {
 
   const {
     username,
-    password,
     email,
     f_name,
     m_name,
@@ -30,7 +29,6 @@ const addClient = async (req, res) => {
 
   if (
     !username ||
-    !password ||
     !f_name ||
     !phone ||
     !designation ||
@@ -90,7 +88,7 @@ const addClient = async (req, res) => {
     });
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword("Qwerty!23456");
 
   try {
     const isExist = await getUserByUsername(username);

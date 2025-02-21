@@ -8,6 +8,8 @@ import { isAdmin } from "../middlewares/isadmin.js";
 const AddTask = async (req, res) => {
   // Adding the task
 
+  const {is_staff, id} = req.user
+
   console.log(req.body);
 
   const {
@@ -34,17 +36,7 @@ const AddTask = async (req, res) => {
     start_date
   );
 
-  if (
-    !description ||
-    !name ||
-    !due_date ||
-    !duration ||
-    !priority ||
-    !start_date ||
-    !status ||
-    !project ||
-    !user
-  ) {
+  if(!description || !name || !due_date || !duration || priority === undefined || !project || !user || !status || !start_date) {
     return sendResponse({
       message: "Fields are empty!!",
       res,
@@ -69,6 +61,24 @@ const AddTask = async (req, res) => {
       },
     });
 
+    await prisma.project.update({
+      where : {
+        id : project
+      },
+      data : {
+        status : "ACTIVE"
+      }
+    })
+
+    const newAssigendTask= await prisma.assigned_list.create({
+      data:{
+          approved : is_staff ? false : true,
+          assigned_to : user,
+          assigned_by : id,
+          task_id : newTask.id,
+      }
+  })
+
     if (newTask) {
       return sendResponse({
         message: "Task Added Successfully",
@@ -86,6 +96,7 @@ const AddTask = async (req, res) => {
       data: null,
     });
   } catch (error) {
+    console.log(error.message)
     return sendResponse({
       message: error.message,
       res,

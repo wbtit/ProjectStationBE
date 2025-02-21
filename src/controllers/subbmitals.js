@@ -26,7 +26,7 @@ const AddSubmitals = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/submittalstemp/${file.filename}`, // Relative path
+      path: `/public/submittalstemp/${file?.filename}`, // Relative path
     }));
 
     const submitals = await prisma.submittals.create({
@@ -158,7 +158,7 @@ const AddSubmitals = async (req, res) => {
         <div class="d-flex justify-content-between align-items-center">
         <div class="title">
             <span>You’ve Received a New Submittal</span><br/>
-            <span><strong>Project:</strong> ${submitals.project.name}</span>
+            <span><strong>Project:</strong> ${submitals.project?.name}</span>
         </div>
         <div> 
             <img 
@@ -168,11 +168,11 @@ const AddSubmitals = async (req, res) => {
         </div>
     </div>
         <div class="email-body">
-            <h2>Welcome to Project Station, <b>${submitals.recepients.username}</b>!</h2>
+            <h2>Welcome to Project Station, <b>${submitals.recepients?.username}</b>!</h2>
             <p>You have received a new Submittal notification. Here are the details:</p>
 
-            <p><strong>Project Name:</strong> ${submitals.project.name}</p>
-            <p><strong>Sender:</strong> ${submitals.sender.username}</p>
+            <p><strong>Project Name:</strong> ${submitals.project?.name}</p>
+            <p><strong>Sender:</strong> ${submitals.sender?.username}</p>
             <p><strong>Date:</strong> ${submitals.date}</p>
             <p><strong>Subject:</strong> ${submitals.subject}</p>
             <p>You can check your Submittal by clicking the link <a href="projectstation.whiteboardtec.com">here</a>.</p>
@@ -184,7 +184,7 @@ const AddSubmitals = async (req, res) => {
             </div>
 
             <p>Thanks & Regards,</p>
-            <p><b>${submitals.sender.username}</b></p>
+            <p><b>${submitals.sender?.username}</b></p>
             <p>Bangalore</p>
         </div>
 

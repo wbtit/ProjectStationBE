@@ -69,7 +69,7 @@ datasource db {
     assignedToUser Assignes[] @relation("assignedToUser")
     approvedByUser Assignes[] @relation("approvedByUser")
 
-
+assignedToUsers Assigned_list[] @relation("assignedToUsers")
     accepttasks AcceptTask[] @relation("acceptTaskUser")
 
 
@@ -79,6 +79,7 @@ datasource db {
     assignedByConfirm Confirm[] @relation("assignedByUserConfirm")
     assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
     approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
+
 
 
     messageSentBy Message[] @relation("messageSentBy")
@@ -269,17 +270,19 @@ model AcceptTask{
 
 model Assigned_list{
   id  String @id @default(uuid()) @db.Uuid
-  approved_on DateTime
-  assigned_on DateTime
-  approved Boolean
+  approved_on DateTime?
+  assigned_on DateTime @default(now())
+  approved Boolean 
   comment String @default(" ")
   task_id String @db.Uuid
   task Task @relation(fields: [task_id],references: [id],name: "taskInAssignedList",onDelete: Cascade)
   assigned_by String @db.Uuid
   users Users @relation(fields: [assigned_by],references: [id],name: "taskAssignedby",onDelete: Cascade)
-  approved_by String @db.Uuid
-  user Users @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
+  approved_by String? @db.Uuid 
+  user Users? @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
   confirm Confirm[] @relation("assignedTaskConfirm")
+  assigned_to String @db.Uuid
+  userss Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUsers")
   @@map("assigendlist")
 }
 
@@ -288,8 +291,8 @@ model Assignes {
  id String @id @default(uuid()) @db.Uuid
  approved_on DateTime @default(now())
  assigned_on DateTime @default(now())
- approved Boolean @default(false) //not sure about the default value
- comment String
+ approved Boolean @default(true) //not sure about the default value
+ comment String @default("")
   task_id String  @db.Uuid
  task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
   assigned_by String @db.Uuid
@@ -489,6 +492,7 @@ model SubTasks{
 
   @@map("subTasks")
 }
+
 
 enum WorkHourStatus {
   START
