@@ -373,11 +373,11 @@ const GetAllProjects = async (req, res) => {
   try {
     console.log("Uer data", req.user);
 
+    const {is_manager, is_staff, is_deptmanager} = req.user
+
     let projects;
 
     if (
-      req.user.is_staff &&
-      req.user.role === "STAFF" &&
       req.user.is_superuser
     ) {
       console.log("ADMIN");
@@ -440,8 +440,115 @@ const GetAllProjects = async (req, res) => {
               },
             },
           },
+          
         },
       });
+    } else if(is_deptmanager) {
+      console.log("I got executed!! hehehe")
+      projects = await prisma.project.findMany({
+        where : {
+          manager : {
+            id : req.user.id
+          }
+        },
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      })
+    }  else if(is_manager && is_staff) {
+      console.log("I got executed!! hehehe")
+      projects = await prisma.project.findMany({
+        where : {
+          manager : {
+            id : req.user.id
+          }
+        },
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      })
+    } else if(is_staff) {
+      projects = await prisma.project.findMany({
+        where: {
+          tasks: {
+            some: {
+              user_id: req.user.id
+            }
+          }
+        },
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      });      
     } else {
       console.log("Random");
       const teams = await prisma.team.findMany({

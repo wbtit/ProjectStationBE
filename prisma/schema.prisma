@@ -40,6 +40,7 @@ datasource db {
     is_staff      Boolean  @default(false)
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
+    is_deptmanager Boolean @default(false)
 
 
     fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
@@ -147,9 +148,9 @@ model Department {
   id         String   @id @default(uuid()) @db.Uuid
   name       String   @unique
   managerId  String?  @db.Uuid // Foreign key to the Users model (UUID)
-  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager", onDelete: Cascade)
+  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager")
   createdById String? @db.Uuid // Foreign key to the Users model (UUID)
-  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator", onDelete: Cascade)
+  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator")
   isBin      Boolean  @default(false)
   users Users[] @relation("userDepartment")
 
