@@ -311,6 +311,7 @@ const UpdateProject = async (req, res) => {
       "status",
       "stage",
       "manager",
+      "teamID",
       "approvalDate",
     ];
 
@@ -371,13 +372,42 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    console.log("Uer data", req.user);
+    console.log("Uer data-==============================================================================", req.user);
 
-    const {is_manager, is_staff, is_deptmanager} = req.user
+    const {is_manager, is_staff, is_deptmanager,is_superuser} = req.user
 
     let projects;
 
-    if (
+    if(is_superuser) {
+      projects = await prisma.project.findMany({
+        include: {
+          fabricator: true,
+          manager: {
+            select: {
+              f_name: true,
+              l_name: true,
+            },
+          },
+          team: {
+            select: {
+              name: true,
+              members: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+              manager: {
+                select: {
+                  f_name: true,
+                  l_name: true,
+                },
+              },
+            },
+          },
+        },
+      });      
+    }if (
       req.user.is_superuser
     ) {
       console.log("ADMIN");
@@ -478,7 +508,7 @@ const GetAllProjects = async (req, res) => {
           },
         },
       })
-    }  else if(is_manager && is_staff) {
+    }  else if(is_manager && !is_staff) {
       console.log("I got executed!! hehehe")
       projects = await prisma.project.findMany({
         where : {
@@ -599,7 +629,7 @@ const GetAllProjects = async (req, res) => {
     }
 
     // await client.set("allprojects", JSON.stringify(projects));
-
+  console.log("***********************************",projects)
     console.log(projects);
     return sendResponse({
       message: "Projects retrived successfully",

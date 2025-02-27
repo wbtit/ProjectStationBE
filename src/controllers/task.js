@@ -148,8 +148,10 @@ const DeleteTask = async (req, res) => {
 };
 
 const GetTask = async (req, res) => {
-  console.log("I got hit on the getAllTasks");
   try {
+    console.log("I got hit on the getAllTasks-================================================================",req.user);
+
+    // Authentication check BEFORE destructuring
     if (!req.user) {
       return sendResponse({
         message: "User not authenticated",
@@ -159,36 +161,61 @@ const GetTask = async (req, res) => {
         data: null,
       });
     }
-    const tasks = await prisma.task.findMany({
-      include: {
-        project: {
-          include: {
-            manager: true,
-          },
-        },
-        user: true,
-        taskcomment: {
-          include : {
-            user : true,
-            task : true
-          }
-        },
-        assignedTask: true,
-        taskInAssignedList: true,
-        workingHourTask: true,
-      },
-    });
 
-    console.log("--------------------------------------------", tasks);
-    if (!tasks) {
+    const { is_manager, is_staff, id, user_id,is_superuser} = req.user;
+    let tasks;
+
+    if (is_superuser) {
+      // Fetch all tasks since superuser has full access
+      tasks = await prisma.task.findMany({
+        include: {
+          project: { include: { manager: true, department: true } },
+          user: true,
+          taskcomment: { include: { user: true, task: true } },
+          assignedTask: true,
+          taskInAssignedList: true,
+          workingHourTask: true,
+        },
+      })
+    }else if (is_manager) {
+      // If the user is a manager, fetch tasks assigned to their managed projects
+      tasks = await prisma.task.findMany({
+        where: { project: { manager: { id } } },
+        include: {
+          project: { include: { manager: true } },
+          user: true,
+          taskcomment: { include: { user: true, task: true } },
+          assignedTask: true,
+          taskInAssignedList: true,
+          workingHourTask: true,
+        },
+      });
+    } else if (is_staff || user_id) {
+      // If the user is staff OR user_id is provided, fetch tasks assigned to them
+      tasks = await prisma.task.findMany({
+        where: { user_id: user_id || id },
+        include: {
+          project: { include: { manager: true } },
+          user: true,
+          taskcomment: { include: { user: true, task: true } },
+          assignedTask: true,
+          taskInAssignedList: true,
+          workingHourTask: true,
+        },
+      });
+    }
+    else {
       return sendResponse({
-        message: "error in fetching tasks",
+        message: "User has no assigned tasks",
         res,
-        statusCode: 403,
+        statusCode: 404,
         success: false,
         data: null,
       });
     }
+
+    console.log("-----------------------------------------", tasks);
+
     return sendResponse({
       message: "Tasks fetched successfully",
       res,
@@ -201,9 +228,9 @@ const GetTask = async (req, res) => {
       message: error.message,
       res,
       statusCode: 500,
+      success: false,
+      data: null,
     });
-  } finally {
-    prisma.$disconnect();
   }
 };
 
