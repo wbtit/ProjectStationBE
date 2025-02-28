@@ -162,7 +162,7 @@ const GetTask = async (req, res) => {
       });
     }
 
-    const { is_manager, is_staff, id, user_id,is_superuser} = req.user;
+    const { is_manager, is_staff, id, user_id,is_superuser,departmentId} = req.user;
     let tasks;
 
     if (is_superuser) {
@@ -177,7 +177,28 @@ const GetTask = async (req, res) => {
           workingHourTask: true,
         },
       })
-    }else if (is_manager) {
+    }else if (is_manager && is_staff) {
+      // If the user is a manager, fetch projects belonging to their department and include all task details
+      tasks = await prisma.project.findMany({
+        where: {
+          department: { managerId: id }, // ✅ Correct reference to the department manager
+        },
+        include: {
+          tasks: {
+            include: {
+              user: true,
+              taskcomment: {
+                include: { user: true, task: true },
+              },
+              assignedTask: true,
+              taskInAssignedList: true,
+              workingHourTask: true,
+            },
+          },
+        },
+      });
+    }
+    else if (is_manager) {
       // If the user is a manager, fetch tasks assigned to their managed projects
       tasks = await prisma.task.findMany({
         where: { project: { manager: { id } } },
