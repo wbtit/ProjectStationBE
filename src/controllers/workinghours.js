@@ -341,6 +341,17 @@ const getWork = async (req, res) => {
 
     let work = works.find((item) => item.user_id === id);
 
+    // 🔹 Fix: Check if work exists before accessing its properties
+    if (!work) {
+      return sendResponse({
+        message: "No work entry found for this user and task",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
     if (work.status === "END" || work.status === "PAUSE") {
       return sendResponse({
         message: "Work fetch success",
@@ -374,5 +385,6 @@ const getWork = async (req, res) => {
     });
   }
 };
+
 
 export { End, Pause, Resume, Start, getWork };
