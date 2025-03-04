@@ -94,7 +94,8 @@ assignedToUsers Assigned_list[] @relation("assignedToUsers")
     rfiRecepients RFI[] @relation("UsersRFI")
     rfisender RFI[] @relation("senderRFI")
 
-
+    UsersRFQ RFQ[] @relation("UsersRFQ")
+    senderRFQ RFQ[] @relation("senderRFQ")
 
 
 
@@ -408,7 +409,21 @@ model RFI{
   @@map("rfi")
 }
 
+model RFQ{
+  id String @id @default(uuid()) @db.Uuid
+  projectName String
+   date DateTime @default(now())
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields:[recepient_id],references:[id],name:"UsersRFQ")
+  sender_id String @db.Uuid
+  sender Users @relation(fields:[sender_id],references:[id],name:"senderRFQ")
+  status Boolean @default(false)
+  subject String
+  description String
+  files Json[] @default([])
 
+  @@map("rfq")
+}
 
 
 model Notification {
@@ -543,6 +558,9 @@ enum Tools {
 
 enum Activity {
   MODELING
+  MODEL_CHECKING
   DETAILING
-  ERECTION  
+  DETAIL_CHECKING
+  ERECTION
+  ERECTION_CHECKING  
 }
