@@ -311,6 +311,7 @@ const UpdateProject = async (req, res) => {
       "status",
       "stage",
       "manager",
+      "teamID",
       "approvalDate",
     ];
 
@@ -371,245 +372,125 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    console.log("Uer data", req.user);
+    console.log("User Data:", req.user);
 
-    const {is_manager, is_staff, is_deptmanager} = req.user
-
+    const { is_manager, is_staff, is_superuser, role, fabricatorId, id } = req.user;
     let projects;
 
-    if (
-      req.user.is_superuser
-    ) {
-      console.log("ADMIN");
+    // 🔹 Superuser: Fetch all projects
+    if (is_superuser) {
       projects = await prisma.project.findMany({
         include: {
           fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
           department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
-          },
-        },
-      });
-    } else if (req.user.role === "CLIENT") {
-      console.log("Yeah this is for client");
-      projects = await prisma.project.findMany({
-        where: {
-          fabricatorID: req.user.fabricatorId,
-        },
-        include: {
-          fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
-          department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
-          },
-          
-        },
-      });
-    } else if(is_deptmanager) {
-      console.log("I got executed!! hehehe")
-      projects = await prisma.project.findMany({
-        where : {
-          manager : {
-            id : req.user.id
-          }
-        },
-        include: {
-          fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
-          department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
-          },
-        },
-      })
-    }  else if(is_manager && is_staff) {
-      console.log("I got executed!! hehehe")
-      projects = await prisma.project.findMany({
-        where : {
-          manager : {
-            id : req.user.id
-          }
-        },
-        include: {
-          fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
-          department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
-          },
-        },
-      })
-    } else if(is_staff) {
-      projects = await prisma.project.findMany({
-        where: {
-          tasks: {
-            some: {
-              user_id: req.user.id
-            }
-          }
-        },
-        include: {
-          fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
-          department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
-          },
-        },
-      });      
-    } else {
-      console.log("Random");
-      const teams = await prisma.team.findMany({
-        include: {
-          project: true,
-        },
-      });
-
-      const projectss = teams
-        .filter((team) =>
-          team.members.some((member) => member.id === req.user.id)
-        ) // Filters teams where user is a member
-        .map((team) => team.project.id); // Extracts project IDs
-
-      console.log(projectss)
-      
-      projects = await prisma.project.findMany({
-        where: {
-          id: projects,
-        },
-        include: {
-          fabricator: true,
-          manager: {
-            select: {
-              f_name: true,
-              l_name: true,
-            },
-          },
-          team: {
-            select: {
-              name: true,
-              members: true,
-            },
-          },
-          department: {
-            select: {
-              name: true,
-              manager: {
-                select: {
-                  f_name: true,
-                  l_name: true,
-                },
-              },
-            },
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
         },
       });
     }
+    // 🔹 Client: Fetch only their fabricator's projects
+    else if (role === "CLIENT") {
+      console.log("Client access granted.");
+      projects = await prisma.project.findMany({
+        where: { fabricatorID: fabricatorId },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Department Manager: Fetch projects belonging to their department
+    else if (is_manager && is_staff) {
+      console.log("Department Manager access granted.");
+      projects = await prisma.project.findMany({
+        where: { 
+          department: { manager: { id } }  // ✅ Fixed reference to department manager
+        },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Regular Manager: Fetch projects they are managing
+    else if (is_manager) {
+      console.log("Project Manager access granted.");
+      projects = await prisma.project.findMany({
+        where: { managerID: id },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Staff: Fetch projects where they have tasks assigned
+    else if (is_staff) {
+      console.log("Staff access granted.");
+      projects = await prisma.project.findMany({
+        where: { tasks: { some: { user_id: id } } },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Team Members: Fetch projects where they are in a team
+    else {
+      console.log("Fetching projects for a team member.");
 
-    // await client.set("allprojects", JSON.stringify(projects));
+      const teams = await prisma.team.findMany({
+        where: { members: { some: { id } } },
+        select: { projectId: true },
+      });
 
-    console.log(projects);
+      const projectIds = teams.map((team) => team.projectId);
+
+      if (projectIds.length > 0) {  // ✅ Prevents querying with an empty array
+        projects = await prisma.project.findMany({
+          where: { id: { in: projectIds } },
+          include: {
+            fabricator: true,
+            manager: { select: { f_name: true, l_name: true } },
+            team: { select: { name: true, members: true } },
+            department: {
+              select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+            },
+          },
+        });
+      } else {
+        projects = [];
+      }
+    }
+
+    console.log("Projects Retrieved:", projects.length);
     return sendResponse({
-      message: "Projects retrived successfully",
+      message: "Projects retrieved successfully",
       res,
       statusCode: 200,
       success: true,
       data: projects,
     });
+
   } catch (error) {
-    console.log(error.message);
+    console.error("Error:", error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -619,6 +500,7 @@ const GetAllProjects = async (req, res) => {
     });
   }
 };
+
 
 const GetProjectByID = async (req, res) => {
   const { id } = req.params;
@@ -674,7 +556,7 @@ const GetProjectByID = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error.message);
+    console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
     return sendResponse({
       message: "Something went wrong",
       res,

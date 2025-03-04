@@ -300,8 +300,8 @@ model Assignes {
   users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
   assigned_to String @db.Uuid
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
-  approved_by String @db.Uuid
-  userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
+  approved_by String? @db.Uuid
+  userss Users? @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
  
   @@map("assignes")
 }

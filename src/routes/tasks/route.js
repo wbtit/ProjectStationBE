@@ -52,7 +52,7 @@ router.delete("/tasks/:id", Authenticate, BroadAccess, DeleteTask); // Deleteing
 
 
 
-router.get("/tasks", Authenticate, GetTask); // Get All Task
+router.get("/tasks", Authenticate,GetTask); // Get All Task
 
 router.patch("/tasks/:id", Authenticate, BroadAccess, UpdateTaskByID); // Update Task By ID (METHOD PATCH)
 
