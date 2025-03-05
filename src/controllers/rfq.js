@@ -248,3 +248,157 @@ const addRFQ=async(req,res)=>{
     });
     }
 }
+const sentRFQByUser = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const sentRFQ = await prisma.rFQ.findMany({
+      where: {
+        sender_id: id,
+      },
+      include: {
+        recepients: true,
+      },
+    });
+
+    if (!sentRFQ) {
+      return sendResponse({
+        message: "Failed to get RFQs",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Sent RFQs fetched success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: sentRFI,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const RFQByID = async (req, res) => {
+  const { id } = req.params;
+
+  console.log(id, "This is rfq ID");
+
+  try {
+    const rfq = await prisma.rFQ.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        recepients:true
+      },
+    });
+
+    console.log(rfq, "This is rfq");
+
+    sendResponse({
+      message: "RFQ fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: rfi,
+    });
+  } catch (error) {
+    console.log(error.message);
+    sendResponse({
+      message: error.message,
+      res,
+      statusCode: 200,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const Inbox = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const sentRFQ = await prisma.rFQ.findMany({
+      where: {
+        recepient_id: id,
+      },
+      include: {
+        recepients: true,
+      },
+    });
+
+    if (!sentRFQ) {
+      return sendResponse({
+        message: "Failed to get RFQs",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Inbox RFQs fetched success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: sentRFI,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const RFQseen = async (req, res) => {
+  const { id } = req?.params;
+  try {
+    const rfqseen = await prisma.rFQ.update({
+      where: {
+        id,
+      },
+      data: {
+        status: true,
+      },
+    });
+    if (!rfqseen) {
+      return sendResponse({
+        message: "Failed to update",
+        res,
+        statusCode: 500,
+        success: false,
+        data: null,
+      });
+    }
+    return sendResponse({
+      message: "Status updated successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: rfqseen,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID };

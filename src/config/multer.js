@@ -5,6 +5,7 @@ import path from "path";
 const fileDataMap = {}; // Object to store file data (UUID and original name)
 const submittalsDataMap = {};
 const rfiDataMap = {};
+const rfqDataMap={};
 const fabricatorDataMap = {};
 const commentDataMap = {};
 const changeOrderDataMap = {};
@@ -102,8 +103,41 @@ const storageRfi = multer.diskStorage({
     cb(null, newFileName);
   },
 });
+const  rfqUploads = multer({
+  storage: storageRfq,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
 
-const rfiUploads = multer({
+
+const storageRfq = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/rfqtemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    rfqDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+
+
+
+
+const  rfiUploads = multer({
   storage: storageRfi,
   fileFilter: (req, file, cb) => {
     cb(null, true);
@@ -219,6 +253,8 @@ export {
   fabricatorsUploads,
   rfiDataMap,
   rfiUploads,
+  rfqDataMap,
+  rfqUploads,
   submittalsDataMap,
   submittalsUploads,
   commentUploads,
