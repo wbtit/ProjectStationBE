@@ -1,6 +1,6 @@
 import { Router } from "express";
-import Authenticate from "../../middlewares/authenticate";
-import { rfqUploads } from "../../config/multer";
+import Authenticate from "../../middlewares/authenticate.js";
+import { rfqUploads } from "../../config/multer.js";
 
 import {
     addRFQ,
@@ -9,7 +9,6 @@ import {
     RFQseen,
     RFQByID
 } from "../../controllers/rfq.js"
-import { RFIByID } from "../../controllers/rfi.js";
 
 const router=Router()
 
@@ -20,6 +19,6 @@ addRFQ
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
 router.patch("/rfq/:id/update",Authenticate,RFQseen)
-router.get("/rfq/:id",Authenticate,RFIByID)
+router.get("/rfq/:id",Authenticate,RFQByID)
 
 export default router

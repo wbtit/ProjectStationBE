@@ -15,6 +15,7 @@ const AddEmployee = async (req, res) => {
     emp_code,
     department,
     is_manager,
+    is_hr
   } = req.body;
 
   console.log(req.body);
@@ -59,6 +60,7 @@ const AddEmployee = async (req, res) => {
         emp_code,
         email,
         is_staff: true,
+        is_hr
       },
     });
 

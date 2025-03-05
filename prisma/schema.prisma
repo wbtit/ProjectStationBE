@@ -41,7 +41,7 @@ datasource db {
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
     is_deptmanager Boolean @default(false)
-
+    is_hr Boolean @default(false)
 
     fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
     fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")

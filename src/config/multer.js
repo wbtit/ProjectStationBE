@@ -103,12 +103,7 @@ const storageRfi = multer.diskStorage({
     cb(null, newFileName);
   },
 });
-const  rfqUploads = multer({
-  storage: storageRfq,
-  fileFilter: (req, file, cb) => {
-    cb(null, true);
-  },
-});
+
 
 
 const storageRfq = multer.diskStorage({
@@ -133,7 +128,12 @@ const storageRfq = multer.diskStorage({
   },
 });
 
-
+const  rfqUploads = multer({
+  storage: storageRfq,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
 
 
 

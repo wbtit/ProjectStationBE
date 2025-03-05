@@ -1,6 +1,6 @@
-import prisma from "../lib/prisma";
-import { sendResponse } from "../utils/responder";
-import { sendEmail } from "../../service/gmailservice";
+import prisma from "../lib/prisma.js";
+import { sendResponse } from "../utils/responder.js";
+import { sendEmail } from "../../service/gmailservice/index.js";
 
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
