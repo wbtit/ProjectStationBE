@@ -111,13 +111,18 @@ const AddTask = async (req, res) => {
 
 const DeleteTask = async (req, res) => {
   const { id } = req?.params;
-
+  const {is_superuser} =req.user
   try {
-    const deletedTask = await prisma.task.delete({
+    
+if (is_superuser){
+  
+const deletedTask = await prisma.task.delete({
       where: {
         id,
       },
     });
+
+
     if (!deletedTask) {
       sendResponse({
         message: "error in deleting task",
@@ -134,6 +139,7 @@ const DeleteTask = async (req, res) => {
       success: true,
       data: deletedTask,
     });
+}
   } catch (error) {
     return sendResponse({
       message: error.message,
@@ -162,10 +168,10 @@ const GetTask = async (req, res) => {
       });
     }
 
-    const { is_manager, is_staff, id, user_id,is_superuser,departmentId} = req.user;
+    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr} = req.user;
     let tasks;
 
-    if (is_superuser) {
+    if (is_superuser||is_hr) {
       // Fetch all tasks since superuser has full access
       tasks = await prisma.task.findMany({
         include: {

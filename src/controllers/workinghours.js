@@ -18,12 +18,31 @@ const Start = async (req, res) => {
   }
 
   try {
+     // Check if an active work session already exists
+    const existingWork= await prisma.workingHours.findFirst({
+      where:{
+        user_id:id,
+        task_id:task_id,
+        status:{notIn:["END"]}// Ensure previous work session is not still active
+      }
+    })
+    if (existingWork) {
+      return sendResponse({
+        message: "A work session is already active for this task.",
+        res,
+        statusCode: 400,
+        success: false,
+        data: existingWork,
+      });
+    }
+
     const workinghour = await prisma.workingHours.create({
       data: {
-        start: new Date(),
-        status: "START",
-        task_id: task_id,
-        user_id: id,
+       user_id:id,
+       task_id:task_id,
+       start:new Date().toISOString(),
+       duration:0,
+       status:"START"
       },
     });
 
@@ -78,19 +97,29 @@ const Pause = async (req, res) => {
       },
     });
 
-    if (workingHourRecord.user_id !== id) {
+    if (!workingHourRecord) {
       return sendResponse({
-        message: "Work not associated with the user",
+        message: "Work session not found",
         res,
-        statusCode: 403,
+        statusCode: 404,
         success: false,
         data: null,
       });
     }
 
-    if (!workingHourRecord || !workingHourRecord.start) {
+    if (workingHourRecord.status === "PAUSE") {
       return sendResponse({
-        message: "Invalid Work",
+        message: "Work is already paused",
+        res,
+        statusCode: 400,
+        success: false,
+        data: workingHourRecord,
+      });
+    }
+
+    if (!workingHourRecord.start) {
+      return sendResponse({
+        message: "Invalid Work session",
         res,
         statusCode: 400,
         success: false,
@@ -98,8 +127,9 @@ const Pause = async (req, res) => {
       });
     }
 
-    const start = new Date(workingHourRecord.start).getTime(); // Convert start to timestamp in milliseconds
-    const durationInMinutes = Math.floor((Date.now() - start) / 60000); // Calculate duration in minutes
+    const startTimestamp= new Date(workingHourRecord.start).getTime()// convert starttime to time stamp
+    const currentTimeStamp= Date.now()
+    const durationInMinutes=Math.floor((currentTimeStamp-startTimestamp)/60000)
 
     // Update the duration in the database
     const updatedWorkingHour = await prisma.workingHours.update({
@@ -162,7 +192,15 @@ const Resume = async (req, res) => {
         id: work_id,
       },
     });
-
+    if (!work) {
+      return sendResponse({
+        message: "Work session not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
     console.log(work);
 
     if (work?.user_id !== id) {
@@ -172,6 +210,16 @@ const Resume = async (req, res) => {
         statusCode: 403,
         success: false,
         data: null,
+      });
+    }
+
+    if (work.status !== "PAUSE") {
+      return sendResponse({
+        message: "Work is not in a paused state",
+        res,
+        statusCode: 400,
+        success: false,
+        data: work,
       });
     }
 
@@ -233,6 +281,25 @@ const End = async (req, res) => {
         id: work_id,
       },
     });
+    if (!workingHourRecord) {
+      return sendResponse({
+        message: "Work session not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+  
+    if (workingHourRecord.user_id !== id) {
+      return sendResponse({
+        message: "Work not associated with the user",
+        res,
+        statusCode: 403,
+        success: false,
+        data: null,
+      });
+    }
 
     if (workingHourRecord.status === "END") {
       return sendResponse({
@@ -278,22 +345,31 @@ const End = async (req, res) => {
       },
     });
 
-    const task = await prisma.task.update({
-      where: {
-        id: task_id,
-      },
-      data: {
-        status: "IN REVIEW",
-      },
+    const task = await prisma.task.findUnique({
+      where: { id: task_id },
+      select: { project_id: true },
     });
 
+    if (!task) {
+      return sendResponse({
+        message: "Task not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    await prisma.task.update({
+      where: { id: task_id },
+      data: { status: "IN REVIEW" },
+    });
+
+    // Update project status to "ACTIVE"
     await prisma.project.update({
-      where : {
-        id : task.project_id
-      }, data : {
-        status : "ACTIVE"
-      }
-    })
+      where: { id: task.project_id },
+      data: { status: "ACTIVE" },
+    });
 
     return sendResponse({
       message: `Work Ended, Total time : ${
@@ -333,15 +409,13 @@ const getWork = async (req, res) => {
   }
 
   try {
-    const works = await prisma.workingHours.findMany({
+    const work = await prisma.workingHours.findFirst({
       where: {
         task_id: task_id,
+        user_id: id,
       },
     });
 
-    let work = works.find((item) => item.user_id === id);
-
-    // 🔹 Fix: Check if work exists before accessing its properties
     if (!work) {
       return sendResponse({
         message: "No work entry found for this user and task",
@@ -351,33 +425,25 @@ const getWork = async (req, res) => {
         data: null,
       });
     }
-
-    if (work.status === "END" || work.status === "PAUSE") {
-      return sendResponse({
-        message: "Work fetch success",
-        res,
-        statusCode: 200,
-        success: true,
-        data: work,
-      });
+    let updatedDuration = work.duration; 
+    // 🔹 Fix: Check if work exists before accessing its properties
+    if ((work.status === "ACTIVE" || work.status === "RESUME") && work.start) {
+      const startTime = new Date(work.start).getTime();
+      const elapsedMinutes = Math.floor((Date.now() - startTime) / 60000);
+      updatedDuration = work.duration + elapsedMinutes;
     }
-
-    const start = new Date(work.start).getTime(); // Convert start to timestamp in milliseconds
-    const durationInMinutes = Math.floor((Date.now() - start) / 60000); // Calculate duration in minutes
-
-    work = { ...work, duration: work.duration + durationInMinutes };
 
     return sendResponse({
       message: "Work fetch success",
       res,
       statusCode: 200,
       success: true,
-      data: work,
+      data: { ...work, duration: updatedDuration }, // Return updated duration
     });
   } catch (error) {
-    console.log(error.message);
+    console.error("Error fetching work record:", error.message);
     return sendResponse({
-      message: error.message,
+      message: "Internal Server Error",
       res,
       statusCode: 500,
       success: false,

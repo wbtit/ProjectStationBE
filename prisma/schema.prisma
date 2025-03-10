@@ -298,7 +298,7 @@ model Assignes {
   task_id String  @db.Uuid
  task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
   assigned_by String @db.Uuid
-  users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
+  users Users @relation(fields: [assigned_by], references: [], onDelete: Cascade, name: "assignedByUser")
   assigned_to String @db.Uuid
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
   approved_by String? @db.Uuid
