@@ -51,7 +51,7 @@ const Start = async (req, res) => {
         id: task_id,
       },
       data: {
-        status: "IN PROGRESS",
+        status: "IN_PROGRESS",
       },
     });
 
@@ -238,7 +238,7 @@ const Resume = async (req, res) => {
         id: task_id,
       },
       data: {
-        status: "IN PROGRESS",
+        status: "IN_PROGRESS",
       },
     });
 
