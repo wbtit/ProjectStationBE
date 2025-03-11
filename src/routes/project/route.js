@@ -2,6 +2,7 @@ import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { BroadAccess } from "../../middlewares/broadaccess.js";
 import { isStaff } from "../../middlewares/isstaff.js";
+import { isProjectManager } from "../../middlewares/isprojectmanager.js";
 import {
   AddProject,
   Uploadfiles,
@@ -12,8 +13,10 @@ import {
   GetAllfiles,
   DownloadFile,
   ViewFile,
+  getProjectsByUser,
 } from "../../controllers/project.js";
 import { uploads } from "../../config/multer.js";
+import { isStaffAndClient } from "../../middlewares/isstaffandclient.js";
 
 const router = Router();
 
@@ -24,14 +27,14 @@ router.post(
   Authenticate,
   BroadAccess,
   uploads.array("files"),
-  Uploadfiles                                           
+  Uploadfiles
 ); // Upload Files To Project+
 
 router.get("/projects/project-files", Authenticate, isStaff, GetAllfiles);
 
 router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Update Projects
 
-router.get("/projects", Authenticate, isStaff, GetAllProjects); // Get All Projects
+router.get("/projects", Authenticate  , GetAllProjects); // Get All Projects
 
 router.get("/projects/:id", Authenticate, isStaff, GetProjectByID); // Get Project by ID
 
@@ -49,5 +52,7 @@ router.get(
 ); // Download specific file
 
 router.get("/projects/viewfile/:id/:fid", ViewFile);
+
+router.get("/projects/u/user", Authenticate, isStaffAndClient, getProjectsByUser);
 
 export default router;

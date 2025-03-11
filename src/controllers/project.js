@@ -9,6 +9,7 @@ import fs from "fs";
 // import client from "../redis/index.js";
 import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
+import { SubTasks } from "../../data/data.js";
 
 const AddProject = async (req, res) => {
   const {
@@ -16,9 +17,9 @@ const AddProject = async (req, res) => {
     description,
     fabricator,
     department,
-    team,
     manager,
     status,
+    team,
     stage,
     tools,
     connectionDesign,
@@ -36,7 +37,6 @@ const AddProject = async (req, res) => {
     !description ||
     !fabricator ||
     !department ||
-    !team ||
     !manager ||
     !start_date ||
     !end_date ||
@@ -66,11 +66,23 @@ const AddProject = async (req, res) => {
         miscDesign: miscDesign,
         stage: stage,
         startDate: start_date,
-        teamID: team,
+        teamID: team || null,
         status: status,
         tools: tools,
         endDate: end_date,
       },
+    });
+
+    console.log("THe 20th data", SubTasks[20]);
+
+    const SubtasksData = SubTasks.map((task) => ({
+      ...task,
+      projectID: project.id,
+    }));
+    console.log(SubtasksData);
+
+    const subtasks = await prisma.subTasks.createMany({
+      data: SubtasksData,
     });
 
     // const projects = JSON.parse(await client.get("allprojects"));
@@ -85,7 +97,10 @@ const AddProject = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: project,
+      data: {
+        project,
+        subtasks,
+      },
     });
   } catch (error) {
     console.log(error.message);
@@ -162,13 +177,13 @@ const Uploadfiles = async (req, res) => {
     // const cachedProjects = await client.get("allprojects");
 
     // Step 3: Parse the cached projects
-    let projects = JSON.parse(cachedProjects);
+    // let projects = JSON.parse(cachedProjects);
 
     // Step 4: Find and update the files field in the cached project by ID
-    const projectIndex = projects.findIndex((project) => project.id === id);
-    if (projectIndex !== -1) {
-      projects[projectIndex].files = updatedFilesProject.files; // Replace files
-    }
+    // const projectIndex = project.findIndex((projects) => projects.id === id);
+    // if (projectIndex !== -1) {
+    //   project[projectIndex].files = updatedFilesProject.files; // Replace files
+    // }
 
     // Step 5: Set the updated projects back to Redis
     // await client.set("allprojects", JSON.stringify(projects));
@@ -183,7 +198,7 @@ const Uploadfiles = async (req, res) => {
   } catch (error) {
     console.error("Error uploading files:", error);
     return sendResponse({
-      message: "Something went wrong",
+      message: error?.message,
       res,
       statusCode: 500,
       success: false,
@@ -296,6 +311,7 @@ const UpdateProject = async (req, res) => {
       "status",
       "stage",
       "manager",
+      "teamID",
       "approvalDate",
     ];
 
@@ -356,59 +372,125 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    // const project = await client.get("allprojects");
-    console.log("I got hit");
-    // if (project) {
-    //   console.log("From Redis ");
-    //   return sendResponse({
-    //     message: "Projects retrived successfully",
-    //     res,
-    //     statusCode: 200,
-    //     success: true,
-    //     data: JSON.parse(project),
-    //   });
-    // }
+    console.log("User Data:", req.user);
 
-    const projects = await prisma.project.findMany({
-      include: {
-        fabricator: true,
-        manager: {
-          select: {
-            f_name: true,
-            l_name: true,
+    const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr} = req.user;
+    let projects;
+
+    // 🔹 Superuser: Fetch all projects
+    if (is_superuser|| is_hr) {
+      projects = await prisma.project.findMany({
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
         },
-        team: {
-          select: {
-            name: true,
-            members: true,
+      });
+    }
+    // 🔹 Client: Fetch only their fabricator's projects
+    else if (role === "CLIENT") {
+      console.log("Client access granted.");
+      projects = await prisma.project.findMany({
+        where: { fabricatorID: fabricatorId },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
         },
-        department: {
-          select: {
-            name: true,
-            manager: {
-              select: {
-                f_name: true,
-                l_name: true,
-              },
+      });
+    }
+    // 🔹 Department Manager: Fetch projects belonging to their department
+    else if (is_manager && is_staff) {
+      console.log("Department Manager access granted.");
+      projects = await prisma.project.findMany({
+        where: { 
+          department: { manager: { id } }  // ✅ Fixed reference to department manager
+        },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Regular Manager: Fetch projects they are managing
+    else if (is_manager) {
+      console.log("Project Manager access granted.");
+      projects = await prisma.project.findMany({
+        where: { managerID: id },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Staff: Fetch projects where they have tasks assigned
+    else if (is_staff) {
+      console.log("Staff access granted.");
+      projects = await prisma.project.findMany({
+        where: { tasks: { some: { user_id: id } } },
+        include: {
+          fabricator: true,
+          manager: { select: { f_name: true, l_name: true } },
+          team: { select: { name: true, members: true } },
+          department: {
+            select: { name: true, manager: { select: { f_name: true, l_name: true } } },
+          },
+        },
+      });
+    }
+    // 🔹 Team Members: Fetch projects where they are in a team
+    else {
+      console.log("Fetching projects for a team member.");
+
+      const teams = await prisma.team.findMany({
+        where: { members: { some: { id } } },
+        select: { projectId: true },
+      });
+
+      const projectIds = teams.map((team) => team.projectId);
+
+      if (projectIds.length > 0) {  // ✅ Prevents querying with an empty array
+        projects = await prisma.project.findMany({
+          where: { id: { in: projectIds } },
+          include: {
+            fabricator: true,
+            manager: { select: { f_name: true, l_name: true } },
+            team: { select: { name: true, members: true } },
+            department: {
+              select: { name: true, manager: { select: { f_name: true, l_name: true } } },
             },
           },
-        },
-      },
-    });
+        });
+      } else {
+        projects = [];
+      }
+    }
 
-    // await client.set("allprojects", JSON.stringify(projects));
-
+    console.log("Projects Retrieved:", projects.length);
     return sendResponse({
-      message: "Projects retrived successfully",
+      message: "Projects retrieved successfully",
       res,
       statusCode: 200,
       success: true,
       data: projects,
     });
+
   } catch (error) {
-    console.log(error.message);
+    console.error("Error:", error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -418,6 +500,7 @@ const GetAllProjects = async (req, res) => {
     });
   }
 };
+
 
 const GetProjectByID = async (req, res) => {
   const { id } = req.params;
@@ -473,7 +556,7 @@ const GetProjectByID = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error.message);
+    console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -646,6 +729,37 @@ const ViewFile = async (req, res) => {
   }
 };
 
+const getProjectsByUser = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    // Fetch tasks for a specific user
+    const tasks = await prisma.task.findMany({
+      where: {
+        user_id: id, // Filter tasks by user_id
+      },
+      include: {
+        project: true, // Include the related project details
+      },
+    });
+
+    // Extract project details from tasks
+    const projectDetails = tasks.map((task) => task.project);
+
+    // Return unique project details (to avoid duplicates)
+    const uniqueProjects = [...new Set(projectDetails.map((p) => p.id))].map(
+      (id) => projectDetails.find((p) => p.id === id)
+    );
+
+    console.log("Pros", uniqueProjects);
+
+    return res.json(uniqueProjects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
 export {
   AddProject,
   Uploadfiles,
@@ -656,4 +770,5 @@ export {
   GetAllfiles,
   DownloadFile,
   ViewFile,
+  getProjectsByUser,
 };

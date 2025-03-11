@@ -6,24 +6,26 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 
 const addTaskAssignes = async (req, res) => {
   console.log("I got hit at addTaskAssignes");
+
   const { task_id } = req.params;
+  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",req.body)
   const {
-    approved_on = new Date(), // Default to the current date if not provided
-    assigned_on = new Date(), // Default to the current date if not provided
-    approved = false, // Default to false if not provided
-    comment = "", // Default value for optional comment
     assigned_by,
     assigned_to,
     approved_by,
+    approved_on = new Date(),
+    assigned_on = new Date(),
+    approved = false,
+    comment = "",
   } = req.body;
 
   console.log("Task ID:", task_id);
   console.log("Request Body:", req.body);
 
-  // Validate input (only required fields: assigned_by, assigned_to, approved_by)
-  if (!assigned_by || !assigned_to || !approved_by) {
+  // Validate required fields
+  if (!assigned_to) {
     return sendResponse({
-      message: "assigned_by, assigned_to, and approved_by are required!",
+      message: "assigned_to is  required!",
       res,
       statusCode: 400,
       success: false,
@@ -43,28 +45,42 @@ const addTaskAssignes = async (req, res) => {
       });
     }
 
+
     // Create new task assignment
-    const newTaskAssignedList = await prisma.assignes.create({
+    const assignment = await prisma.assignes.create({
       data: {
         approved_on,
         assigned_on,
         approved,
         comment,
-        task_id: task_id,
-        assigned_by,
-        assigned_to,
-        approved_by,
+        task: { connect: { id: task_id } },
+        users: { connect: { id: req.user.id } }, // assigned_by → user
+        user: { connect: { id: assigned_to } }, // assigned_to → user
+        ...(approved_by && { approved_by }), // ✅ Only include if `approved_by` exists
       },
     });
 
+    const newAssigendTask= await prisma.assigned_list.create({
+      data:{
+          approved_on,
+          assigned_on,
+          approved,
+          task: { connect: { id: task_id } },
+          users: { connect: { id: req.user.id } },
+          userss: { connect: { id: assigned_to } },
+          ...(approved_by && { approved_by }), // ✅ Only include if `approved_by` exists
+      }
+  })
+
     return sendResponse({
-      message: "Task Added to AssignedList Successfully",
+      message: "Task assigned successfully",
       res,
       statusCode: 200,
       success: true,
-      data: newTaskAssignedList,
+      data: assignment,
     });
   } catch (error) {
+    console.error("Error assigning task:", error);
     return sendResponse({
       message: error.message,
       res,

@@ -15,7 +15,7 @@ datasource db {
   model Users {
     id            String   @id @default(uuid()) @db.Uuid
     username      String   @unique
-    password      String  
+    password      String   
     email         String?  @db.VarChar(150)
     f_name        String   @db.VarChar(50)
     m_name        String?  @db.VarChar(50)
@@ -32,14 +32,16 @@ datasource db {
     address       String?  @default("")
     role          UserRole
     emp_code      String?   @default("WBT")
-    department    Json?    @default("{}")
+    department    String?   @db.Uuid
+    departmentId Department? @relation(fields: [department], references: [id], onDelete: Cascade,name: "userDepartment")
     is_sales      Boolean? @default(false)
     is_manager    Boolean @default(false)
     is_active     Boolean  @default(true)
     is_staff      Boolean  @default(false)
     is_superuser  Boolean  @default(false)
     is_firstLogin Boolean  @default(true)
-
+    is_deptmanager Boolean @default(false)
+    is_hr Boolean @default(false)
 
     fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
     fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")
@@ -68,7 +70,7 @@ datasource db {
     assignedToUser Assignes[] @relation("assignedToUser")
     approvedByUser Assignes[] @relation("approvedByUser")
 
-
+assignedToUsers Assigned_list[] @relation("assignedToUsers")
     accepttasks AcceptTask[] @relation("acceptTaskUser")
 
 
@@ -78,6 +80,7 @@ datasource db {
     assignedByConfirm Confirm[] @relation("assignedByUserConfirm")
     assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
     approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
+
 
 
     messageSentBy Message[] @relation("messageSentBy")
@@ -91,7 +94,8 @@ datasource db {
     rfiRecepients RFI[] @relation("UsersRFI")
     rfisender RFI[] @relation("senderRFI")
 
-
+    UsersRFQ RFQ[] @relation("UsersRFQ")
+    senderRFQ RFQ[] @relation("senderRFQ")
 
 
 
@@ -99,6 +103,9 @@ datasource db {
     notification Notification[] @relation("Notification")
 
     workingHourUser WorkingHours[] @relation("workingHourUser")
+
+    changeorderRecipients ChangeOrder[] @relation("ChangeOrderRecipients")
+    changeorderSender ChangeOrder[] @relation("ChangeOrderSender")
 
 
     @@map("users")
@@ -114,7 +121,7 @@ model Fabricator {
   website     String?   @default("")
   drive       String?   @default("")
   branches    Json     @default("[]")
-  files       String[] @default([])
+  files       Json @default("[]")
   is_bin      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -142,10 +149,11 @@ model Department {
   id         String   @id @default(uuid()) @db.Uuid
   name       String   @unique
   managerId  String?  @db.Uuid // Foreign key to the Users model (UUID)
-  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager", onDelete: Cascade)
+  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager")
   createdById String? @db.Uuid // Foreign key to the Users model (UUID)
-  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator", onDelete: Cascade)
+  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator")
   isBin      Boolean  @default(false)
+  users Users[] @relation("userDepartment")
 
 
   project Project[] @relation("projectDepartment")
@@ -182,8 +190,8 @@ model Team {
   fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
   departmentID String @db.Uuid
   department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
-  teamID String @db.Uuid
-  team Team @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
+  teamID String? @db.Uuid
+  team Team? @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
   managerID  String @db.Uuid
   manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
   status Status @default(ACTIVE)
@@ -204,7 +212,9 @@ model Team {
    submittals Submittals[] @relation("ProjectSubmittals")
   rfi RFI[] @relation("ProjectRFI")
 
-
+  changeOrder ChangeOrder[] @relation("ChangeOrderProject")
+  Jobstudy JobStudy[] @relation("projectJobStudy")
+  subTasks SubTasks[] @relation("subTasks")
 
 
   @@map("project")
@@ -262,17 +272,19 @@ model AcceptTask{
 
 model Assigned_list{
   id  String @id @default(uuid()) @db.Uuid
-  approved_on DateTime
-  assigned_on DateTime
-  approved Boolean
+  approved_on DateTime?
+  assigned_on DateTime @default(now())
+  approved Boolean 
   comment String @default(" ")
   task_id String @db.Uuid
   task Task @relation(fields: [task_id],references: [id],name: "taskInAssignedList",onDelete: Cascade)
   assigned_by String @db.Uuid
   users Users @relation(fields: [assigned_by],references: [id],name: "taskAssignedby",onDelete: Cascade)
-  approved_by String @db.Uuid
-  user Users @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
+  approved_by String? @db.Uuid 
+  user Users? @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
   confirm Confirm[] @relation("assignedTaskConfirm")
+  assigned_to String @db.Uuid
+  userss Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUsers")
   @@map("assigendlist")
 }
 
@@ -281,16 +293,16 @@ model Assignes {
  id String @id @default(uuid()) @db.Uuid
  approved_on DateTime @default(now())
  assigned_on DateTime @default(now())
- approved Boolean @default(false) //not sure about the default value
- comment String
+ approved Boolean @default(true) //not sure about the default value
+ comment String @default("")
   task_id String  @db.Uuid
  task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
   assigned_by String @db.Uuid
   users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
   assigned_to String @db.Uuid
   user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
-  approved_by String @db.Uuid
-  userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
+  approved_by String? @db.Uuid
+  userss Users? @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
  
   @@map("assignes")
 }
@@ -397,7 +409,21 @@ model RFI{
   @@map("rfi")
 }
 
+model RFQ{
+  id String @id @default(uuid()) @db.Uuid
+  projectName String
+   date DateTime @default(now())
+  recepient_id String @db.Uuid
+  recepients Users @relation(fields:[recepient_id],references:[id],name:"UsersRFQ")
+  sender_id String @db.Uuid
+  sender Users @relation(fields:[sender_id],references:[id],name:"senderRFQ")
+  status Boolean @default(false)
+  subject String
+  description String
+  files Json[] @default([])
 
+  @@map("rfq")
+}
 
 
 model Notification {
@@ -418,13 +444,72 @@ model WorkingHours {
   task_id  String         @db.Uuid
   status   WorkHourStatus
   start    DateTime
-  duration Int
+  end   DateTime @default(now()) // Set a default value
+  duration Int @default(0)
   task     Task           @relation("workingHourTask", fields: [task_id], references: [id], onDelete: Cascade)
   user     Users          @relation("workingHourUser", fields: [user_id], references: [id], onDelete: Cascade)
 
 @@map("workinghour")
 
 }
+
+
+model ChangeOrder {
+  id String @id @default(uuid()) @db.Uuid
+  project String @db.Uuid
+  Project Project @relation(fields: [project], references: [id], onDelete: Cascade, name: "ChangeOrderProject")
+  recipients String @db.Uuid
+  Recipients Users @relation(fields: [recipients], references: [id], onDelete: Cascade, name: "ChangeOrderRecipients")
+  sender String @db.Uuid
+  senders Users @relation(fields: [sender], references: [id], onDelete: Cascade, name: "ChangeOrderSender")
+  remarks String @default("")
+  changeOrder Int @default(1)
+  description String @default("")
+  rows Json @default("[]")
+  files Json @default("[]")
+  sentOn DateTime @default(now())
+
+  @@map("changeorder")
+}
+
+model JobStudy{
+  id String @id @default(uuid()) @db.Uuid
+  QtyNo Int 
+  unitTime Float @default(0.0) // Change from Int to Float
+  execTime Float @default(0.0) // Change from Int to Float
+  description String
+  projectId String @db.Uuid
+  projects Project @relation(fields: [projectId],references: [id],name: "projectJobStudy",onDelete: Cascade)
+  
+  @@map("jobStudy")
+}
+
+model WBSActivity{
+  id String @id @default(uuid()) @db.Uuid
+  type Activity 
+  name String
+
+  subTasks SubTasks[] @relation("subTasks")
+
+  @@map("wbsactivity")
+}
+
+model SubTasks{
+  id String @id @default(uuid()) @db.Uuid
+  description String
+  QtyNo Int @default(0)
+  unitTime Float @default(0.0) // Change from Int to Float
+  execHr Float @default(0.0) // Change from Int to Float
+  CheckUnitTime Float @default(0.0) // Change from Int to Float
+  checkHr  Float @default(0.0) // Change from Int to Float
+  projectID String @db.Uuid
+  project Project @relation(fields: [projectID],references: [id],name: "subTasks",onDelete: Cascade)
+  wbsactivityID String @db.Uuid
+  WBSACTIVITY WBSActivity @relation(fields: [wbsactivityID],references: [id],name: "subTasks", onDelete: Cascade)
+
+  @@map("subTasks")
+}
+
 
 enum WorkHourStatus {
   START
@@ -433,13 +518,10 @@ enum WorkHourStatus {
   RESUME
 }
 
-
-
 enum UserRole {
   STAFF
   CLIENT
   VENDOR
- 
 }
 //task
 enum Status {
@@ -462,13 +544,24 @@ enum Stage {
   RBFA
   IFC
   BFC
-  RJFC
+  RIFC
   REV
   CO // Not possible to use "#"
+  COMPLETED
 }
 
 
 enum Tools {
   TEKLA
   SDS2
+  PEMB
+}
+
+enum Activity {
+  MODELING
+  MODEL_CHECKING
+  DETAILING
+  DETAIL_CHECKING
+  ERECTION
+  ERECTION_CHECKING  
 }

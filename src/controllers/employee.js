@@ -6,7 +6,6 @@ import { getUserByUsername } from "../models/userUniModel.js";
 const AddEmployee = async (req, res) => {
   const {
     username,
-    password,
     email,
     f_name,
     m_name,
@@ -16,18 +15,12 @@ const AddEmployee = async (req, res) => {
     emp_code,
     department,
     is_manager,
+    is_hr
   } = req.body;
 
   console.log(req.body);
 
-  if (
-    !username ||
-    !password ||
-    !f_name ||
-    !email ||
-    !phone ||
-    !emp_code
-  ) {
+  if (!username || !f_name || !email || !phone || !emp_code) {
     return sendResponse({
       message: "Fields are empty.",
       res,
@@ -37,7 +30,7 @@ const AddEmployee = async (req, res) => {
     });
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword("Qwerty!23456");
 
   try {
     const isExist = await getUserByUsername(username);
@@ -66,6 +59,8 @@ const AddEmployee = async (req, res) => {
         department,
         emp_code,
         email,
+        is_staff: true,
+        is_hr
       },
     });
 
@@ -178,4 +173,45 @@ const GetEmployeeBYID = async (req, res) => {
   }
 };
 
-export { AddEmployee , GetEmployeeBYID, getAllEmployees};
+const UpdateEmployee = async(req, res) => {
+
+  const {id} = req?.params
+ 
+  if(!id) {
+    return sendResponse({
+      message : "Cannot find user",
+      res,
+      statusCode : 400,
+      success : false,
+      data : null
+    })
+  }
+
+  if(!req.body) {
+    return sendResponse({
+      message : "Invalid Data",
+      res ,
+      statusCode : 400,
+      success : false,
+      data : null
+    })
+  }
+
+  const updatedEmployee = await prisma.users.update({
+    where : {
+      id
+    },
+    data : req.body
+  })
+
+  return sendResponse({
+    message : "User updated success",
+    res,
+    statusCode : 200,
+  success : true,
+  data : updatedEmployee
+  })
+
+}
+
+export { AddEmployee, GetEmployeeBYID, getAllEmployees, UpdateEmployee };

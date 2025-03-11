@@ -1,12 +1,16 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import { sendEmail } from "../../service/gmailservice/index.js";
 
 const AddSubmitals = async (req, res) => {
-  const { id } = req?.user;
-  const { fabricator, project, recipient, subject, description } = req.body;
+  const { id, fabricatorId } = req?.user;
+  const { fabricator_id, project_id, recepient_id, subject, description } =
+    req.body;
+
+  console.log(fabricator_id, project_id, recepient_id, subject, description);
 
   try {
-    if (!fabricator || !project || !recipient || !subject || !description) {
+    if (!project_id || !recepient_id || !subject || !description) {
       console.log("Fields are empty");
       return sendResponse({
         message: "Fields are empty",
@@ -22,17 +26,18 @@ const AddSubmitals = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/submittalstemp/${file.filename}`, // Relative path
+      path: `/public/submittalstemp/${file?.filename}`, // Relative path
     }));
 
     const submitals = await prisma.submittals.create({
       data: {
         description,
         subject,
-        fabricator_id: fabricator,
+        fabricator_id:
+          fabricator_id !== "undefined" ? fabricator_id : fabricatorId,
         files: fileDetails,
-        project_id: project,
-        recepient_id: recipient, // Make sure this matches your DB field
+        project_id,
+        recepient_id,
         sender_id: id,
         status: true,
       },
@@ -41,47 +46,160 @@ const AddSubmitals = async (req, res) => {
       },
     });
 
-    const htmlContent = `
-    <html>
-      <head>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            color: #333;
-          }
-          .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-          }
-          h1 {
-            color: #5b6e7d;
-          }
-          .content {
-            margin-top: 20px;
-          }
-          .description {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.5;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Notification</h1>
-          <div class="content">
-            <p class="description">
-              ${description}
-            </p>
-          </div>
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Station - Submittal Notification</title>
+    <style>
+      body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #f2fdf3; /* Light greenish background */
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      .email-container {
+        background-color: #ffffff;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        padding: 35px;
+        margin-top: 50px;
+        max-width: 650px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .email-header {
+        background-color: #6adb45;
+        color: white;
+        padding: 25px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .email-header .title {
+        font-size: 26px;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .email-body {
+        margin-top: 25px;
+        text-align: left;
+        line-height: 1.6;
+      }
+
+      .card {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 25px;
+        margin-top: 30px;
+        border: none;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .footer img {
+        max-width: 150px;
+        margin-top: 15px;
+      }
+
+      a {
+        color: #6adb45;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .green-text {
+        color: #6adb45;
+      }
+
+      h2 {
+        font-size: 20px;n
+        color: #333;
+        margin-top: 20px;
+      }
+
+      p {
+        font-size: 16px;
+        color: #555;
+      }
+
+      /* Ensure logo is centered in footer */
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+      }
+
+      .footer img {
+        max-width: 150px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Ensure the email container is centered */
+      .email-container {
+        text-align: center;
+      }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="d-flex justify-content-between align-items-center">
+        <div class="title">
+            <span>You’ve Received a New Submittal</span><br/>
+            <span><strong>Project:</strong> ${submitals.project?.name}</span>
         </div>
-      </body>
-    </html>
-  `;
+        <div> 
+            <img 
+                src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                alt="Company Logo" 
+                style="max-width: 100px;" />
+        </div>
+    </div>
+        <div class="email-body">
+            <h2>Welcome to Project Station, <b>${submitals.recepients?.username}</b>!</h2>
+            <p>You have received a new Submittal notification. Here are the details:</p>
+
+            <p><strong>Project Name:</strong> ${submitals.project?.name}</p>
+            <p><strong>Sender:</strong> ${submitals.sender?.username}</p>
+            <p><strong>Date:</strong> ${submitals.date}</p>
+            <p><strong>Subject:</strong> ${submitals.subject}</p>
+            <p>You can check your Submittal by clicking the link <a href="projectstation.whiteboardtec.com">here</a>.</p>
+
+            <div class="card">
+                <div class="card-body">
+                    ${description}
+                </div>
+            </div>
+
+            <p>Thanks & Regards,</p>
+            <p><b>${submitals.sender?.username}</b></p>
+            <p>Bangalore</p>
+        </div>
+
+        <div class="footer">
+            <img
+                src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                alt="Company Logo"
+            />
+            <p><b>Whiteboard Technologies Pvt. Ltd.</b></p>
+            <p>Bangalore</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
 
     sendEmail({
       html: htmlContent,
@@ -89,18 +207,16 @@ const AddSubmitals = async (req, res) => {
       subject: subject,
       text: description,
     });
-
     const notification = await prisma.notification.create({
       data: {
-        userID: recipient, // Notify the recipient instead of sender
+        userID: id,
         subject: subject,
         isRead: false,
       },
     });
-
     if (!notification) {
       return sendResponse({
-        message: "Failed to add the notification",
+        message: "Failed to add the notifications",
         res,
         statusCode: 400,
         success: false,
@@ -108,13 +224,13 @@ const AddSubmitals = async (req, res) => {
       });
     }
 
-    // Emit real-time notification using socket.io
-    if (global.io) {
-      global.io.to(recipient).emit("newNotification", {
-        message: `New submittal received: ${subject}`,
-        submittalId: submitals.id,
-      });
-    }
+    // // Emit real-time notification using socket.io
+    // if (global.io) {
+    //   global.io.to(recepient_id).emit("newNotification", {
+    //     message: `New RFI received: ${subject}`,
+    //     rfiId: newrfi.id,
+    //   });
+    // }
 
     return sendResponse({
       message: "Submittals added successfully",
@@ -152,6 +268,13 @@ const SentSubmittals = async (req, res) => {
         sender: true,
       },
     });
+    // // Emit real-time notification using socket.io
+    // if (global.io) {
+    //   global.io.to(recepient_id).emit("newNotification", {
+    //     message: `New submittal received: ${subject}`,
+    //     submittalId: submittals.id,
+    //   });
+    // }
 
     return sendResponse({
       message: "Retrived all sent submittals",

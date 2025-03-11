@@ -75,8 +75,8 @@ docker-compose.yml
 .yarn-integrity
 
 # dotenv environment variables file
-.env
 .env.*
+.env
 .env.test
 .env.production
 
@@ -87,6 +87,8 @@ docker-compose.yml
 # Next.js build output
 .next
 out
+
+public/
 
 # Nuxt.js build / generate output
 .nuxt

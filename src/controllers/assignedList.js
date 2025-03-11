@@ -72,7 +72,14 @@ const addAssignedList=async(req,res)=>{
 }
 const getAssignedList=async(req,res)=>{
     try{
-        const assigned_list= await prisma.assigned_list.findMany();
+        const assigned_list= await prisma.assigned_list.findMany({
+            include : {
+                task : true,
+                user : true,
+                users : true,
+                userss : true
+            }
+        });
         if(!assigned_list){
             sendResponse({
                 message:"Error in getting assigned list",
@@ -126,6 +133,11 @@ const getAssignedListById=async(req,res)=>{
         const assigned_list= await prisma.assigned_list.findUnique({
             where:{
                 id
+            }, include : {
+                task : true,
+                users : true,
+                userss : true,
+                user : true
             }
         })
         if(!assigned_list){
@@ -158,7 +170,8 @@ const getAssignedListById=async(req,res)=>{
 }
 
 const updateAssignedList=async(req,res)=>{
-    const {id}=req?.params
+    const {aid}=req?.params
+    const {id} = req.user
     try{
         if(!id){
             return sendResponse({
@@ -180,9 +193,15 @@ const updateAssignedList=async(req,res)=>{
         }
         const assigned_list= await prisma.assigned_list.update({
             where:{
-                id
+                id : aid
             },
-            data:req?.body
+            data:{...req?.body, approved_on : new Date(), approved_by : id},
+            include : {
+                task : true,
+                user : true,
+                users : true,
+                userss : true
+            }
         });
         if(!assigned_list){
              return sendResponse({

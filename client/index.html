@@ -1,89 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Files</title>
-  </head>
-  <body>
-    <h1>Upload Files</h1>
+    <title>Project Station - Submittal Notification</title>
+    <style>
+      body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #f2fdf3; /* Light greenish background */
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
 
-    <!-- Form to select multiple files -->
-    <form id="fileForm">
-      <input
-        type="file"
-        id="fileInput"
-        name="files"
-        multiple
-        accept=".pdf, .jpeg, .jpg, .png"
-        required
-      />
-      <button type="submit">Upload</button>
-    </form>
+      .email-container {
+        background-color: #ffffff;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        padding: 35px;
+        margin-top: 50px;
+        max-width: 650px;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-    <div id="responseMessage"></div>
+      .email-header {
+        background-color: #28a745;
+        color: white;
+        padding: 25px;
+        border-radius: 8px;
+        text-align: center;
+      }
 
-    <script>
-      // Handle form submission
-      document
-        .getElementById("fileForm")
-        .addEventListener("submit", async (event) => {
-          event.preventDefault(); // Prevent default form submission
+      .email-header .title {
+        font-size: 26px;
+        font-weight: bold;
+        margin: 0;
+      }
 
-          const formData = new FormData();
-          const files = document.getElementById("fileInput").files;
+      .email-body {
+        margin-top: 25px;
+        text-align: left;
+        line-height: 1.6;
+      }
 
-          // Check if files are selected
-          if (files.length === 0) {
-            console.log("No files selected");
-            document.getElementById("responseMessage").textContent =
-              "Please select files to upload.";
-            return;
-          }
+      .card {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 25px;
+        margin-top: 30px;
+        border: none;
+      }
 
-          // Append all selected files to the form data
-          for (let i = 0; i < files.length; i++) {
-            formData.append("files", files[i]);
-          }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+        color: #555;
+      }
 
-          // Log FormData content to verify the files
-          for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-          }
+      .footer img {
+        max-width: 150px;
+        margin-top: 15px;
+      }
 
-          try {
-            const projectId = "45f521f5-aafb-432d-b891-fb208181f518"; // Replace with actual project ID
+      a {
+        color: #28a745;
+        text-decoration: none;
+        font-weight: bold;
+      }
 
-            // Send the request to the backend
-            const response = await fetch(
-              `http://localhost:8000/api/project/${projectId}/uploadprojectfiles`,
-              {
-                method: "POST",
-                body: formData,
-              }
-            );
+      .green-text {
+        color: #28a745;
+      }
 
-            const data = await response.json();
+      h2 {
+        font-size: 20px;
+        color: #333;
+        margin-top: 20px;
+      }
 
-            console.log(data);
+      p {
+        font-size: 16px;
+        color: #555;
+      }
 
-            if (response.ok) {
-              // Show success message
-              document.getElementById("responseMessage").textContent =
-                "Files uploaded successfully!";
-              console.log(data); // Optional: Log the server response
-            } else {
-              // Show error message
-              document.getElementById(
-                "responseMessage"
-              ).textContent = `Error: ${data.error}`;
-            }
-          } catch (error) {
-            console.error(error);
-            document.getElementById("responseMessage").textContent =
-              "An error occurred while uploading files.";
-          }
-        });
-    </script>
-  </body>
+      /* Ensure logo is centered in footer */
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+      }
+
+      .footer img {
+        max-width: 150px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Ensure the email container is centered */
+      .email-container {
+        text-align: center;
+      }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="email-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="title">
+            <span>You’ve Received a New Submittal</span><br/>
+            <span><strong>Project:</strong> ${submittals.project.name}</span>
+        </div>
+        <div> 
+            <img 
+                src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                alt="Company Logo" 
+                style="max-width: 100px;" />
+        </div>
+    </div>
+</div>
+
+        <div class="email-body">
+            <h2>Welcome to Project Station, <b>${submittals.recepients.username}</b>!</h2>
+            <p>You have received a new Submittal notification. Here are the details:</p>
+
+            <p><strong>Project Name:</strong> ${submittals.project.name}</p>
+            <p><strong>Sender:</strong> ${submittals.sender.username}</p>
+            <p><strong>Date:</strong> ${submittals.date}</p>
+            <p><strong>Subject:</strong> ${submittals.subject}</p>
+            <p>You can check your Submittal by clicking the link <a href="projectstation.whiteboardtec.com">here</a>.</p>
+
+            <div class="card">
+                <div class="card-body">
+                    ${description}
+                </div>
+            </div>
+
+            <p>Thank you & Regards,</p>
+            <p><b>Whiteboard Technologies Pvt. Ltd.</b></p>
+            <p>Bangalore</p>
+        </div>
+
+        <div class="footer">
+            <img
+                src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                alt="Company Logo"
+            />
+            <p><b>Whiteboard Technologies Pvt. Ltd.</b></p>
+            <p>Bangalore</p>
+        </div>
+    </div>
+</body>
 </html>

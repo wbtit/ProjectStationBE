@@ -7,9 +7,15 @@ import Project from "./project/route.js";
 import Task from "./tasks/route.js";
 import Team from "./team/route.js";
 import Employee from "./employee/route.js";
-import RFI from "./rfi/route.js"
+import RFI from "./rfi/route.js";
+import RFQ from "./rfq/routes.js"
 import { Submittals } from "./submittals/route.js";
-import Notifications from "./notifications/routes.js"
+import Notifications from "./notifications/routes.js";
+import WorkingHour from "./workinghours/route.js";
+import { ChangeOrderRouter } from "./changeorder/route.js";
+import { WorkBreakDown } from "./workbreakdown/route.js";
+import WBSActivity from "./wbsactivity/route.js";
+import { SubTasksRouter } from "./subtasks/route.js";
 
 const routes = express.Router();
 
@@ -21,8 +27,14 @@ routes.use("/project", Project);
 routes.use("/task", Task);
 routes.use("/team", Team);
 routes.use("/employee", Employee);
-routes.use("/RFI",RFI)
+routes.use("/RFI", RFI);
+routes.use("/RFQ",RFQ)
 routes.use("/submittals", Submittals);
-routes.use("/notifications",Notifications)
+routes.use("/notifications", Notifications);
+routes.use("/wh", WorkingHour);
+routes.use("/co", ChangeOrderRouter);
+routes.use("/br", WorkBreakDown);
+routes.use("/wbs", WBSActivity);
+routes.use("/st", SubTasksRouter);
 
 export { routes };

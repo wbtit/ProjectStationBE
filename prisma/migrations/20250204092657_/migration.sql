@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "subTasks" ALTER COLUMN "QtyNo" SET DEFAULT 0;

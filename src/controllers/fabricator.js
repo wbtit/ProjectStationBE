@@ -5,6 +5,10 @@ import { sendResponse } from "../utils/responder.js";
 import { v4 as uuidv4 } from "uuid";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import { getFabricators } from "../models/getAllFabricator.js";
+import path from "path";
+import fs from "fs";
+// import client from "../redis/index.js";
+import mime from "mime";
 
 const AddFabricator = async (req, res) => {
   const { id } = req.user;
@@ -42,7 +46,7 @@ const AddFabricator = async (req, res) => {
       data: fabricator,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -229,8 +233,9 @@ const UpdateFabricator = async (req, res) => {
         data: updatedFabricator,
       });
     } catch (error) {
+      console.log(error.message);
       return sendResponse({
-        message: "Failed to update the fabricator.",
+        message: error.message,
         res,
         statusCode: 500,
         success: false,
@@ -242,6 +247,103 @@ const UpdateFabricator = async (req, res) => {
   } else {
     return sendResponse({
       message: "Only staff admin can upate fabricator.",
+      res,
+      statusCode: 403,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+const Uploadfiles = async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidUUID(id)) {
+    return sendResponse({
+      message: "Invalid Fabrictor",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    // Check if files are provided
+    if (!req.files || req.files.length === 0) {
+      return sendResponse({
+        message: "No files uploaded",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Extract file details (uuid, originalName, path)
+    const fileDetails = req.files.map((file) => ({
+      filename: file.filename, // UUID + extension
+      originalName: file.originalname, // Original name of the file
+      id: file.filename.split(".")[0], // Extract UUID from the filename
+      path: `/public/fabricatortemp/${file.filename}`, // Relative path
+    }));
+
+    // Fetch the project
+    const fab = await prisma.fabricator.findUnique({
+      where: { id },
+    });
+
+    if (!fab) {
+      return sendResponse({
+        message: "Invalid Fabricator ID",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Merge existing files with the new file details
+    const updatedFiles = [...(fab.files || []), ...fileDetails];
+
+    // Update the project with new files array
+    const updatedFilesFabricator = await prisma.fabricator.update({
+      where: { id },
+      data: {
+        files: updatedFiles,
+      },
+    });
+
+    // Step 2: Get the cached projects from Redis
+    // const cachedProjects = await client.get("allprojects");
+
+    // Step 3: Parse the cached projects
+    // let projects = JSON.parse(cachedProjects);
+
+    // Step 4: Find and update the files field in the cached project by ID
+    // const projectIndex = project.findIndex((projects) => projects.id === id);
+    // if (projectIndex !== -1) {
+    //   project[projectIndex].files = updatedFilesProject.files; // Replace files
+    // }
+
+    // Step 5: Set the updated projects back to Redis
+    // await client.set("allprojects", JSON.stringify(projects));
+
+    return sendResponse({
+      message: "Files Upload Complete",
+      res,
+      statusCode: 200,
+      success: true,
+      data: updatedFilesFabricator,
+    });
+  } catch (error) {
+    console.error("Error uploading files:", error);
+    return sendResponse({
+      message: error?.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
     });
   }
 };
@@ -358,6 +460,102 @@ const DeleteBranch = async (req, res) => {
   });
 };
 
+const DownloadFile = async (req, res) => {
+  const { id, fid } = req.params; // id: Project ID, fid: File UUID
+
+  try {
+    // Fetch project to access the files array
+    const fab = await prisma.fabricator.findUnique({
+      where: { id },
+    });
+
+    if (!fab) {
+      return res.status(404).json({ message: "Fabricator not found" });
+    }
+
+    // Find the file in the project's files array using the file UUID (fid)
+    const fileObject = fab.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    // Construct the file path using __dirname
+    const __dirname = path.resolve(); // Get the absolute path of the current directory
+    const filePath = path.join(__dirname, fileObject.path);
+
+    console.log("Firnam", __dirname);
+
+    console.log("File path:", filePath);
+
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    console.log("FO", fileObject);
+
+    // Initiate file download
+    res.download(filePath, fileObject.originalName, (err) => {
+      if (err) {
+        console.error("File Download Error:", err);
+        return res
+          .status(500)
+          .json({ message: "Error occurred while downloading the file" });
+      }
+    });
+  } catch (error) {
+    console.error("Download File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while downloading the file" });
+  }
+};
+
+const ViewFile = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const project = await prisma.fabricator.findUnique({
+      where: { id },
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Fabricator not found" });
+    }
+
+    const fileObject = project.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    console.log(filePath);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 export {
   AddBranch,
   AddFabricator,
@@ -366,4 +564,7 @@ export {
   UpdateFabricator,
   GetFabricatorByID,
   DeleteBranch,
+  Uploadfiles,
+  DownloadFile,
+  ViewFile,
 };

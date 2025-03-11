@@ -13,7 +13,7 @@ const router = Router();
 
 router.post("/login", login); // Routing to Login Logic
 
-router.post("/signup", Authenticate,isAdmin,signup); // Routing to SignUp (New User) Logic
+router.post("/signup",signup); // Routing to SignUp (New User) Logic
 
 router.post("/resetpassword", Authenticate, resetpassword); // Routing to Reset Password Logic
 
