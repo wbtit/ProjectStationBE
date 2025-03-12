@@ -24,16 +24,34 @@ const Start = async (req, res) => {
         user_id:id,
         task_id:task_id,
         status:{notIn:["END"]}// Ensure previous work session is not still active
+      },
+      orderBy:{start:'desc'}
+    })
+    const task= await prisma.task.findUnique({
+      where:{
+        id:task_id
+      },select:{
+        created_on:true
       }
     })
     if (existingWork) {
-      return sendResponse({
-        message: "A work session is already active for this task.",
-        res,
-        statusCode: 400,
-        success: false,
-        data: existingWork,
-      });
+      if(new Date(existingWork.start)<new Date(task.created_on)){
+        await prisma.workingHours.update({
+          where:{ user_id:id,
+            task_id:task_id,
+            status:{notIn:["END"]}},
+          data:{status:"END"}
+        })
+      }else{
+        return sendResponse({
+          message: "A work session is already active for this task.",
+          res,
+          statusCode: 400,
+          success: false,
+          data: existingWork,
+        });
+      }
+      
     }
 
     const workinghour = await prisma.workingHours.create({
