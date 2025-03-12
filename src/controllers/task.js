@@ -515,7 +515,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       },
     });
 
-    const filteredTasks = tasks.filter((t) => t.status !== "IN_REVIEW");
+    const filteredTasks = tasks.filter((t) => t.status !== "IN_REVIEW" && t.status!=="COMPLETE");
 
     if (!tasks) {
       return sendResponse({

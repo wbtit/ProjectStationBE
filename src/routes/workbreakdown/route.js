@@ -27,8 +27,8 @@ router.get("/getTaskBreakDown/:id", Authenticate, getTaskBreakDown);
 router.get("/getSubTasks/:id", Authenticate, getSubTasks);
 router.get("/getJobStudy/:id", Authenticate, getJobStudy);
 
-router.put("/putJobStudy/:id", Authenticate, putJobStudy);
-router.put("/putTaskBreakDown/:id", Authenticate, putTaskBreakDown);
-router.put("/putSubTasks/:id", Authenticate, putSubTasksput);
+router.patch("/putJobStudy/:id", Authenticate, putJobStudy);
+router.patch("/putTaskBreakDown/:id", Authenticate, putTaskBreakDown);
+router.patch("/putSubTasks/:id", Authenticate, putSubTasksput);
 
 export { router as WorkBreakDown };
