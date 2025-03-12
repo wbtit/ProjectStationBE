@@ -14,9 +14,11 @@ import {
   DownloadFile,
   ViewFile,
   getProjectsByUser,
+  deleteProjectById
 } from "../../controllers/project.js";
 import { uploads } from "../../config/multer.js";
 import { isStaffAndClient } from "../../middlewares/isstaffandclient.js";
+import { isAdmin } from "../../middlewares/isadmin.js";
 
 const router = Router();
 
@@ -54,5 +56,6 @@ router.get(
 router.get("/projects/viewfile/:id/:fid", ViewFile);
 
 router.get("/projects/u/user", Authenticate, isStaffAndClient, getProjectsByUser);
+router.delete("/projects/:pid",Authenticate,isAdmin,deleteProjectById)
 
 export default router;

@@ -760,6 +760,51 @@ const getProjectsByUser = async (req, res) => {
   }
 };
 
+const deleteProjectById=async(req,res)=>{
+  const {pid}=req.params
+  try {
+    if(!pid){
+      return sendResponse({
+        message:"Missing ProjectID ",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const deletedProject= await prisma.project.delete({
+      where:{
+        id:pid
+      }
+    })
+    if(!deleteProjectById){
+      return sendResponse({
+        message:"Failed to delete the Project",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    return sendResponse({
+      message:"Project got deleted successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:null
+    })
+  } catch (error) {
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
+
 export {
   AddProject,
   Uploadfiles,
@@ -771,4 +816,5 @@ export {
   DownloadFile,
   ViewFile,
   getProjectsByUser,
+  deleteProjectById
 };
