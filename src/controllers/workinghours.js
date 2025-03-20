@@ -18,8 +18,9 @@ const Start = async (req, res) => {
   }
 
   try {
+    await prisma.$transaction(async(tx)=>{
      // Check if an active work session already exists
-    const existingWork= await prisma.workingHours.findFirst({
+    const existingWork= await tx.workingHours.findFirst({
       where:{
         user_id:id,
         task_id:task_id,
@@ -27,7 +28,7 @@ const Start = async (req, res) => {
       },
       orderBy:{start:'desc'}
     })
-    const task= await prisma.task.findUnique({
+    const task= await tx.task.findUnique({
       where:{
         id:task_id
       },select:{
@@ -36,7 +37,7 @@ const Start = async (req, res) => {
     })
     if (existingWork) {
       if(new Date(existingWork.start)<new Date(task.created_on)){
-        await prisma.workingHours.update({
+        await tx.workingHours.update({
           where:{ user_id:id,
             task_id:task_id,
             status:{notIn:["END"]}},
@@ -54,7 +55,7 @@ const Start = async (req, res) => {
       
     }
 
-    const workinghour = await prisma.workingHours.create({
+    const workinghour = await tx.workingHours.create({
       data: {
        user_id:id,
        task_id:task_id,
@@ -64,7 +65,7 @@ const Start = async (req, res) => {
       },
     });
 
-    await prisma.task.update({
+    await tx.task.update({
       where: {
         id: task_id,
       },
@@ -79,7 +80,7 @@ const Start = async (req, res) => {
       statusCode: 200,
       success: true,
       data: workinghour,
-    });
+    });})
   } catch (error) {
     return sendResponse({
       message: error.message,
@@ -108,8 +109,8 @@ const Pause = async (req, res) => {
   }
 
   try {
-    // Fetch the current `start` value from the database
-    const workingHourRecord = await prisma.workingHours.findUnique({
+    await prisma.$transaction(async(tx)=>{// Fetch the current `start` value from the database
+    const workingHourRecord = await tx.workingHours.findUnique({
       where: {
         id: work_id,
       },
@@ -150,7 +151,7 @@ const Pause = async (req, res) => {
     const durationInMinutes=Math.floor((currentTimeStamp-startTimestamp)/60000)
 
     // Update the duration in the database
-    const updatedWorkingHour = await prisma.workingHours.update({
+    const updatedWorkingHour = await tx.workingHours.update({
       where: {
         id: work_id,
       },
@@ -160,7 +161,7 @@ const Pause = async (req, res) => {
       },
     });
 
-    await prisma.task.update({
+    await tx.task.update({
       where: {
         id: task_id,
       },
@@ -170,14 +171,13 @@ const Pause = async (req, res) => {
     });
 
     return sendResponse({
-      message: `Work paused, Total time : ${
-        workingHourRecord.duration + durationInMinutes
-      } mins`,
+      message: `Work paused, Total time : ${workingHourRecord.duration } mins`,
       res,
       statusCode: 200,
       success: false,
       data: updatedWorkingHour,
     });
+  })
   } catch (error) {
     console.log(error.message);
     return sendResponse({
@@ -205,7 +205,8 @@ const Resume = async (req, res) => {
   }
 
   try {
-    const work = await prisma.workingHours.findUnique({
+    await prisma.$transaction(async(tx)=>{
+    const work = await tx.workingHours.findUnique({
       where: {
         id: work_id,
       },
@@ -241,7 +242,7 @@ const Resume = async (req, res) => {
       });
     }
 
-    const workingupdate = await prisma.workingHours.update({
+    const workingupdate = await tx.workingHours.update({
       where: {
         id: work_id,
       },
@@ -251,7 +252,7 @@ const Resume = async (req, res) => {
       },
     });
 
-    await prisma.task.update({
+    await tx.task.update({
       where: {
         id: task_id,
       },
@@ -267,6 +268,7 @@ const Resume = async (req, res) => {
       success: true,
       data: workingupdate,
     });
+  })
   } catch (error) {
     console.log(error.message);
     return sendResponse({
@@ -294,7 +296,8 @@ const End = async (req, res) => {
   }
 
   try {
-    const workingHourRecord = await prisma.workingHours.findUnique({
+    await prisma.$transaction(async(tx)=>{
+    const workingHourRecord = await tx.workingHours.findUnique({
       where: {
         id: work_id,
       },
@@ -353,7 +356,7 @@ const End = async (req, res) => {
     const durationInMinutes = Math.floor((Date.now() - start) / 60000); // Calculate duration in minutes
 
     // Update the duration in the database
-    const updatedWorkingHour = await prisma.workingHours.update({
+    const updatedWorkingHour = await tx.workingHours.update({
       where: {
         id: work_id,
       },
@@ -363,7 +366,7 @@ const End = async (req, res) => {
       },
     });
 
-    const task = await prisma.task.findUnique({
+    const task = await tx.task.findUnique({
       where: { id: task_id },
       select: { project_id: true },
     });
@@ -378,13 +381,13 @@ const End = async (req, res) => {
       });
     }
 
-    await prisma.task.update({
+    await tx.task.update({
       where: { id: task_id },
       data: { status: "IN_REVIEW" },
     });
 
     // Update project status to "ACTIVE"
-    await prisma.project.update({
+    await tx.project.update({
       where: { id: task.project_id },
       data: { status: "ACTIVE" },
     });
@@ -397,7 +400,8 @@ const End = async (req, res) => {
       statusCode: 200,
       success: false,
       data: updatedWorkingHour,
-    });
+    })
+  });
   } catch (error) {
     console.log(error.message);
     return sendResponse({
@@ -445,7 +449,7 @@ const getWork = async (req, res) => {
     }
     let updatedDuration = work.duration; 
     // 🔹 Fix: Check if work exists before accessing its properties
-    if ((work.status === "ACTIVE" || work.status === "RESUME") && work.start) {
+    if ((work.status === "START" || work.status === "RESUME") && work.start) {
       const startTime = new Date(work.start).getTime();
       const elapsedMinutes = Math.floor((Date.now() - startTime) / 60000);
       updatedDuration = work.duration + elapsedMinutes;
