@@ -10,6 +10,7 @@ import fs from "fs";
 import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 import { SubTasks } from "../../data/data.js";
+import { connect } from "http2";
 
 const AddProject = async (req, res) => {
   const {
@@ -247,7 +248,7 @@ const UpdateProject = async (req, res) => {
       // Check whether such department exists
       const department = await prisma.department.findUnique({
         where: {
-          id: req.department,
+          id: req.body.department,
         },
       });
       if (!department) {
@@ -283,7 +284,7 @@ const UpdateProject = async (req, res) => {
       // Check the provided user ID is a manager or not
       const { is_manager } = await prisma.users.findUnique({
         where: {
-          id: req.manager,
+          id: req.body.manager,
         },
         select: {
           is_manager: true,
@@ -311,7 +312,7 @@ const UpdateProject = async (req, res) => {
       "status",
       "stage",
       "manager",
-      "teamID",
+      "team",
       "approvalDate",
     ];
 
@@ -324,7 +325,11 @@ const UpdateProject = async (req, res) => {
         updateData[field] = req.body[field];
       }
     });
-
+    if(req.body.manager){
+      updateData.manager={
+        connect:{id:req.body.manager}
+      }
+    }
     console.log(updateData);
 
     const updatedProject = await prisma.project.update({
