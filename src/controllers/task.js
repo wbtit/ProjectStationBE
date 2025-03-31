@@ -6,106 +6,134 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 import { isAdmin } from "../middlewares/isadmin.js";
 
 const AddTask = async (req, res) => {
-  // Adding the task
-
-  const {is_staff, id} = req.user
+  const { is_staff, id } = req.user;
 
   console.log(req.body);
 
   const {
-    description,
-    due_date,
-    duration,
-    name,
-    priority,
-    project,
-    user,
-    status,
-    start_date,
+      description,
+      due_date,
+      duration,
+      name,
+      priority,
+      project,
+      user,
+      status,
+      start_date,
   } = req.body;
 
-  console.log(
-    description,
-    due_date,
-    duration,
-    name,
-    priority,
-    project,
-    user,
-    status,
-    start_date
-  );
-
-  if(!description || !name || !due_date || !duration || priority === undefined || !project || !user || !status || !start_date) {
-    return sendResponse({
-      message: "Fields are empty!!",
-      res,
-      statusCode: 400,
-      success: false,
-      data: null,
-    });
+  if (!description || !name || !due_date || !duration || priority === undefined || !project || !user || !status || !start_date) {
+      return sendResponse({
+          message: "Fields are empty!!",
+          res,
+          statusCode: 400,
+          success: false,
+          data: null,
+      });
   }
 
   try {
-    const newTask = await prisma.task.create({
-      data: {
-        description,
-        due_date,
-        duration,
-        name,
-        priority,
-        start_date,
-        status,
-        project_id: project,
-        user_id: user,
-      },
-    });
-
-    await prisma.project.update({
-      where : {
-        id : project
-      },
-      data : {
-        status : "ACTIVE"
-      }
-    })
-
-    const newAssigendTask= await prisma.assigned_list.create({
-      data:{
-          approved : is_staff ? false : true,
-          assigned_to : user,
-          assigned_by : id,
-          task_id : newTask.id,
-      }
-  })
-
-    if (newTask) {
-      return sendResponse({
-        message: "Task Added Successfully",
-        res,
-        statusCode: 200,
-        success: true,
-        data: newTask,
+      // Create Task
+      const newTask = await prisma.task.create({
+          data: {
+              description,
+              due_date,
+              duration,
+              name,
+              priority,
+              start_date,
+              status,
+              project_id: project,
+              user_id: user,
+          },
       });
-    }
-    sendResponse({
-      message: "error in adding task",
-      res,
-      statusCode: 403,
-      success: false,
-      data: null,
+
+      if (!newTask) {
+          return sendResponse({
+              message: "Failed to create task",
+              res,
+              statusCode: 500,
+              success: false,
+              data: null,
+          });
+      }
+
+      // Update Project Status
+      await prisma.project.update({
+          where: { id: project },
+          data: { status: "ACTIVE" },
+      });
+
+      // Get Assigned User
+      const assignedUser = await prisma.users.findUnique({
+          where: { id },
+      });
+
+      if (!assignedUser) {
+          return sendResponse({
+              message: "Assigned user not found",
+              res,
+              statusCode: 404,
+              success: false,
+              data: null,
+          });
+      }
+
+      // Determine Approval Status
+      const approvedStatus = assignedUser.is_manager || assignedUser.is_superuser || (assignedUser.is_manager && assignedUser.is_staff);
+
+      // Assign Task
+      const newAssignedTask = await prisma.assigned_list.create({
+          data: {
+              approved: approvedStatus,
+              assigned_to: user.id || user, // Ensure it's an ID
+              assigned_by: id,
+              task_id: newTask.id,
+          },
+      });
+      //update
+      const assigned_list= await prisma.assigned_list.update({
+        where:{
+            id : newAssignedTask.id
+        },
+        data:{approved_on : new Date(), approved_by : id},
+        include : {
+            task : true,
+            user : true,
+            users : true,
+            userss : true
+        }
     });
+
+      if (newAssignedTask) {
+          return sendResponse({
+              message: "Task Added Successfully",
+              res,
+              statusCode: 200,
+              success: true,
+              data: newTask,
+          });
+      }
+
+      return sendResponse({
+          message: "Error in adding task",
+          res,
+          statusCode: 403,
+          success: false,
+          data: null,
+      });
+
   } catch (error) {
-    console.log(error.message)
-    return sendResponse({
-      message: error.message,
-      res,
-      statusCode: 500,
-      success: false,
-      data: null,
-    });
+      console.log(error.message);
+      return sendResponse({
+          message: error.message,
+          res,
+          statusCode: 500,
+          success: false,
+          data: null,
+      });
   } finally {
-    prisma.$disconnect();
+      await prisma.$disconnect();
   }
 };
 
@@ -512,10 +540,17 @@ const getMyTaskByIdAndStatus = async (req, res) => {
     const tasks = await prisma.task.findMany({
       where: {
         user_id: user_id,
+        status: { notIn: ["IN_REVIEW", "COMPLETE"] }, // Exclude these statuses
+        taskInAssignedList: {
+          some: { assigned_to: user_id }, // Ensure assigned_to matches user_id
+        },
       },
+      include:{
+        taskInAssignedList:true
+      }
     });
 
-    const filteredTasks = tasks.filter((t) => t.status !== "IN_REVIEW" && t.status!=="COMPLETE");
+    //const filteredTasks = tasks.filter((t) => t.status !== "IN_REVIEW" && t.status!=="COMPLETE");
 
     if (!tasks) {
       return sendResponse({
@@ -540,7 +575,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: filteredTasks,
+      data: tasks,
     });
   } catch (error) {
     return sendResponse({

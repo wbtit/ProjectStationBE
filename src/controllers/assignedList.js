@@ -22,7 +22,7 @@ const addAssignedList=async(req,res)=>{
         !assigned_by||
         !approved_by
     ){
-        sendResponse({
+        return sendResponse({
             message:"Fields are empty",
             res,
             statusCode:400,
@@ -32,32 +32,59 @@ const addAssignedList=async(req,res)=>{
         })
     }
     try{
-        const newAssigendTask= await prisma.assigned_list.create({
-            data:{
-                approved_on,
-                assigned_on,
-                approved,
-                task_id,
-                assigned_by,
-                approved_by 
+        let approvedStatus= false;
+        const user=await prisma.users.findUnique({
+            where:{
+                id:assigned_by
             }
         })
-        if(newAssigendTask){
+        if (!user) {
             return sendResponse({
-                message:"Task added to Assigned list",
+                message: "Assigned user not found",
                 res,
-                statusCode:200,
-                success:true,
-                data:newAssigendTask
-            })
+                statusCode: 404,
+                success: false,
+                data: null
+            });
         }
-        return sendResponse({
-            message:"error in adding task to Assigned list",
-            res,
-            statusCode:403,
-            success:false,
-            data:null
-        })
+
+        //project manager or admin
+        if(user.is_manager || user.is_superuser){
+            approvedStatus=true
+        }
+        
+        //dept manager
+        else if(user.is_manager && user.is_staff){
+            approvedStatus=true
+        }
+            const newAssigendTask= await prisma.assigned_list.create({
+                data:{
+                    approved_on,
+                    assigned_on,
+                    approved:approvedStatus,
+                    task_id,
+                    assigned_by,
+                    approved_by 
+                }
+            })
+            if(newAssigendTask){
+                return sendResponse({
+                    message:"Task added to Assigned list",
+                    res,
+                    statusCode:200,
+                    success:true,
+                    data:newAssigendTask
+                })
+            }
+            return sendResponse({
+                message:"error in adding task to Assigned list",
+                res,
+                statusCode:403,
+                success:false,
+                data:null
+            })
+        
+        
     }catch(error){
         return sendResponse({
             message:error.message,
@@ -67,9 +94,10 @@ const addAssignedList=async(req,res)=>{
             data:null
         })
     }finally{
-        prisma.$disconnect();
+       await prisma.$disconnect();
     }
 }
+
 const getAssignedList=async(req,res)=>{
     try{
         const assigned_list= await prisma.assigned_list.findMany({
@@ -114,7 +142,7 @@ const getAssignedListById=async(req,res)=>{
     try{
         if(!id){
             return sendResponse({
-                message:"Invalid ID",
+                message:"Assigned taskId is required",
                 res,
                 statusCode:400,
                 success:false,
@@ -123,7 +151,7 @@ const getAssignedListById=async(req,res)=>{
         }
         if(!isValidUUID(id)){
             return sendResponse({
-                message: "Invalid task UUid",
+                message: "Invalid UUid",
                 res,
                 statusCode: 400,
                 success: false,
@@ -140,6 +168,7 @@ const getAssignedListById=async(req,res)=>{
                 user : true
             }
         })
+  
         if(!assigned_list){
              return sendResponse({
                 message:"error in fetching the taskById",
@@ -175,16 +204,25 @@ const updateAssignedList=async(req,res)=>{
     try{
         if(!id){
             return sendResponse({
-                message:"Invalid ID",
+                message:"userID is required",
                 res,
-                statusCode:403,
+                statusCode:400,
                 success:false,
                 data:null
             })
         }
-        if(!isValidUUID(id)){
+        if(!aid){
             return sendResponse({
-                message: "Invalid task UUid",
+                message:"Assigned taskId is required",
+                res,
+                statusCode:400,
+                success:false,
+                data:null
+            })
+        }
+        if(!isValidUUID(id)|| !isValidUUID(aid)){
+            return sendResponse({
+                message: "Invalid  UUids",
                 res,
                 statusCode: 400,
                 success: false,
