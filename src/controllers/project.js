@@ -86,10 +86,6 @@ const AddProject = async (req, res) => {
       data: SubtasksData,
     });
 
-    // const projects = JSON.parse(await client.get("allprojects"));
-    // projects.push(project);
-
-    // await client.set("allprojects", JSON.stringify(projects));
 
     console.log(project);
 
@@ -174,20 +170,6 @@ const Uploadfiles = async (req, res) => {
       },
     });
 
-    // Step 2: Get the cached projects from Redis
-    // const cachedProjects = await client.get("allprojects");
-
-    // Step 3: Parse the cached projects
-    // let projects = JSON.parse(cachedProjects);
-
-    // Step 4: Find and update the files field in the cached project by ID
-    // const projectIndex = project.findIndex((projects) => projects.id === id);
-    // if (projectIndex !== -1) {
-    //   project[projectIndex].files = updatedFilesProject.files; // Replace files
-    // }
-
-    // Step 5: Set the updated projects back to Redis
-    // await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Files Upload Complete",
@@ -338,21 +320,6 @@ const UpdateProject = async (req, res) => {
       },
       data: updateData, // req.body must contains only fields present in the project schema
     });
-
-    // // Step 2: Get the cached projects from Redis
-    // const cachedProjects = await client.get("allprojects");
-
-    // // Step 3: Parse the cached projects
-    // let projects = JSON.parse(cachedProjects);
-
-    // // Step 4: Find and update the project in the cached list
-    // const projectIndex = projects.findIndex((project) => project.id === id);
-    // if (projectIndex !== -1) {
-    //   projects[projectIndex] = updatedProject; // Replace the old project with the updated one
-    // }
-
-    // // Step 5: Set the updated projects back to Redis
-    // await client.set("allprojects", JSON.stringify(projects));
 
     return sendResponse({
       message: "Project Update Successfully",
