@@ -62,7 +62,7 @@ const addTaskAssignes = async (req, res) => {
 
     const newAssigendTask= await prisma.assigned_list.create({
       data:{
-          approved_on,
+          approved_on:null,
           assigned_on,
           approved,
           task: { connect: { id: task_id } },

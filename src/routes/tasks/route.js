@@ -70,6 +70,10 @@ router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes); //up
 
 router.post("/tasks/add_comment/:task_id", Authenticate, addComment); //add comment
 
+
+
+//CRUD Assigned list
+
 router.post("/add_assigned-list", Authenticate, addAssignedList); // add assigned-list
 
 router.get("/get_assigned-list", Authenticate, getAssignedList); // get assigned-list
@@ -81,6 +85,11 @@ router.put("/update_assigned-list/:id", Authenticate, updateAssignedList); // up
 router.patch("/update_assigned-list/:aid", Authenticate, updateAssignedList); // patchUpdate assigned-list
 
 router.delete("/delete_assigned-list/:id", Authenticate, deleteAssignedList); //delete assigned-list
+
+
+
+
+
 
 // CRUD confirm assign list
 router.post("/assigned-list/:id/confirm", Authenticate, postConfirmtaskById);
