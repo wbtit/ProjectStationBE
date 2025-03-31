@@ -443,8 +443,8 @@ model WorkingHours {
   user_id  String         @db.Uuid
   task_id  String         @db.Uuid
   status   WorkHourStatus
-  start    DateTime
-  end   DateTime @default(now()) // Set a default value
+  start    DateTime?
+  end      DateTime?  
   duration Int @default(0)
   task     Task           @relation("workingHourTask", fields: [task_id], references: [id], onDelete: Cascade)
   user     Users          @relation("workingHourUser", fields: [user_id], references: [id], onDelete: Cascade)
