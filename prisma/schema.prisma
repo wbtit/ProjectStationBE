@@ -498,10 +498,10 @@ model SubTasks{
   id String @id @default(uuid()) @db.Uuid
   description String
   QtyNo Int @default(0)
-  unitTime Float @default(0.0) // Change from Int to Float
   execHr Float @default(0.0) // Change from Int to Float
-  CheckUnitTime Float @default(0.0) // Change from Int to Float
-  checkHr  Float @default(0.0) // Change from Int to Float
+  unitTime Float @default(0.0) // Change from Int to Float
+  checkHr Float @default(0.0) // Change from Int to Float
+  CheckUnitTime  Float @default(0.0) // Change from Int to Float
   projectID String @db.Uuid
   project Project @relation(fields: [projectID],references: [id],name: "subTasks",onDelete: Cascade)
   wbsactivityID String @db.Uuid

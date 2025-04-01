@@ -1,5 +1,58 @@
+
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+
+const addSubTasks = async (req, res) => {
+  const {projectID,wbsactivityID}=req.params
+  const { description, Qty, execHr, checkHr } =
+    req.body;   
+
+  if (!description || !Qty || !execHr || !checkHr ||!projectID||!wbsactivityID) {
+    return sendResponse({
+      message: "Fields are empty",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const subtask = await prisma.subTasks.create({
+      data: {
+        description: description,
+        Qty: Qty,
+        execHr,
+        checkHr,
+        project:{
+          connect:{projectID:projectID}
+        },
+        WBSACTIVITY:{
+          connect:{wbsactivityID:wbsactivityID}
+        }
+      }
+    });
+
+    return sendResponse({
+      message: "Subtask added successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: subtask,
+    });
+  } catch (error) {
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+
 
 const GetSubTasks = async (req, res) => {
   try {
@@ -70,4 +123,4 @@ const UpdateSubTasks = async (req, res) => {
   }
 };
 
-export { GetSubTasks, UpdateSubTasks };
+export { GetSubTasks, UpdateSubTasks,addSubTasks};
