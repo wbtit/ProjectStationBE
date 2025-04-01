@@ -333,6 +333,7 @@ const GetTaskByID = async (req, res) => {
       include: {
         project: true,
         taskcomment: true,
+        taskInAssignedList:true
       },
     });
 
@@ -541,18 +542,20 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       where: {
         user_id: user_id,
         status: { notIn: ["IN_REVIEW", "COMPLETE"] }, // Exclude these statuses
-        taskInAssignedList: {
-          some: { assigned_to: user_id }, // Ensure assigned_to matches user_id
-        },
       },
       include:{
         taskInAssignedList:true
       }
     });
 
-    //const filteredTasks = tasks.filter((t) => t.status !== "IN_REVIEW" && t.status!=="COMPLETE");
+    const filteredTask=tasks.filter((task)=>{
+      const assignedList=task.taskInAssignedList;
+      return assignedList.length>0 && assignedList[assignedList.length-1].assigned_to===user_id;
+    })
 
-    if (!tasks) {
+    
+
+    if (!filteredTask) {
       return sendResponse({
         message: "Failed to fetch My_tasks",
         res,
@@ -561,13 +564,13 @@ const getMyTaskByIdAndStatus = async (req, res) => {
         data: null,
       });
     }
-    if (tasks.length === 0) {
+    if (filteredTask.length === 0) {
       return sendResponse({
         message: "No tasks found for this user with status 'ASSIGNED",
         res,
         statusCode: 200,
         success: true,
-        data: tasks,
+        data: filteredTask,
       });
     }
     return sendResponse({
@@ -575,7 +578,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: tasks,
+      data: filteredTask,
     });
   } catch (error) {
     return sendResponse({
@@ -683,6 +686,7 @@ const getMyTaskRecords = async (req, res) => {
       include: {
         project: true,
         workingHourTask: true,
+        taskInAssignedList:true
       },
     });
 
