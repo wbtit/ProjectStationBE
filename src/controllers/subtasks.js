@@ -6,7 +6,7 @@ const addSubTasks = async (req, res) => {
   const {projectID,wbsactivityID}=req.params
   const { description, Qty, execHr, checkHr } =
     req.body;   
-
+  console.log("Subtasks00000000000000000000000000000000000000000",req.body)
   if (!description || !Qty || !execHr || !checkHr ||!projectID||!wbsactivityID) {
     return sendResponse({
       message: "Fields are empty",
@@ -18,20 +18,16 @@ const addSubTasks = async (req, res) => {
   }
 
   try {
-    const subtask = await prisma.subTasks.create({
-      data: {
-        description: description,
-        Qty: Qty,
-        execHr,
-        checkHr,
-        project:{
-          connect:{projectID:projectID}
-        },
-        WBSACTIVITY:{
-          connect:{wbsactivityID:wbsactivityID}
-        }
-      }
-    });
+    const subtask= await prisma.subTasks.createMany({
+      data:Object.values(req.body).map((task)=>({
+        description:task.description,
+        Qty:task.Qty,
+        execHr:task.execHr,
+        checkHr:task.checkHr,
+        projectID:task.projectID,
+        wbsactivityID:task.wbsactivityID
+      }))
+    })
 
     return sendResponse({
       message: "Subtask added successfully",
