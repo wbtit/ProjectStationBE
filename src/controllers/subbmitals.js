@@ -42,7 +42,7 @@ const AddSubmitals = async (req, res) => {
         status: true,
       },
       include: {
-        recepients: true,
+        recipient: true, // Make sure this matches your Prisma schema
       },
     });
 
@@ -203,7 +203,7 @@ const AddSubmitals = async (req, res) => {
 
     sendEmail({
       html: htmlContent,
-      to: submitals.recepients.email,
+      to: submitals.recipient.email, // Ensure it's `recipient`, not `recepients`
       subject: subject,
       text: description,
     });
@@ -233,7 +233,7 @@ const AddSubmitals = async (req, res) => {
     // }
 
     return sendResponse({
-      message: "Submittals success",
+      message: "Submittals added successfully",
       res,
       statusCode: 200,
       success: true,
@@ -250,6 +250,8 @@ const AddSubmitals = async (req, res) => {
     });
   }
 };
+
+
 
 const SentSubmittals = async (req, res) => {
   const { id } = req.user;

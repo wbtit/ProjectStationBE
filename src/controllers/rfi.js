@@ -239,7 +239,6 @@ const addRFI = async (req, res) => {
         rfiId: newrfi.id,
       });
     }
-
     return sendResponse({
       message: "RFI added successfully",
       res,
