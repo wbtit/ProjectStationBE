@@ -22,8 +22,6 @@ const addSubTasks = async (req, res) => {
         QtyNo: parseInt(task.QtyNo), // Convert to integer, default to 0 if undefined
         execHr:parseFloat(task.execHr), // Convert to float
         checkHr: parseFloat(task.checkHr), // Convert to float
-        unitTime:parseFloat(task.execHr), // Assign execHr to unitTime
-        CheckUnitTime:parseFloat(task.checkHr), // Assign checkHr to CheckUnitTime
         projectID: task.projectID, 
         wbsactivityID: task.wbsactivityID
       })),
