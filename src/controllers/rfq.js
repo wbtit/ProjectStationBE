@@ -6,7 +6,7 @@ const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
     try {
-        if (!project_id || !recipient_id || !subject || !description) {
+        if (!project_id|| !subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -25,7 +25,6 @@ const addRFQ=async(req,res)=>{
           const newrfq= await prisma.rFQ.create({
             data:{
                 projectName,
-                recepient_id,
                 sender_id:id,
                 status:false,
                 subject,
