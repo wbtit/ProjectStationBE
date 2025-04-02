@@ -4,10 +4,8 @@ import { sendResponse } from "../utils/responder.js";
 
 const addSubTasks = async (req, res) => {
   const {projectID,wbsactivityID}=req.params
-  const { description, Qty, execHr, checkHr } =
-    req.body;   
   console.log("Subtasks00000000000000000000000000000000000000000",req.body)
-  if (!description || !Qty || !execHr || !checkHr ||!projectID||!wbsactivityID) {
+  if (!req.body) {
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -18,16 +16,19 @@ const addSubTasks = async (req, res) => {
   }
 
   try {
-    const subtask= await prisma.subTasks.createMany({
-      data:Object.values(req.body).map((task)=>({
-        description:task.description,
-        Qty:task.Qty,
-        execHr:task.execHr,
-        checkHr:task.checkHr,
-        projectID:task.projectID,
-        wbsactivityID:task.wbsactivityID
-      }))
-    })
+    const subtask = await prisma.subTasks.createMany({
+      data: Object.values(req.body).map((task) => ({
+        description: task.description,
+        QtyNo: parseInt(task.QtyNo), // Convert to integer, default to 0 if undefined
+        execHr:parseFloat(task.execHr), // Convert to float
+        checkHr: parseFloat(task.checkHr), // Convert to float
+        unitTime:parseFloat(task.execHr), // Assign execHr to unitTime
+        CheckUnitTime:parseFloat(task.checkHr), // Assign checkHr to CheckUnitTime
+        projectID: task.projectID, 
+        wbsactivityID: task.wbsactivityID
+      })),
+    });
+    
 
     return sendResponse({
       message: "Subtask added successfully",
