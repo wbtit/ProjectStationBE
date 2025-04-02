@@ -214,8 +214,7 @@ model Team {
 
   changeOrder ChangeOrder[] @relation("ChangeOrderProject")
   Jobstudy JobStudy[] @relation("projectJobStudy")
-  wbsactivities WBSActivity[] 
-  subTasks SubTasks[] @relation("subTasks")
+subTasks SubTasks[] @relation("subTasks")
 
 
   @@map("project")
@@ -489,10 +488,7 @@ model WBSActivity{
   id String @id @default(uuid()) @db.Uuid
   type Activity 
   name String
-
-  projectID  String?   @db.Uuid  // Nullable initially to avoid data loss
-  project    Project?  @relation(fields: [projectID], references: [id])
-
+  
   subTasks SubTasks[] @relation("subTasks")
 
 
