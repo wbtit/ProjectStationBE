@@ -214,6 +214,7 @@ model Team {
 
   changeOrder ChangeOrder[] @relation("ChangeOrderProject")
   Jobstudy JobStudy[] @relation("projectJobStudy")
+  wbsactivities WBSActivity[] 
   subTasks SubTasks[] @relation("subTasks")
 
 
@@ -489,7 +490,11 @@ model WBSActivity{
   type Activity 
   name String
 
+  projectID  String?   @db.Uuid  // Nullable initially to avoid data loss
+  project    Project?  @relation(fields: [projectID], references: [id])
+
   subTasks SubTasks[] @relation("subTasks")
+
 
   @@map("wbsactivity")
 }
@@ -498,10 +503,10 @@ model SubTasks{
   id String @id @default(uuid()) @db.Uuid
   description String
   QtyNo Int @default(0)
-  execHr Float @default(0.0) // Change from Int to Float
   unitTime Float @default(0.0) // Change from Int to Float
-  checkHr Float @default(0.0) // Change from Int to Float
-  CheckUnitTime  Float @default(0.0) // Change from Int to Float
+  execHr Float @default(0.0) // Change from Int to Float
+  CheckUnitTime Float @default(0.0) // Change from Int to Float
+  checkHr  Float @default(0.0) // Change from Int to Float
   projectID String @db.Uuid
   project Project @relation(fields: [projectID],references: [id],name: "subTasks",onDelete: Cascade)
   wbsactivityID String @db.Uuid
