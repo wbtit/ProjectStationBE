@@ -3,9 +3,10 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 
 const addSubTasks = async (req, res) => {
-  const {projectID,wbsactivityID}=req.params
-  console.log("Subtasks00000000000000000000000000000000000000000",req.body)
-  if (!req.body) {
+  const { projectID, wbsactivityID } = req.params;
+  console.log("Subtasks:", req.body);
+
+  if (!req.body || req.body.length === 0) {
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -16,17 +17,27 @@ const addSubTasks = async (req, res) => {
   }
 
   try {
-    const subtask = await prisma.subTasks.createMany({
-      data: Object.values(req.body).map((task) => ({
-        description: task.description,
-        QtyNo: parseInt(task.QtyNo), // Convert to integer, default to 0 if undefined
-        execHr:parseFloat(task.execHr), // Convert to float
-        checkHr: parseFloat(task.checkHr), // Convert to float
-        projectID: task.projectID, 
-        wbsactivityID: task.wbsactivityID
-      })),
-    });
-    
+    const subtask = await Promise.all(
+      Object.values(req.body).map((task) =>
+        prisma.subTasks.upsert({
+          where: { id: task.id || "" }, // Ensuring ID is provided
+          update: {
+            description: task.description,
+            QtyNo: parseInt(task.QtyNo) || 0, // Default to 0 if missing
+            execHr: parseFloat(task.execHr) || 0.0, // Default to 0.0 if missing
+            checkHr: parseFloat(task.checkHr) || 0.0, // Default to 0.0 if missing
+          },
+          create: {
+            description: task.description,
+            QtyNo: parseInt(task.QtyNo) || 0,
+            execHr: parseFloat(task.execHr) || 0.0,
+            checkHr: parseFloat(task.checkHr) || 0.0,
+            projectID:projectID,
+            wbsactivityID:wbsactivityID
+          },
+        })
+      )
+    );
 
     return sendResponse({
       message: "Subtask added successfully",
@@ -36,6 +47,7 @@ const addSubTasks = async (req, res) => {
       data: subtask,
     });
   } catch (error) {
+    console.error("Error adding subtasks:", error);
     return sendResponse({
       message: error.message,
       res,
