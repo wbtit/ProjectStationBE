@@ -9,7 +9,7 @@ const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
     try {
-        if (!project_id|| !subject || !description) {
+        if ( !subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -196,7 +196,7 @@ const addRFQ=async(req,res)=>{
 
           sendEmail({
             html: htmlContent,
-            to: newrfq.recepients.email,
+            to: newrfq.recipients.email,
             subject: subject,
             text: description,
           });
@@ -276,7 +276,7 @@ const sentRFQByUser = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     return sendResponse({
@@ -351,7 +351,7 @@ const Inbox = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     console.log(error.message);
