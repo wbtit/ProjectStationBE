@@ -9,7 +9,7 @@ const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
     try {
-        if ( !subject || !description) {
+        if ( recepient_id||!subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -32,7 +32,8 @@ const addRFQ=async(req,res)=>{
                 status:false,
                 subject,
                 description,
-                files:fileDetails
+                files:fileDetails,
+                recepient_id:recepient_id
             },
             include:{
                 recepients:true,
