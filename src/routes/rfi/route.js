@@ -7,7 +7,8 @@ import {
   sentRFIByUser,
   Inbox,
   RFIseen,
-  RFIByID
+  RFIByID,
+  viewRFIfiles
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -18,6 +19,9 @@ router.post(
   rfiUploads.array("files"),
   addRFI
 );
+
+router.get("/rfi/viewfile/:id/:fid", viewRFIfiles);//view files in RFI
+
 router.get("/rfi/sent", Authenticate, sentRFIByUser);
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);

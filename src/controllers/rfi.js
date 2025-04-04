@@ -462,7 +462,7 @@ const viewRFIfiles=async(req,res)=>{
     const __dirname=path.resolve()
     const filePath=path.join(__dirname,fileObject.path)
 
-    if(!fs.existsSync(filePath)){
+    if(!fs.existsSync(filePath)){recepients
       return sendResponse({
         message:"File not found on server",
         res,
@@ -495,4 +495,4 @@ const viewRFIfiles=async(req,res)=>{
   }
 }
 
-export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID };
+export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles };

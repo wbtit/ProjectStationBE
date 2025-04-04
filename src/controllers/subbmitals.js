@@ -1,6 +1,9 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendEmail } from "../../service/gmailservice/index.js";
+import path from "path"
+import mime from "mime"
+import fs from "fs"
 
 const AddSubmitals = async (req, res) => {
   const { id, fabricatorId } = req?.user;
@@ -373,4 +376,71 @@ const SubmittalsSeen = async (req, res) => {
   }
 };
 
-export { AddSubmitals, RecievedSubmittals, SentSubmittals, SubmittalsSeen };
+
+const submitalsViewFiles=async(req,res)=>{
+const {id,fid}=req?.params
+try {
+  const submital= await prisma.submittals.findUnique({
+    where:{
+      id:id
+    }
+  })
+
+  if(!submital){
+    return sendResponse({
+      message:"Submittals not Found",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+
+  const fileObject= submital.files.find((file)=>file.id===fid)
+
+  if(!fileObject){
+    return sendResponse({
+      message:"File not found",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  const __dirname=path.resolve()
+  const filePath=path.join(__dirname,fileObject.path)
+
+  if(!fs.existsSync(filePath)){
+    return sendResponse({
+      message:"File not found on server",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+
+  const mimeType= mime.getType(filePath)
+
+  //set Header
+  res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=${fileObject.originalName}`
+    )
+
+    const fileStream=fs.createReadStream(filePath)
+        fileStream.pipe(res)
+} catch (error) {
+  console.log(error.message)
+  return sendResponse({
+    message:"Failed to view Submittals files",
+    res,
+    statusCode:500,
+    success:false,
+    data:null
+  })
+}
+}
+
+export { AddSubmitals, RecievedSubmittals, SentSubmittals, SubmittalsSeen,submitalsViewFiles };

@@ -6,6 +6,7 @@ import {
   RecievedSubmittals,
   SentSubmittals,
   SubmittalsSeen,
+  submitalsViewFiles
 } from "../../controllers/subbmitals.js";
 
 const router = Router();
@@ -16,7 +17,7 @@ router.post(
   submittalsUploads.array("files"),
   AddSubmitals
 );
-
+router.get("/submittals/:id/:fid",Authenticate,submitalsViewFiles)
 router.get("/submittals/sent", Authenticate, SentSubmittals);
 
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);

@@ -1,12 +1,15 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendEmail } from "../../service/gmailservice/index.js";
+import fs from "fs"
+import mime from "mime"
+import path from "path"
 
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
     try {
-        if (!project_id|| !subject || !description) {
+        if ( recepient_id||!subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -29,7 +32,8 @@ const addRFQ=async(req,res)=>{
                 status:false,
                 subject,
                 description,
-                files:fileDetails
+                files:fileDetails,
+                recepient_id:recepient_id
             },
             include:{
                 recepients:true,
@@ -193,7 +197,7 @@ const addRFQ=async(req,res)=>{
 
           sendEmail({
             html: htmlContent,
-            to: newrfq.recepients.email,
+            to: newrfq.recipients.email,
             subject: subject,
             text: description,
           });
@@ -273,7 +277,7 @@ const sentRFQByUser = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     return sendResponse({
@@ -348,7 +352,7 @@ const Inbox = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     console.log(error.message);
@@ -400,4 +404,69 @@ const RFQseen = async (req, res) => {
   }
 };
 
-export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID };
+const RfqViewFiles=async(req,res)=>{
+  const {id,fid}=req?.params
+  try {
+    const rfq= await prisma.rFQ.findUnique({
+      where:{
+        id:id
+      }
+    })
+    if(!rfq){
+      return sendResponse({
+        message:"RFQ not found",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const fileObject= rfq.files.find((file)=>file.id===fid)
+    if(!fileObject){
+      return sendResponse({
+        message:"File not found",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const __dirname=path.resolve()
+    const filePath=path.join(__dirname,fileObject.path)
+
+      if(!fs.existsSync(filePath)){
+        return sendResponse({
+          message:"File not found on server",
+          res,
+          statusCode:400,
+          success:false,
+          data:null
+        })
+      }
+      const mimeType= mime.getType(filePath)
+
+  //set Header
+  res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=${fileObject.originalName}`
+    )
+
+    const fileStream=fs.createReadStream(filePath)
+        fileStream.pipe(res)
+
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"Failed to RfqViewFiles",
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
+
+export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID,RfqViewFiles};

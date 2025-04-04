@@ -412,8 +412,8 @@ model RFI{
 model RFQ{
   id String @id @default(uuid()) @db.Uuid
   projectName String
-   date DateTime @default(now())
-  recepient_id String @db.Uuid
+  date DateTime @default(now())
+  recepient_id String @db.Uuid 
   recepients Users @relation(fields:[recepient_id],references:[id],name:"UsersRFQ")
   sender_id String @db.Uuid
   sender Users @relation(fields:[sender_id],references:[id],name:"senderRFQ")
