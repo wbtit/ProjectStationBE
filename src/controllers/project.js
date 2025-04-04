@@ -28,6 +28,7 @@ const AddProject = async (req, res) => {
     customer,
     start_date,
     end_date,
+    approvalDate,
     estimatedHours,
   } = req.body;
 
@@ -40,8 +41,8 @@ const AddProject = async (req, res) => {
     !department ||
     !manager ||
     !start_date ||
-    !end_date ||
-    !estimatedHours
+    !estimatedHours||
+    !approvalDate
   ) {
     return sendResponse({
       message: "Fields are empty",
@@ -58,7 +59,7 @@ const AddProject = async (req, res) => {
         description: description,
         estimatedHours: parseInt(estimatedHours),
         name: name,
-        approvalDate: start_date,
+        approvalDate: approvalDate,
         connectionDesign: connectionDesign,
         customerDesign: customer,
         departmentID: department,
@@ -262,11 +263,11 @@ const UpdateProject = async (req, res) => {
       }
     }
 
-    if (req.body.manager) {
+    if (req.body.managerID) {
       // Check the provided user ID is a manager or not
       const { is_manager } = await prisma.users.findUnique({
         where: {
-          id: req.body.manager,
+          id: req.body.managerID,
         },
         select: {
           is_manager: true,
@@ -293,9 +294,10 @@ const UpdateProject = async (req, res) => {
       "endDate",
       "status",
       "stage",
-      "manager",
+      "managerID",
       "team",
       "approvalDate",
+      "estimatedHours"
     ];
 
     fieldsToUpdate.forEach((field) => {
@@ -307,11 +309,6 @@ const UpdateProject = async (req, res) => {
         updateData[field] = req.body[field];
       }
     });
-    if(req.body.manager){
-      updateData.manager={
-        connect:{id:req.body.manager}
-      }
-    }
     console.log(updateData);
 
     const updatedProject = await prisma.project.update({

@@ -2,10 +2,65 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 
+const addSubTask=async(req,res)=>{
+  const{projectID,wbsactivityID}=req?.params
+  const{description,unitTime,CheckUnitTime}=req.body
+  console.log(req.body)
+
+try{  if(!description ||!unitTime||!CheckUnitTime){
+    return sendResponse({
+      message:"Feilds are Empty while adding subtask",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+
+  const subTask= await prisma.subTasks.create({
+    data:{
+      description:description,
+      unitTime:unitTime,
+      CheckUnitTime:CheckUnitTime,
+      projectID:projectID,
+      wbsactivityID:wbsactivityID
+    }
+  })
+    if(!subTask){
+      return sendResponse({
+        message:"Failed to create Subtask",
+        res,
+        statusCode:400,
+        success:false,
+        data:null,
+      })
+       
+    }
+  return sendResponse({
+      message:"sunTask added successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:subTask,
+    })
+  }catch(error){
+    console.error("Error adding subtask:", error);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+
+}
+
 const addSubTasks = async (req, res) => {
-  const {projectID,wbsactivityID}=req.params
-  console.log("Subtasks00000000000000000000000000000000000000000",req.body)
-  if (!req.body) {
+  const { projectID, wbsactivityID } = req.params;
+  console.log("Subtasks:", req.body);
+
+  if (!req.body || req.body.length === 0) {
     return sendResponse({
       message: "Fields are empty",
       res,
@@ -16,17 +71,27 @@ const addSubTasks = async (req, res) => {
   }
 
   try {
-    const subtask = await prisma.subTasks.createMany({
-      data: Object.values(req.body).map((task) => ({
-        description: task.description,
-        QtyNo: parseInt(task.QtyNo), // Convert to integer, default to 0 if undefined
-        execHr:parseFloat(task.execHr), // Convert to float
-        checkHr: parseFloat(task.checkHr), // Convert to float
-        projectID: task.projectID, 
-        wbsactivityID: task.wbsactivityID
-      })),
-    });
-    
+    const subtask = await Promise.all(
+      Object.values(req.body).map((task) =>
+        prisma.subTasks.upsert({
+          where: { id: task.id || "" }, // Ensuring ID is provided
+          update: {
+            description: task.description,
+            QtyNo: parseInt(task.QtyNo) || 0, // Default to 0 if missing
+            execHr: parseFloat(task.execHr) || 0.0, // Default to 0.0 if missing
+            checkHr: parseFloat(task.checkHr) || 0.0, // Default to 0.0 if missing
+          },
+          create: {
+            description: task.description,
+            QtyNo: parseInt(task.QtyNo) || 0,
+            execHr: parseFloat(task.execHr) || 0.0,
+            checkHr: parseFloat(task.checkHr) || 0.0,
+            projectID:projectID,
+            wbsactivityID:wbsactivityID
+          },
+        })
+      )
+    );
 
     return sendResponse({
       message: "Subtask added successfully",
@@ -36,6 +101,7 @@ const addSubTasks = async (req, res) => {
       data: subtask,
     });
   } catch (error) {
+    console.error("Error adding subtasks:", error);
     return sendResponse({
       message: error.message,
       res,
@@ -118,4 +184,4 @@ const UpdateSubTasks = async (req, res) => {
   }
 };
 
-export { GetSubTasks, UpdateSubTasks,addSubTasks};
+export { GetSubTasks, UpdateSubTasks,addSubTasks,addSubTask};
