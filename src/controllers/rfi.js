@@ -1,6 +1,9 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendEmail } from "../../service/gmailservice/index.js";
+import path from "path"
+import fs from "fs"
+import mime from "mime"
 
 const addRFI = async (req, res) => {
   const { id, fabricatorId } = req.user;
@@ -423,5 +426,73 @@ const RFIseen = async (req, res) => {
     });
   }
 };
+
+
+const viewRFIfiles=async(req,res)=>{
+  const {id,fid}=req?.params
+  try {
+    //Get RFI
+    const rfi= await prisma.rFI.findUnique({
+      where:{
+        id:id
+      }
+    })
+
+    if(!rfi){
+      return sendResponse({
+        message:"RFI not found",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    const fileObject=rfi.files.find((file)=>file.id===fid)
+
+    if(!fileObject){
+      return sendResponse({
+        message:"File not found",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const __dirname=path.resolve()
+    const filePath=path.join(__dirname,fileObject.path)
+
+    if(!fs.existsSync(filePath)){
+      return sendResponse({
+        message:"File not found on server",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const mimeType=mime.getType(filePath)
+
+    //set headers
+    res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=${fileObject.originalName}`
+    )
+
+    const fileStream=fs.createReadStream(filePath)
+    fileStream.pipe(res)
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
 
 export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID };

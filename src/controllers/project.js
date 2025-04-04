@@ -263,11 +263,11 @@ const UpdateProject = async (req, res) => {
       }
     }
 
-    if (req.body.manager) {
+    if (req.body.managerID) {
       // Check the provided user ID is a manager or not
       const { is_manager } = await prisma.users.findUnique({
         where: {
-          id: req.body.manager,
+          id: req.body.managerID,
         },
         select: {
           is_manager: true,
@@ -294,7 +294,7 @@ const UpdateProject = async (req, res) => {
       "endDate",
       "status",
       "stage",
-      "manager",
+      "managerID",
       "team",
       "approvalDate",
       "estimatedHours"
@@ -309,11 +309,6 @@ const UpdateProject = async (req, res) => {
         updateData[field] = req.body[field];
       }
     });
-    if(req.body.manager){
-      updateData.manager={
-        connect:{id:req.body.manager}
-      }
-    }
     console.log(updateData);
 
     const updatedProject = await prisma.project.update({
