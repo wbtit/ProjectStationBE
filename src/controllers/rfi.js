@@ -495,4 +495,4 @@ const viewRFIfiles=async(req,res)=>{
   }
 }
 
-export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID };
+export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles };
