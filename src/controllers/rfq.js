@@ -8,8 +8,9 @@ import path from "path"
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
+    console.log("The Rfq data Input",req.body)
     try {
-        if ( recepient_id||!subject || !description) {
+        if ( !recepient_id||!subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -124,7 +125,7 @@ const addRFQ=async(req,res)=>{
           
                 p {
                   font-size: 16px;
-                  color: #555;
+                  color: #555;recepient_id
                 }
           
                 /* Ensure logo is centered in footer */
@@ -197,7 +198,7 @@ const addRFQ=async(req,res)=>{
 
           sendEmail({
             html: htmlContent,
-            to: newrfq.recipients.email,
+            to: newrfq.recepients.email,
             subject: subject,
             text: description,
           });
