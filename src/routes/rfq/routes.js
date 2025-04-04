@@ -7,7 +7,8 @@ import {
     sentRFQByUser,
     Inbox,
     RFQseen,
-    RFQByID
+    RFQByID,
+    RfqViewFiles
 } from "../../controllers/rfq.js"
 
 const router=Router()
@@ -16,6 +17,9 @@ router.post(
 "/rfq/addrfq",Authenticate,rfqUploads.array("files"),
 addRFQ
 ),
+
+router.get("/rfq/:id/:",Authenticate,RfqViewFiles)
+
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
 router.patch("/rfq/:id/update",Authenticate,RFQseen)
