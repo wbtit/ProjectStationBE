@@ -28,6 +28,7 @@ const AddProject = async (req, res) => {
     customer,
     start_date,
     end_date,
+    approvalDate,
     estimatedHours,
   } = req.body;
 
@@ -40,8 +41,8 @@ const AddProject = async (req, res) => {
     !department ||
     !manager ||
     !start_date ||
-    !end_date ||
-    !estimatedHours
+    !estimatedHours||
+    !approvalDate
   ) {
     return sendResponse({
       message: "Fields are empty",
@@ -58,7 +59,7 @@ const AddProject = async (req, res) => {
         description: description,
         estimatedHours: parseInt(estimatedHours),
         name: name,
-        approvalDate: start_date,
+        approvalDate: approvalDate,
         connectionDesign: connectionDesign,
         customerDesign: customer,
         departmentID: department,
@@ -296,6 +297,7 @@ const UpdateProject = async (req, res) => {
       "manager",
       "team",
       "approvalDate",
+      "estimatedHours"
     ];
 
     fieldsToUpdate.forEach((field) => {

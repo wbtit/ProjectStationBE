@@ -202,7 +202,7 @@ model Team {
   miscDesign Boolean @default(true) // Not sure about the default value
   customerDesign Boolean @default(false) // Not sure about the default value
   startDate String  // Not sure about the default value
-  endDate String
+  endDate String?
   approvalDate String
   estimatedHours Int
   tasks Task[] @relation("projectTask")
