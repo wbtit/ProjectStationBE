@@ -24,7 +24,6 @@ const userStats=async(req,res)=>{
         })
         console.log(userdata)
         if(!userdata){
-            
             return sendResponse({
                 message:"Failed to Fetch users Data",
                 res,
