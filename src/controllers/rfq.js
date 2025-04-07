@@ -405,69 +405,46 @@ const RFQseen = async (req, res) => {
   }
 };
 
-const RfqViewFiles=async(req,res)=>{
-  const {id,fid}=req?.params
+const RfqViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+
   try {
-    const rfq= await prisma.rFQ.findUnique({
-      where:{
-        id:id
-      }
-    })
-    if(!rfq){
-      return sendResponse({
-        message:"RFQ not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    const rFQ = await prisma.rFQ.findUnique({
+      where: { id },
+    });
+
+    if (!rFQ) {
+      return res.status(404).json({ message: "rFQ not found" });
     }
 
-    const fileObject= rfq.files.find((file)=>file.id===fid)
-    if(!fileObject){
-      return sendResponse({
-        message:"File not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    const fileObject = rFQ.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname=path.resolve()
-    const filePath=path.join(__dirname,fileObject.path)
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
 
-      if(!fs.existsSync(filePath)){
-        return sendResponse({
-          message:"File not found on server",
-          res,
-          statusCode:400,
-          success:false,
-          data:null
-        })
-      }
-      const mimeType= mime.getType(filePath)
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
 
-  //set Header
-  res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename=${fileObject.originalName}`
-    )
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    const fileStream=fs.createReadStream(filePath)
-        fileStream.pipe(res)
-
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
   } catch (error) {
-    console.log(error.message)
-    return sendResponse({
-      message:"Failed to RfqViewFiles",
-      res,
-      statusCode:500,
-      success:false,
-      data:null
-    })
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
   }
-}
+};
 
 export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID,RfqViewFiles};

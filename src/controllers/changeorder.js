@@ -108,17 +108,17 @@ const AddChangeOrder = async (req, res) => {
   const {
     project,
     recipients,
-    sender,
     remarks,
     changeOrder,
     description,
     rows,
   } = req.body;
+  console.log(req.body)
+
 
   if (
     !project ||
     !recipients ||
-    !sender ||
     !remarks ||
     !changeOrder ||
     !description ||
@@ -141,7 +141,7 @@ const AddChangeOrder = async (req, res) => {
       path: `/public/rfitemp/${file.filename}`, // Relative path
     }));
 
-    const changeOrder = await prisma.changeOrder.create({
+    const changeorder = await prisma.changeOrder.create({
       data: {
         changeOrder: changeOrder,
         description: description,
@@ -159,7 +159,7 @@ const AddChangeOrder = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: changeOrder,
+      data: changeorder,
     });
   } catch (error) {
     console.log(error.message);

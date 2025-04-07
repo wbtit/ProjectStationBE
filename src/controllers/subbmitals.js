@@ -377,70 +377,46 @@ const SubmittalsSeen = async (req, res) => {
 };
 
 
-const submitalsViewFiles=async(req,res)=>{
-const {id,fid}=req?.params
-try {
-  const submital= await prisma.submittals.findUnique({
-    where:{
-      id:id
+const submitalsViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const submittals = await prisma.submittals.findUnique({
+      where: { id },
+    });
+
+    if (!submittals) {
+      return res.status(404).json({ message: "submittals not found" });
     }
-  })
 
-  if(!submital){
-    return sendResponse({
-      message:"Submittals not Found",
-      res,
-      statusCode:400,
-      success:false,
-      data:null
-    })
-  }
+    const fileObject = submittals.files.find((file) => file.id === fid);
 
-  const fileObject= submital.files.find((file)=>file.id===fid)
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
 
-  if(!fileObject){
-    return sendResponse({
-      message:"File not found",
-      res,
-      statusCode:400,
-      success:false,
-      data:null
-    })
-  }
-  const __dirname=path.resolve()
-  const filePath=path.join(__dirname,fileObject.path)
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
 
-  if(!fs.existsSync(filePath)){
-    return sendResponse({
-      message:"File not found on server",
-      res,
-      statusCode:400,
-      success:false,
-      data:null
-    })
-  }
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
 
-  const mimeType= mime.getType(filePath)
-
-  //set Header
-  res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename=${fileObject.originalName}`
-    )
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    const fileStream=fs.createReadStream(filePath)
-        fileStream.pipe(res)
-} catch (error) {
-  console.log(error.message)
-  return sendResponse({
-    message:"Failed to view Submittals files",
-    res,
-    statusCode:500,
-    success:false,
-    data:null
-  })
-}
-}
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
 
 export { AddSubmitals, RecievedSubmittals, SentSubmittals, SubmittalsSeen,submitalsViewFiles };
