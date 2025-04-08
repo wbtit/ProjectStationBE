@@ -61,7 +61,10 @@ const AddTask = async (req, res) => {
       
       //Notification
       const { id: userId } = req.user;
-      sendNotification(user,{message:"You have a new task!"})
+      sendNotification(userId, {
+        title: "New Task Assigned",
+        message: "You have a new task to complete!",
+      });
 
       // Update Project Status
       await prisma.project.update({
