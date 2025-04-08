@@ -4,7 +4,7 @@ import { sendEmail } from "../../service/gmailservice/index.js";
 import path from "path"
 import fs from "fs"
 import mime from "mime"
-
+import { sendNotification } from "../utils/notify.js";
 const addRFI = async (req, res) => {
   const { id, fabricatorId } = req.user;
   console.log("==", req.body);
@@ -236,12 +236,10 @@ const addRFI = async (req, res) => {
       });
     }
     // Emit real-time notification using socket.io
-    if (global.io) {
-      global.io.to(recipient_id).emit("newNotification", {
-        message: `New RFI received: ${subject}`,
-        rfiId: newrfi.id,
-      });
-    }
+     sendNotification(recipient_id,{
+      message:`New RFI received :${subject}`,
+      rfiId:newrfi.id
+     })
     return sendResponse({
       message: "RFI added successfully",
       res,

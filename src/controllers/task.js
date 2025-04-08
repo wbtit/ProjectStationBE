@@ -4,6 +4,7 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import { isAdmin } from "../middlewares/isadmin.js";
+import { sendNotification } from "../utils/notify.js";
 
 const AddTask = async (req, res) => {
   const { is_staff, id } = req.user;
@@ -57,6 +58,10 @@ const AddTask = async (req, res) => {
               data: null,
           });
       }
+      
+      //Notification
+      const { id: userId } = req.user;
+      sendNotification(user,{message:"You have a new task!"})
 
       // Update Project Status
       await prisma.project.update({
