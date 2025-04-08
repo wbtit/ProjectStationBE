@@ -1,28 +1,27 @@
-import { Socket } from "socket.io"
+// socket.js
+const userSocketMap = new Map();
 
-const userSocketMap= new Map()
+const initSocket = (io) => {
+  io.on("connection", (socket) => {
+    console.log(`User connected socketId: ${socket.id}`);
 
-const initSocket=(io)=>{
+    socket.on("joinRoom", (userId) => {
+      if (!userId) return;
 
-io.on("connection",(socket)=>{
-    console.log(`User connected userId: ${socket.id}`)
+      userSocketMap.set(userId, socket.id);
+      console.log(`User ${userId} joined. Socket ID mapped: ${socket.id}`);
+    });
 
-    socket.on("joinRoom",(userId)=>{
-        if(!userId) return;
-        socket.join(userId)
-        userSocketMap.set(userId,socket.id)
-        console.log(`User ${userId} joined room`)
-    })
-
-    socket.on("disconnect",()=>{
-        for(const [userId,id] of userSocketMap.entries()){
-            if(id=== socket.id){
-                userSocketMap.delete(userId);
-                break;
-            }
+    socket.on("disconnect", () => {
+      for (const [userId, id] of userSocketMap.entries()) {
+        if (id === socket.id) {
+          userSocketMap.delete(userId);
+          break;
         }
-        console.log(`Socket disconnected: ${socket.id}`)
-    })
-})
-}
-export {initSocket};
+      }
+      console.log(`Socket disconnected: ${socket.id}`);
+    });
+  });
+};
+
+export { initSocket, userSocketMap };
