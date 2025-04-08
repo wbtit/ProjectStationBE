@@ -75,7 +75,20 @@ const AddProject = async (req, res) => {
         endDate: end_date,
       },
     });
+    const fabricator= await prisma.fabricator.findUnique({
+      where:{id:fabricator},
+      include:{
+        userss:true
+      }
+    })
 
+    if(fabricator && fabricator.userss?.length){
+      fabricator.userss.forEach((client)=>{
+        sendNotification(client.id,{
+          message:`A New Project "${project.name}" has been created.`,
+        })
+      })
+    }
     console.log("THe 20th data", SubTasks[20]);
 
     const SubtasksData = SubTasks.map((task) => ({
