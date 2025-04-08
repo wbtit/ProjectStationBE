@@ -187,34 +187,34 @@ model Team {
     name String @unique
     description String
     fabricatorID String @db.Uuid
-  fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
-  departmentID String @db.Uuid
-  department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
-  teamID String? @db.Uuid
-  team Team? @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
-  managerID  String @db.Uuid
-  manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
-  status Status @default(ACTIVE)
-  stage Stage @default(RFI)
-  tools Tools @default(TEKLA) // Not sure about the default value
-  files Json @default("[]")
-  connectionDesign Boolean @default(true) // Not sure about the default value
-  miscDesign Boolean @default(true) // Not sure about the default value
-  customerDesign Boolean @default(false) // Not sure about the default value
-  startDate String  // Not sure about the default value
-  endDate String?
-  approvalDate String
-  estimatedHours Int
-  tasks Task[] @relation("projectTask")
-  accepttasks AcceptTask[] @relation("acceptTaskProject")
+    fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
+    departmentID String @db.Uuid
+    department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
+    teamID String? @db.Uuid
+    team Team? @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
+    managerID  String @db.Uuid
+    manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
+    status Status @default(ACTIVE)
+    stage Stage @default(RFI)
+    tools Tools @default(TEKLA) // Not sure about the default value
+    files Json @default("[]")
+    connectionDesign Boolean @default(true) // Not sure about the default value
+    miscDesign Boolean @default(true) // Not sure about the default value
+    customerDesign Boolean @default(false) // Not sure about the default value
+    startDate String  // Not sure about the default value
+    endDate String?
+    approvalDate String
+    estimatedHours Int
+    tasks Task[] @relation("projectTask")
+    accepttasks AcceptTask[] @relation("acceptTaskProject")
 
 
    submittals Submittals[] @relation("ProjectSubmittals")
-  rfi RFI[] @relation("ProjectRFI")
+    rfi RFI[] @relation("ProjectRFI")
 
-  changeOrder ChangeOrder[] @relation("ChangeOrderProject")
-  Jobstudy JobStudy[] @relation("projectJobStudy")
-subTasks SubTasks[] @relation("subTasks")
+    changeOrder ChangeOrder[] @relation("ChangeOrderProject")
+    Jobstudy JobStudy[] @relation("projectJobStudy")
+  subTasks SubTasks[] @relation("subTasks")
 
 
   @@map("project")
