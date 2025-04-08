@@ -4,6 +4,7 @@ import { sendEmail } from "../../service/gmailservice/index.js";
 import fs from "fs"
 import mime from "mime"
 import path from "path"
+import { sendNotification } from "../utils/notify.js";
 
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
@@ -228,12 +229,10 @@ const addRFQ=async(req,res)=>{
             });
           }
           // Emit real-time notification using socket.io
-          if (global.io) {
-            global.io.to(recepient_id).emit("newNotification", {
-              message: `New RFQ received: ${subject}`,
-              rfiId: newrfq.id,
-            });
-          }
+          sendNotification(recepient_id,{
+            message:`New RFQ received:${recepient_id}`,
+            rfqId:newrfq.id
+          })
       
           return sendResponse({
             message: "RFQ added successfully",
