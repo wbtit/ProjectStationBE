@@ -8,8 +8,9 @@ import path from "path"
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
+    console.log("The Rfq data Input",req.body)
     try {
-        if (!project_id|| !subject || !description) {
+        if ( !recepient_id||!subject || !description) {
             return sendResponse({
               message: "Fields are empty",
               res,
@@ -32,7 +33,8 @@ const addRFQ=async(req,res)=>{
                 status:false,
                 subject,
                 description,
-                files:fileDetails
+                files:fileDetails,
+                recepient_id:recepient_id
             },
             include:{
                 recepients:true,
@@ -123,7 +125,7 @@ const addRFQ=async(req,res)=>{
           
                 p {
                   font-size: 16px;
-                  color: #555;
+                  color: #555;recepient_id
                 }
           
                 /* Ensure logo is centered in footer */
@@ -276,7 +278,7 @@ const sentRFQByUser = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     return sendResponse({
@@ -351,7 +353,7 @@ const Inbox = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFI,
+      data: sentRFQ,
     });
   } catch (error) {
     console.log(error.message);
@@ -403,69 +405,46 @@ const RFQseen = async (req, res) => {
   }
 };
 
-const RfqViewFiles=async(req,res)=>{
-  const {id,fid}=req?.params
+const RfqViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+
   try {
-    const rfq= await prisma.rFQ.findUnique({
-      where:{
-        id:id
-      }
-    })
-    if(!rfq){
-      return sendResponse({
-        message:"RFQ not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    const rFQ = await prisma.rFQ.findUnique({
+      where: { id },
+    });
+
+    if (!rFQ) {
+      return res.status(404).json({ message: "rFQ not found" });
     }
 
-    const fileObject= rfq.files.find((file)=>file.id===fid)
-    if(!fileObject){
-      return sendResponse({
-        message:"File not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    const fileObject = rFQ.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname=path.resolve()
-    const filePath=path.join(__dirname,fileObject.path)
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
 
-      if(!fs.existsSync(filePath)){
-        return sendResponse({
-          message:"File not found on server",
-          res,
-          statusCode:400,
-          success:false,
-          data:null
-        })
-      }
-      const mimeType= mime.getType(filePath)
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
 
-  //set Header
-  res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename=${fileObject.originalName}`
-    )
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    const fileStream=fs.createReadStream(filePath)
-        fileStream.pipe(res)
-
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
   } catch (error) {
-    console.log(error.message)
-    return sendResponse({
-      message:"Failed to RfqViewFiles",
-      res,
-      statusCode:500,
-      success:false,
-      data:null
-    })
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
   }
-}
+};
 
 export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID,RfqViewFiles};

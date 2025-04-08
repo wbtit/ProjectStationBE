@@ -18,7 +18,7 @@ router.post(
 addRFQ
 ),
 
-router.get("/rfq/:id/:",Authenticate,RfqViewFiles)
+router.get("/rfq/:id/:fid",Authenticate,RfqViewFiles)
 
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),

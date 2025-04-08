@@ -428,71 +428,46 @@ const RFIseen = async (req, res) => {
 };
 
 
-const viewRFIfiles=async(req,res)=>{
-  const {id,fid}=req?.params
+const viewRFIfiles = async (req, res) => {
+  const { id, fid } = req.params;
+
   try {
-    //Get RFI
-    const rfi= await prisma.rFI.findUnique({
-      where:{
-        id:id
-      }
-    })
+    const rfi = await prisma.rFI.findUnique({
+      where: { id },
+    });
 
-    if(!rfi){
-      return sendResponse({
-        message:"RFI not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
-    }
-    const fileObject=rfi.files.find((file)=>file.id===fid)
-
-    if(!fileObject){
-      return sendResponse({
-        message:"File not found",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    if (!rfi) {
+      return res.status(404).json({ message: "rfi not found" });
     }
 
-    const __dirname=path.resolve()
-    const filePath=path.join(__dirname,fileObject.path)
+    const fileObject = rfi.files.find((file) => file.id === fid);
 
-    if(!fs.existsSync(filePath)){
-      return sendResponse({
-        message:"File not found on server",
-        res,
-        statusCode:400,
-        success:false,
-        data:null
-      })
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
     }
 
-    const mimeType=mime.getType(filePath)
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
 
-    //set headers
-    res.setHeader("Content-Type",mimeType || "application/ocet-stream")
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename=${fileObject.originalName}`
-    )
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    const fileStream=fs.createReadStream(filePath)
-    fileStream.pipe(res)
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
   } catch (error) {
-    console.log(error.message)
-    return sendResponse({
-      message:error.message,
-      res,
-      statusCode:500,
-      success:false,
-      data:null
-    })
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
   }
-}
+};
 
 export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles };
