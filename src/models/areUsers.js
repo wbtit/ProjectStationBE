@@ -2,7 +2,7 @@ import prisma from "../lib/prisma.js";
 
 const areUsers = async ({ users }) => {
   if (users.length === 0) {
-    console.log("Users are empty");
+    // console.log("Users are empty");
     return { foundUsers: [], missingUsers: [] };
   }
 
@@ -17,7 +17,7 @@ const areUsers = async ({ users }) => {
       },
     });
 
-    console.log("Full users", usersFound);
+    //// console.log("Full users", usersFound);
 
     // Map found users to include their corresponding roles
     const foundUsers = usersFound.map((user) => {
@@ -36,7 +36,7 @@ const areUsers = async ({ users }) => {
 
     return { foundUsers, missingUsers };
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return { foundUsers: [], missingUsers: [] };
   } finally {
     await prisma.$disconnect();

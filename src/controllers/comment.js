@@ -8,7 +8,7 @@ const addComment = async (req, res) => {
   const { task_id } = req.params;
   const { comment } = req.body;
   const { id } = req.user;
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!comment || !task_id) {
     return sendResponse({
@@ -51,7 +51,7 @@ const addComment = async (req, res) => {
       data: newComment,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

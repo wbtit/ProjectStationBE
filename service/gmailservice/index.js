@@ -9,7 +9,7 @@ const sendEmail = async ({ to, subject, text, html }) => {
       text, // Plain text body
       html, // HTML body (optional)
     });
-    console.log("Email sent:", info.messageId);
+    // console.log("Email sent:", info.messageId);
     return info;
   } catch (error) {
     console.error("Error sending email:", error);

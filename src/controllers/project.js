@@ -33,7 +33,7 @@ const AddProject = async (req, res) => {
     estimatedHours,
   } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (
     !name ||
@@ -89,20 +89,20 @@ const AddProject = async (req, res) => {
         })
       })
     }
-    console.log("THe 20th data", SubTasks[20]);
+    // console.log("THe 20th data", SubTasks[20]);
 
     const SubtasksData = SubTasks.map((task) => ({
       ...task,
       projectID: project.id,
     }));
-    console.log(SubtasksData);
+    // console.log(SubtasksData);
 
     const subtasks = await prisma.subTasks.createMany({
       data: SubtasksData,
     });
 
 
-    console.log(project);
+    // console.log(project);
 
     return sendResponse({
       message: "Project created successfully",
@@ -115,7 +115,7 @@ const AddProject = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -218,7 +218,7 @@ const UpdateProject = async (req, res) => {
     });
   }
 
-  console.log(req.body);
+  // console.log(req.body);
 
   req.body = { ...req.body, fabricator: null };
 
@@ -323,7 +323,7 @@ const UpdateProject = async (req, res) => {
         updateData[field] = req.body[field];
       }
     });
-    console.log(updateData);
+    // console.log(updateData);
 
     const updatedProject = await prisma.project.update({
       where: {
@@ -340,7 +340,7 @@ const UpdateProject = async (req, res) => {
       data: updatedProject,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -355,7 +355,7 @@ const UpdateProject = async (req, res) => {
 
 const GetAllProjects = async (req, res) => {
   try {
-    console.log("User Data:", req.user);
+    // console.log("User Data:", req.user);
 
     const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr} = req.user;
     let projects;
@@ -375,7 +375,7 @@ const GetAllProjects = async (req, res) => {
     }
     // 🔹 Client: Fetch only their fabricator's projects
     else if (role === "CLIENT") {
-      console.log("Client access granted.");
+      // console.log("Client access granted.");
       projects = await prisma.project.findMany({
         where: { fabricatorID: fabricatorId },
         include: {
@@ -390,7 +390,7 @@ const GetAllProjects = async (req, res) => {
     }
     // 🔹 Department Manager: Fetch projects belonging to their department
     else if (is_manager && is_staff) {
-      console.log("Department Manager access granted.");
+      // console.log("Department Manager access granted.");
       projects = await prisma.project.findMany({
         where: { 
           department: { manager: { id } }  // ✅ Fixed reference to department manager
@@ -407,7 +407,7 @@ const GetAllProjects = async (req, res) => {
     }
     // 🔹 Regular Manager: Fetch projects they are managing
     else if (is_manager) {
-      console.log("Project Manager access granted.");
+      // console.log("Project Manager access granted.");
       projects = await prisma.project.findMany({
         where: { managerID: id },
         include: {
@@ -422,7 +422,7 @@ const GetAllProjects = async (req, res) => {
     }
     // 🔹 Staff: Fetch projects where they have tasks assigned
     else if (is_staff) {
-      console.log("Staff access granted.");
+      // console.log("Staff access granted.");
       projects = await prisma.project.findMany({
         where: { tasks: { some: { user_id: id } } },
         include: {
@@ -437,7 +437,7 @@ const GetAllProjects = async (req, res) => {
     }
     // 🔹 Team Members: Fetch projects where they are in a team
     else {
-      console.log("Fetching projects for a team member.");
+      // console.log("Fetching projects for a team member.");
 
       const teams = await prisma.team.findMany({
         where: { members: { some: { id } } },
@@ -463,7 +463,7 @@ const GetAllProjects = async (req, res) => {
       }
     }
 
-    console.log("Projects Retrieved:", projects.length);
+    // console.log("Projects Retrieved:", projects.length);
     return sendResponse({
       message: "Projects retrieved successfully",
       res,
@@ -539,7 +539,7 @@ const GetProjectByID = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
+    // console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -607,7 +607,7 @@ const GetAllFilesByProjectID = async (req, res) => {
       data: files,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -642,16 +642,16 @@ const DownloadFile = async (req, res) => {
     const __dirname = path.resolve(); // Get the absolute path of the current directory
     const filePath = path.join(__dirname, fileObject.path);
 
-    console.log("Firnam", __dirname);
+    // console.log("Firnam", __dirname);
 
-    console.log("File path:", filePath);
+    // console.log("File path:", filePath);
 
     // Check if the file exists
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    console.log("FO", fileObject);
+    // console.log("FO", fileObject);
 
     // Initiate file download
     res.download(filePath, fileObject.originalName, (err) => {
@@ -734,7 +734,7 @@ const getProjectsByUser = async (req, res) => {
       (id) => projectDetails.find((p) => p.id === id)
     );
 
-    console.log("Pros", uniqueProjects);
+    // console.log("Pros", uniqueProjects);
 
     return res.json(uniqueProjects);
   } catch (error) {

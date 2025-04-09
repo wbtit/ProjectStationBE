@@ -10,7 +10,7 @@ const AddDepartment = async (req, res) => {
 
   const { name, manager } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!name || !manager)
     return sendResponse({
@@ -51,7 +51,7 @@ const AddDepartment = async (req, res) => {
         data: department,
       });
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
       return sendResponse({
         message: error.message,
         res,

@@ -9,7 +9,7 @@ const initSocket = (io) => {
       if (!userId) return;
 
       userSocketMap.set(userId, socket.id);
-      console.log(`User ${userId} joined. Socket ID mapped: ${socket.id}`);
+       console.log(`User ${userId} joined. Socket ID mapped: ${socket.id}`);
     });
 
     socket.on("disconnect", () => {
@@ -19,7 +19,7 @@ const initSocket = (io) => {
           break;
         }
       }
-      console.log(`Socket disconnected: ${socket.id}`);
+     console.log(`Socket disconnected: ${socket.id}`);
     });
   });
 };
