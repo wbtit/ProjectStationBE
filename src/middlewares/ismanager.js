@@ -6,7 +6,7 @@ const isManager = async (req, res, next) => {
   const { is_manager } = req?.user;
 
   if (!is_manager) { // If not a manager then return
-    console.log("User is not a manager");
+    // console.log("User is not a manager");
     return sendResponse({
       message: "You are not a manager",
       res,

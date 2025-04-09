@@ -22,7 +22,7 @@ const userStats=async(req,res)=>{
                 }
             }
         })
-        console.log(userdata)
+        // console.log(userdata)
         if(!userdata){
             return sendResponse({
                 message:"Failed to Fetch users Data",
@@ -42,7 +42,7 @@ const userStats=async(req,res)=>{
         
         
     } catch (error) {
-        console.log(error.message)
+        // console.log(error.message)
         return sendResponse({
             message:"Failed Fetch userStats",
             res,

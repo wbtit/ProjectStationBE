@@ -17,7 +17,7 @@ async function swapValues() {
         });
     }
 
-    console.log("Values swapped successfully!");
+    // console.log("Values swapped successfully!");
 }
 
 swapValues()

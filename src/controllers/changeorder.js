@@ -114,7 +114,7 @@ const AddChangeOrder = async (req, res) => {
     description,
     rows,
   } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
 
 
   if (
@@ -167,7 +167,7 @@ const AddChangeOrder = async (req, res) => {
       data: changeorder,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

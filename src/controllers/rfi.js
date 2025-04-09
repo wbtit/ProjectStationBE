@@ -7,7 +7,7 @@ import mime from "mime"
 import { sendNotification } from "../utils/notify.js";
 const addRFI = async (req, res) => {
   const { id, fabricatorId } = req.user;
-  console.log("==", req.body);
+  // console.log("==", req.body);
   const { fabricator_id, project_id, recipient_id, subject, description } =
     req.body;
 
@@ -248,7 +248,7 @@ const addRFI = async (req, res) => {
       data: newrfi,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -303,7 +303,7 @@ const sentRFIByUser = async (req, res) => {
 const RFIByID = async (req, res) => {
   const { id } = req.params;
 
-  console.log(id, "This is rfi ID");
+  // console.log(id, "This is rfi ID");
 
   try {
     const rfi = await prisma.rFI.findUnique({
@@ -324,7 +324,7 @@ const RFIByID = async (req, res) => {
       },
     });
 
-    console.log(rfi, "This is rfi");
+    // console.log(rfi, "This is rfi");
 
     sendResponse({
       message: "RFI fetch success",
@@ -334,7 +334,7 @@ const RFIByID = async (req, res) => {
       data: rfi,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     sendResponse({
       message: error.message,
       res,
@@ -376,7 +376,7 @@ const Inbox = async (req, res) => {
       data: sentRFI,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

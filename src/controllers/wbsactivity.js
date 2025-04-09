@@ -33,7 +33,7 @@ const getWbsActivity = async (req, res) => {
         }
       })
     )
-    console.log("The wbsActivityWithSum000000000000000000000000000",wbsActivityWithSum)
+    // console.log("The wbsActivityWithSum000000000000000000000000000",wbsActivityWithSum)
 
     return sendResponse({
       message: "WbsActivity found",
@@ -43,7 +43,7 @@ const getWbsActivity = async (req, res) => {
       data: wbsActivityWithSum,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

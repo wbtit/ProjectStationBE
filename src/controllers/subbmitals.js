@@ -11,11 +11,11 @@ const AddSubmitals = async (req, res) => {
   const { fabricator_id, project_id, recepient_id, subject, description } =
     req.body;
 
-  console.log(fabricator_id, project_id, recepient_id, subject, description);
+  // console.log(fabricator_id, project_id, recepient_id, subject, description);
 
   try {
     if (!project_id || !recepient_id || !subject || !description) {
-      console.log("Fields are empty");
+      // console.log("Fields are empty");
       return sendResponse({
         message: "Fields are empty",
         res,
@@ -242,7 +242,7 @@ const AddSubmitals = async (req, res) => {
       data: submitals,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -279,7 +279,7 @@ const SentSubmittals = async (req, res) => {
       data: submittals,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -314,7 +314,7 @@ const RecievedSubmittals = async (req, res) => {
       data: submittals,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -329,7 +329,7 @@ const SubmittalsSeen = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    console.log("Invalid ID");
+    // console.log("Invalid ID");
     return sendResponse({
       message: "Invalid ID",
       res,
@@ -357,7 +357,7 @@ const SubmittalsSeen = async (req, res) => {
       data: submittals,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

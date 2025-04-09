@@ -7,7 +7,7 @@ const isAdmin = (req, res, next) => {
 
   if (!is_superuser || !is_staff) {
     // If not a admin return
-    console.log("You are not a admin");
+    // console.log("You are not a admin");
     return sendResponse({
       message: "You are not a admin",
       res,

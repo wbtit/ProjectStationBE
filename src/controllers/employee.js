@@ -18,7 +18,7 @@ const AddEmployee = async (req, res) => {
     is_hr
   } = req.body;
 
-  console.log(req.body);
+  //// console.log(req.body);
 
   if (!username || !f_name || !email || !phone || !emp_code) {
     return sendResponse({
@@ -91,7 +91,7 @@ const getAllEmployees = async (req, res) => {
         role: "STAFF",
       },
     });
-    console.log(employees);
+    //// console.log(employees);
     if (!employees) {
       return sendResponse({
         message: "No employee found",
@@ -151,7 +151,7 @@ const GetEmployeeBYID = async (req, res) => {
       });
     }
 
-    console.log(employee);
+    //// console.log(employee);
 
     return sendResponse({
       message: "Employee fetch success",

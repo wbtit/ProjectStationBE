@@ -5,7 +5,7 @@ import { sendResponse } from "../utils/responder.js";
 const addSubTask=async(req,res)=>{
   const{projectID,wbsactivityID}=req?.params
   const{description,unitTime,CheckUnitTime}=req.body
-  console.log(req.body)
+  // console.log(req.body)
 
 try{  if(!description ||!unitTime||!CheckUnitTime){
     return sendResponse({
@@ -58,7 +58,7 @@ try{  if(!description ||!unitTime||!CheckUnitTime){
 
 const addSubTasks = async (req, res) => {
   const { projectID, wbsactivityID } = req.params;
-  console.log("Subtasks:", req.body);
+  // console.log("Subtasks:", req.body);
 
   if (!req.body || req.body.length === 0) {
     return sendResponse({
@@ -126,7 +126,7 @@ const GetSubTasks = async (req, res) => {
       },
     });
 
-    console.log("The subTasks", subtasks)
+    // console.log("The subTasks", subtasks)
 
     sendResponse({
       message: "Subtasks fetch success",
@@ -148,6 +148,7 @@ const GetSubTasks = async (req, res) => {
 
 const UpdateSubTasks = async (req, res) => {
   const { subtaskid } = req.params;
+  console.log(subtaskid)
 
   if (!subtaskid) {
     sendResponse({
@@ -166,6 +167,7 @@ const UpdateSubTasks = async (req, res) => {
       },
       data: req.body,
     });
+    console.log(subtasks)
     sendResponse({
       message: "Subtasks update success",
       res,

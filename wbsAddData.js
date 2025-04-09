@@ -8,7 +8,7 @@ const createTasks = async () => {
       skipDuplicates: true, // Prevents duplicate entries
     });
 
-    console.log("Data inserted successfully");
+    // console.log("Data inserted successfully");
   } catch (error) {
     console.error("Error inserting data:", error);
   } finally {

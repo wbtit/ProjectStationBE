@@ -48,7 +48,7 @@ app.get("/getall", async (req, res) => {
       data: users,
     });
   } catch (error) {
-    console.log(error);
+     console.log(error);
     res.status(500).json({
       message: "Unsuccess",
     });

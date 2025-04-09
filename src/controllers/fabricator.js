@@ -46,7 +46,7 @@ const AddFabricator = async (req, res) => {
       data: fabricator,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -62,7 +62,7 @@ const AddFabricator = async (req, res) => {
 const AddBranch = async (req, res) => {
   const { fid } = req.params;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!isValidUUID(fid)) {
     return sendResponse({
@@ -233,7 +233,7 @@ const UpdateFabricator = async (req, res) => {
         data: updatedFabricator,
       });
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
       return sendResponse({
         message: error.message,
         res,
@@ -368,7 +368,7 @@ const GetFabricatorByID = async (req, res) => {
       },
     });
 
-    console.log(fabricator);
+    // console.log(fabricator);
 
     if (!fabricator) {
       return sendResponse({
@@ -388,7 +388,7 @@ const GetFabricatorByID = async (req, res) => {
       data: fabricator,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -484,16 +484,16 @@ const DownloadFile = async (req, res) => {
     const __dirname = path.resolve(); // Get the absolute path of the current directory
     const filePath = path.join(__dirname, fileObject.path);
 
-    console.log("Firnam", __dirname);
+    // console.log("Firnam", __dirname);
 
-    console.log("File path:", filePath);
+    // console.log("File path:", filePath);
 
     // Check if the file exists
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    console.log("FO", fileObject);
+    // console.log("FO", fileObject);
 
     // Initiate file download
     res.download(filePath, fileObject.originalName, (err) => {
@@ -533,7 +533,7 @@ const ViewFile = async (req, res) => {
     const __dirname = path.resolve();
     const filePath = path.join(__dirname, fileObject.path);
 
-    console.log(filePath);
+    // console.log(filePath);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });

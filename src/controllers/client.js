@@ -9,7 +9,7 @@ import { isValidUUID } from "../utils/isValiduuid.js";
 const addClient = async (req, res) => {
   const { fid } = req.params;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   const {
     username,
@@ -251,7 +251,7 @@ const getAllClients = async (req, res) => {
         fabricator: true,
       },
     });
-    console.log(clients);
+    // console.log(clients);
     if (!clients) {
       return sendResponse({
         message: "No clients found",
@@ -311,7 +311,7 @@ const GetClientBYID = async (req, res) => {
       });
     }
 
-    console.log(client);
+    // console.log(client);
 
     return sendResponse({
       message: "Client fetch success",

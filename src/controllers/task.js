@@ -9,7 +9,7 @@ import { sendNotification } from "../utils/notify.js";
 const AddTask = async (req, res) => {
   const { is_staff, id } = req.user;
 
-  console.log(req.body);
+   console.log(req.body);
 
   const {
       description,
@@ -60,11 +60,12 @@ const AddTask = async (req, res) => {
       }
       
       //Notification
-      const { id: userId } = req.user;
+      const userId = typeof user === "string" ? user : user?.id;
       sendNotification(userId, {
         title: "New Task Assigned",
         message: "You have a new task to complete!",
       });
+
 
       // Update Project Status
       await prisma.project.update({
@@ -132,7 +133,7 @@ const AddTask = async (req, res) => {
       });
 
   } catch (error) {
-      console.log(error.message);
+      //// console.log(error.message);
       return sendResponse({
           message: error.message,
           res,
@@ -191,7 +192,7 @@ const deletedTask = await prisma.task.delete({
 
 const GetTask = async (req, res) => {
   try {
-    console.log("I got hit on the getAllTasks-================================================================",req.user);
+    //// console.log("I got hit on the getAllTasks-================================================================",req.user);
 
     // Authentication check BEFORE destructuring
     if (!req.user) {
@@ -280,7 +281,7 @@ const GetTask = async (req, res) => {
       });
     }
 
-    console.log("-----------------------------------------", tasks);
+    // console.log("-----------------------------------------", tasks);
 
     return sendResponse({
       message: "Tasks fetched successfully",
@@ -378,7 +379,7 @@ const UpdateTaskByID = async (req, res) => {
   const { id } = req?.params;
   let { user, user_id, ...updateData } = req.body; // Extract `user` and `user_id`
 
-  console.log(req.body);
+  //// console.log(req.body);
 
   try {
     if (!isValidUUID(id)) {
@@ -442,7 +443,7 @@ const calender = async (req, res) => {
   const { id: user_id, date } = req?.params;
 
   try {
-    console.log("User ID:", user_id);
+    //// console.log("User ID:", user_id);
     if (!user_id) {
       return sendResponse({
         message: "Invalid userId",
@@ -511,7 +512,7 @@ const calender = async (req, res) => {
       data: taskFetched,
     });
   } catch (error) {
-    return sendResponse({
+    return sendResponse({// console.log
       message: error.message,
       res,
       statusCode: 500,
@@ -561,7 +562,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       return assignedList.length>0 && assignedList[assignedList.length-1].assigned_to===user_id;
     })
 
-    
+    // console.log
 
     if (!filteredTask) {
       return sendResponse({
@@ -603,7 +604,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
 const getAllTasksByUserId = async (req, res) => {
   const { id } = req?.user;
   const user = req.user;
-  console.log("user=--==-====-==-===--==-=-=-=-=-=-=-=", user.is_superuser);
+  //// console.log("user=--==-====-==-===--==-=-=-=-=-=-=-=", user.is_superuser);
 
   if (!id) {
     return sendResponse({

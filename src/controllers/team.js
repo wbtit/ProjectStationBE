@@ -20,7 +20,7 @@ const isMember = ({ members, id }) => {
 const AddTeam = async (req, res) => {
   const { name, manager, teammembers } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!name || !manager) {
     return sendResponse({
@@ -358,8 +358,8 @@ const AddMember = async (req, res) => {
   const { tid } = req.params;
   const { employee, role } = req.body;
 
-  console.log("Tid", tid)
-  console.log("body", req.body)
+  // console.log("Tid", tid)
+  // console.log("body", req.body)
 
   if (!tid || !employee || !role) {
     // Checking if the necessary data are not undefined.
@@ -400,7 +400,7 @@ const AddMember = async (req, res) => {
       role: role,
     });
 
-    console.log(members)
+    // console.log(members)
 
     const newTeam = await prisma.team.update({
       where: {
@@ -419,7 +419,7 @@ const AddMember = async (req, res) => {
       data: newTeam,
     });
   } catch (error) {
-    console.log(error.message)
+    // console.log(error.message)
     return sendResponse({
       message: "Something went wrong",
       res,

@@ -2,7 +2,7 @@ import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 
 const addJobStudy = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
 
   try {
     if (!req.body) {
@@ -33,7 +33,7 @@ const addJobStudy = async (req, res) => {
       data: jobstudy,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
