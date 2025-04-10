@@ -7,7 +7,7 @@ const isStaffAndClient = (req, res, next) => {
 
   if (!is_staff || role !== "CLIENT" || role !== "STAFF") {
     // If not in sales then return
-    console.log("You are not a staff or client");
+    // console.log("You are not a staff or client");
     return sendResponse({
       message: "You are not a staff or client",
       res,

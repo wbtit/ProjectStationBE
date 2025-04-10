@@ -7,6 +7,7 @@ import { routes } from "./src/routes/index.js";
 import { app } from "./src/app.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import {initSocket} from "./socket.js"
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const io=new Server(server,{
 
 global.io = io;
 
+initSocket(io)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -46,7 +48,7 @@ app.get("/getall", async (req, res) => {
       data: users,
     });
   } catch (error) {
-    console.log(error);
+     console.log(error);
     res.status(500).json({
       message: "Unsuccess",
     });
@@ -54,19 +56,6 @@ app.get("/getall", async (req, res) => {
 });
 
 app.use("/api", routes);
-
-io.on('connection',(socket)=>{
-  console.log(`A user connected with SocketId:${socket.id}`)
-
-  socket.on("joinRoom",(userId)=>{
-    socket.join(userId)
-    console.log(`user ${userId} joined the room`)
-  })
-
-  socket.on('disconnect',()=>{
-    console.log(`A user disconnected with SocketID:${socket.id}`)
-  })
-})
  
 const PORT = process.env.PORT || 5154;
 

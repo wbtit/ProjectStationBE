@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import { sendNotification } from "../utils/notify.js";
 
 
 const changeOrderReceived=async(req,res)=>{
@@ -113,7 +114,7 @@ const AddChangeOrder = async (req, res) => {
     description,
     rows,
   } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
 
 
   if (
@@ -153,7 +154,11 @@ const AddChangeOrder = async (req, res) => {
         files: fileDetails,
       },
     });
-
+    //RLT notifications
+    sendNotification(recipients,{
+      message:`New CO received: ${remarks}`,
+      coId:changeorder.id
+    })
     return sendResponse({
       message: "Change Order Submitted",
       res,
@@ -162,7 +167,7 @@ const AddChangeOrder = async (req, res) => {
       data: changeorder,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

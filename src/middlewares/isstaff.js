@@ -7,7 +7,7 @@ const isStaff = (req, res, next) => {
 
   if (!is_staff) {
     // If not in sales then return
-    console.log("You are not a staff");
+    // console.log("You are not a staff");
     return sendResponse({
       message: "You are not a staff",
       res,

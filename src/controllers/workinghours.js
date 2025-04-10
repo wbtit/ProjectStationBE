@@ -5,7 +5,7 @@ const Start = async (req, res) => {
   const { id } = req.user;
   const { task_id } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!task_id) {
     return sendResponse({
@@ -96,7 +96,7 @@ const Pause = async (req, res) => {
   const { id } = req.user;
   const { work_id, task_id } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!work_id || !task_id) {
     return sendResponse({
@@ -179,7 +179,7 @@ const Pause = async (req, res) => {
     });
   })
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -220,7 +220,7 @@ const Resume = async (req, res) => {
         data: null,
       });
     }
-    console.log(work);
+    // console.log(work);
 
     if (work?.user_id !== id) {
       return sendResponse({
@@ -270,7 +270,7 @@ const Resume = async (req, res) => {
     });
   })
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -403,7 +403,7 @@ const End = async (req, res) => {
     })
   });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error,
       res,
@@ -418,7 +418,7 @@ const getWork = async (req, res) => {
   const { id } = req.user;
   const { task_id } = req.params;
 
-  console.log(task_id);
+  // console.log(task_id);
 
   if (!task_id) {
     return sendResponse({

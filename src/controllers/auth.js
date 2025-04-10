@@ -58,7 +58,7 @@ const createUser = async ({
 const login = async (req, res) => {
   let { username, password } = req.body;
 
-  console.log(username.length, password.length);
+  // console.log(username.length, password.length);
 
   if (!username || !password) {
     return sendResponse({
@@ -73,7 +73,7 @@ const login = async (req, res) => {
   try {
     // Find the user by username
     const user = await getUserByUsername(username);
-    console.log(username)
+    // console.log(username)
     if (!user) {
       return sendResponse({
         message: "user not found",
@@ -86,8 +86,8 @@ const login = async (req, res) => {
 
     // Compare the provided password with the stored hashed password
     password = typeof password === "number" ? password.toString() : password;
-    console.log("Password:",password)
-    console.log("userPassword:",user.password)
+    // console.log("Password:",password)
+    // console.log("userPassword:",user.password)
     const isPasswordValid = await comparePassword(password, user.password);
     
     if (!isPasswordValid) {

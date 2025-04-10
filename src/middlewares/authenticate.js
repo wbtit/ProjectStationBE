@@ -3,14 +3,14 @@ import { sendResponse } from "../utils/responder.js";
 
 const Authenticate = async (req, res, next) => {
   //   const authHeaders = req?.headers?.authorization;
-  console.log(req.headers);
+  // console.log(req.headers);
   const authHeaders =
     req.body?.headers?.Authorization || req?.headers?.authorization;
-  console.log(authHeaders);
+  // console.log(authHeaders);
 
   const secret = process.env.SECRET;
   if (!secret) {
-    console.log("Secret key is not defined");
+    // console.log("Secret key is not defined");
     return sendResponse({
       message: "Secret key is defined",
       res,

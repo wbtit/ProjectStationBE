@@ -6,7 +6,7 @@ const isSales = (req, res, next) => {
   const { is_sales } = req?.user;
 
   if (!is_sales) { // If not in sales then return
-    console.log("You are not a sales person");
+    // console.log("You are not a sales person");
     return sendResponse({
       message: "You are not a sales person",
       res,

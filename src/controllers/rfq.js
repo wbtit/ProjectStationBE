@@ -4,11 +4,12 @@ import { sendEmail } from "../../service/gmailservice/index.js";
 import fs from "fs"
 import mime from "mime"
 import path from "path"
+import { sendNotification } from "../utils/notify.js";
 
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description}=req.body
     const {id}=req.user
-    console.log("The Rfq data Input",req.body)
+    //// console.log("The Rfq data Input",req.body)
     try {
         if ( !recepient_id||!subject || !description) {
             return sendResponse({
@@ -228,12 +229,10 @@ const addRFQ=async(req,res)=>{
             });
           }
           // Emit real-time notification using socket.io
-          if (global.io) {
-            global.io.to(recepient_id).emit("newNotification", {
-              message: `New RFQ received: ${subject}`,
-              rfiId: newrfq.id,
-            });
-          }
+          sendNotification(recepient_id,{
+            message:`New RFQ received:${recepient_id}`,
+            rfqId:newrfq.id
+          })
       
           return sendResponse({
             message: "RFQ added successfully",
@@ -242,7 +241,7 @@ const addRFQ=async(req,res)=>{
             success: true,
             data: newrfq,})
     } catch (error) {
-        console.log(error);
+        // console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -294,7 +293,7 @@ const sentRFQByUser = async (req, res) => {
 const RFQByID = async (req, res) => {
   const { id } = req.params;
 
-  console.log(id, "This is rfq ID");
+  //// console.log(id, "This is rfq ID");
 
   try {
     const rfq = await prisma.rFQ.findUnique({
@@ -306,7 +305,7 @@ const RFQByID = async (req, res) => {
       },
     });
 
-    console.log(rfq, "This is rfq");
+    //// console.log(rfq, "This is rfq");
 
     sendResponse({
       message: "RFQ fetch success",
@@ -316,7 +315,7 @@ const RFQByID = async (req, res) => {
       data: rfi,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     sendResponse({
       message: error.message,
       res,
@@ -356,7 +355,7 @@ const Inbox = async (req, res) => {
       data: sentRFQ,
     });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
