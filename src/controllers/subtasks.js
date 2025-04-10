@@ -148,7 +148,7 @@ const GetSubTasks = async (req, res) => {
 
 const UpdateSubTasks = async (req, res) => {
   const { subtaskid } = req.params;
-  console.log(subtaskid)
+  console.log("The subtask Id:",subtaskid)
 
   if (!subtaskid) {
     sendResponse({
@@ -176,6 +176,7 @@ const UpdateSubTasks = async (req, res) => {
       data: subtasks,
     });
   } catch (error) {
+    console.log(error.message)
     sendResponse({
       message: "Subtasks update failed",
       res,
