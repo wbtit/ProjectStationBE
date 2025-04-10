@@ -1,5 +1,6 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
+import redis from "./redisClient.js";
 
 const userSocketMap = new Map();
 
@@ -17,17 +18,20 @@ const initSocket = async(io) => {
   io.on("connection", (socket) => {
       console.log(`🔌 User connected socketId: ${socket.id}`);
 
-    socket.on("joinRoom", (userId) => {
+    socket.on("joinRoom",async (userId) => {
       if (!userId) return;
 
-      userSocketMap.set(userId, socket.id);
+      await redis.set(`socket:${userId}`,socket.id)
       console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
     });
 
-    socket.on("disconnect", () => {
-      for (const [userId, id] of userSocketMap.entries()) {
-        if (id === socket.id) {
-          userSocketMap.delete(userId);
+    socket.on("disconnect", async() => {
+      const entries= await redis.keys("socket:*")
+      for(const key of entries){
+        const sid= await redis.get(key)
+        if(sid=== socket.id){
+          await redis.del(key)
+          console.log(`🧹 Cleaned socket for ${key}`);
           break;
         }
       }
@@ -36,4 +40,4 @@ const initSocket = async(io) => {
   });
 };
 
-export { initSocket, userSocketMap };
+export { initSocket};
