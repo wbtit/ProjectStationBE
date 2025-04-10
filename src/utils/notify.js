@@ -1,12 +1,11 @@
-// notification.js
-import { userSocketMap } from "../../socket.js"
+import redis from "../../redisClient.js";
 
-export const sendNotification = (userId, payload) => {
-  const socketId = userSocketMap.get(userId);
+export const sendNotification = async(userId, payload) => {
+  const socketId = await redis.get(`socket:${userId}`)
   if (socketId && global.io) {
-    (`Sending notification to socket ${socketId} for user ${userId}`);
+    console.log(`📢 Sending notification to socket ${socketId} for user ${userId}`);
     global.io.to(socketId).emit("customNotification", payload);
   } else {
-    console.warn(`No socket found for userId: ${userId}`);
+    console.warn(`⚠️ No socket found for userId: ${userId}`);
   }
 };

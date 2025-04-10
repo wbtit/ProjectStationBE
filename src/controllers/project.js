@@ -75,15 +75,15 @@ const AddProject = async (req, res) => {
         endDate: end_date,
       },
     });
-    const fabricator= await prisma.fabricator.findUnique({
+    const fabricatorData= await prisma.fabricator.findUnique({
       where:{id:fabricator},
       include:{
         userss:true
       }
     })
-
-    if(fabricator && fabricator.userss?.length){
-      fabricator.userss.forEach((client)=>{
+// RLT notification
+    if(fabricatorData && fabricatorData.userss?.length){
+      fabricatorData.userss.forEach((client)=>{
         sendNotification(client.id,{
           message:`A New Project "${project.name}" has been created.`,
         })
