@@ -1,15 +1,27 @@
-// socket.js
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
+
 const userSocketMap = new Map();
 
-const initSocket = (io) => {
+const initSocket = async(io) => {
+
+  const pubClient=createClient({url:"redis://127.0.0.1:6379"})
+  const subClient=pubClient.duplicate()
+
+  await pubClient.connect()
+  await subClient.connect()
+
+  io.adapter(createAdapter(pubClient,subClient))
+
+
   io.on("connection", (socket) => {
-    console.log(`User connected socketId: ${socket.id}`);
+      console.log(`🔌 User connected socketId: ${socket.id}`);
 
     socket.on("joinRoom", (userId) => {
       if (!userId) return;
 
       userSocketMap.set(userId, socket.id);
-       console.log(`User ${userId} joined. Socket ID mapped: ${socket.id}`);
+      console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
     });
 
     socket.on("disconnect", () => {
@@ -19,7 +31,7 @@ const initSocket = (io) => {
           break;
         }
       }
-     console.log(`Socket disconnected: ${socket.id}`);
+      console.log(`❌ Socket disconnected: ${socket.id}`);
     });
   });
 };
