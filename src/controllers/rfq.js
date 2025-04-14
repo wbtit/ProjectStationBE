@@ -212,22 +212,6 @@ const addRFQ=async(req,res)=>{
               data: null,
             });
           }
-          const notification = await prisma.notification.create({
-            data: {
-              userID: id,
-              subject: subject,
-              isRead: false,
-            },
-          });
-          if (!notification) {
-            return sendResponse({
-              message: "Failed to add the notifications",
-              res,
-              statusCode: 400,
-              success: false,
-              data: null,
-            });
-          }
           // Emit real-time notification using socket.io
           sendNotification(recepient_id,{
             message:`New RFQ received:${recepient_id}`,
