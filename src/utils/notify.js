@@ -1,4 +1,5 @@
 import redis from "../../redisClient.js";
+import prisma from "../lib/prisma.js";
 
 export const sendNotification = async(userId, payload) => {
   const socketId = await redis.get(`socket:${userId}`)
@@ -7,5 +8,13 @@ export const sendNotification = async(userId, payload) => {
     global.io.to(socketId).emit("customNotification", payload);
   } else {
     console.warn(`⚠️ No socket found for userId: ${userId}`);
+
+    await prisma.notification.create({
+      data:{
+        userID:userId,
+        payload:payload,
+        delivered:false
+      }
+    })
   }
 };
