@@ -431,8 +431,8 @@ model Notification {
   createdAt DateTime @default(now())
   userID String @db.Uuid
   user Users @relation(fields: [userID], references: [id], onDelete: Cascade, name: "Notification")
-  subject String
-  isRead Boolean @default(false)
+  payload Json
+  delivered Boolean @default(false)
 
 
   }
