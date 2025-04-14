@@ -10,7 +10,6 @@ import Employee from "./employee/route.js";
 import RFI from "./rfi/route.js";
 import RFQ from "./rfq/routes.js"
 import { Submittals } from "./submittals/route.js";
-import Notifications from "./notifications/routes.js";
 import WorkingHour from "./workinghours/route.js";
 import { ChangeOrderRouter } from "./changeorder/route.js";
 import { WorkBreakDown } from "./workbreakdown/route.js";
@@ -30,7 +29,6 @@ routes.use("/employee", Employee);
 routes.use("/RFI", RFI);
 routes.use("/RFQ",RFQ)
 routes.use("/submittals", Submittals);
-routes.use("/notifications", Notifications);
 routes.use("/wh", WorkingHour);
 routes.use("/co", ChangeOrderRouter);
 routes.use("/br", WorkBreakDown);
