@@ -26,7 +26,7 @@ const initSocket = async(io) => {
       console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
 
       const pendingNotifications= await prisma.notification.findMany({
-        where:{userId,delivered:false}
+        where:{userID:userId,delivered:false}
       })
       for( const notification of pendingNotifications){
         global.io.to(socket.id).emit('customNotification',notification.payload)
