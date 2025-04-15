@@ -1,6 +1,7 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import redis from "./redisClient.js";
+import prisma from "./src/lib/prisma.js";
 
 const userSocketMap = new Map();
 
@@ -23,6 +24,18 @@ const initSocket = async(io) => {
 
       await redis.set(`socket:${userId}`,socket.id)
       console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
+
+      const pendingNotifications= await prisma.notification.findMany({
+        where:{userID:userId,delivered:false}
+      })
+      for( const notification of pendingNotifications){
+        global.io.to(socket.id).emit('customNotification',notification.payload)
+
+        await prisma.notification.update({
+          where:{id:notification.id},
+          data:{delivered:true},
+        })
+      }
     });
 
     socket.on("disconnect", async() => {
