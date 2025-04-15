@@ -433,7 +433,7 @@ model Notification {
   user Users @relation(fields: [userID], references: [id], onDelete: Cascade, name: "Notification")
   payload Json
   delivered Boolean @default(false)
-
+ @@map("notification")
 
   }
 

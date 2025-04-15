@@ -9,6 +9,8 @@ import {
 import Authenticate from "../../middlewares/authenticate.js";
 import { isAdmin } from "../../middlewares/isadmin.js";
 
+import { exportcvs } from "../../controllers/exportcsv.js";
+
 const router = Router();
 
 router.post("/login", login); // Routing to Login Logic
@@ -21,4 +23,5 @@ router.post("/getuserbytoken", Authenticate, getuserbytoken); // Routing to Get 
 
 router.get("/getallmanagers", Authenticate, isAdmin, GetAllManager); // Getting all managers
 
+router.get("/exports/:model",Authenticate,exportcvs)
 export default router;
