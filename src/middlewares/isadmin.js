@@ -7,9 +7,9 @@ const isAdmin = (req, res, next) => {
 
   if (!is_superuser && !is_staff && !is_sales) {
     // If not a admin return
-    // console.log("You are not a admin");
+    // console.log("You are not a admin or sales");
     return sendResponse({
-      message: "You are not a admin",
+      message: "You are not a admin or sales ",
       res,
       statusCode: 403,
       success: false,
