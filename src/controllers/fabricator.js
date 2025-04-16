@@ -133,7 +133,7 @@ const AddBranch = async (req, res) => {
     });
   } catch (error) {
     return sendResponse({
-      message: "Something went wrong",
+      message:error.message,
       res,
       statusCode: 500,
       success: false,
