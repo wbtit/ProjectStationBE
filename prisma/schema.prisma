@@ -85,6 +85,7 @@ assignedToUsers Assigned_list[] @relation("assignedToUsers")
 
     messageSentBy Message[] @relation("messageSentBy")
     messageReceivedBy Message[] @relation("messageReceivedBy")
+    groupMembers GroupUser[] @relation("groupMembers")
 
 
     submittalRecepients Submittals[] @relation("UsersSubmittals")
@@ -106,6 +107,8 @@ assignedToUsers Assigned_list[] @relation("assignedToUsers")
 
     changeorderRecipients ChangeOrder[] @relation("ChangeOrderRecipients")
     changeorderSender ChangeOrder[] @relation("ChangeOrderSender")
+
+
 
 
     @@map("users")
@@ -339,34 +342,6 @@ model Comment{
 
 
 }
-model Message {
-  id String @id @default(uuid()) @db.Uuid
-  sender_id String @db.Uuid
-  user Users @relation(fields: [sender_id], references: [id], onDelete: Cascade, name: "messageSentBy")
-  receiver_id String @db.Uuid
-  users Users @relation(fields: [receiver_id], references: [id], onDelete: Cascade, name: "messageReceivedBy")
-  subject String
-  body String
-  timeStamp DateTime @default(now())
-  status Boolean
-  attachment Attachment[] @relation("fileAttachment")
-  @@map("message")
-}
-
-
-model Attachment {
-  id String @id @default(uuid()) @db.Uuid
-  message_id String @db.Uuid
-  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade, name: "fileAttachment")
-  file_path String
-  file_name String
-  @@map("attachment")
-}
-
-
-
-
-
 
 model Submittals{
   id String @id @default(uuid()) @db.Uuid
@@ -510,7 +485,41 @@ model SubTasks{
 
   @@map("subTasks")
 }
+model Group{
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  memberId String @db.Uuid
+  members GroupUser[] @relation("groupOfUsers")
+  messages Message[] @relation("groupMessages")
 
+  @@map("group")
+}
+
+model GroupUser{
+ id String @id @default(uuid()) @db.Uuid
+
+ memberId String @db.Uuid
+ members Users @relation(fields:[memberId],references:[id],name:"groupMembers")
+
+ groupId String @db.Uuid
+ group Group @relation(fields:[groupId],references:[id],name:"groupOfUsers")
+
+ @@map("groupuser")
+}
+
+
+model Message{
+  id String @id @default(uuid()) @db.Uuid
+  content String
+  createdAt DateTime @default(now())
+  senderId String @db.Uuid
+  sender Users @relation(fields:[senderId],references:[id],name:"messageSentBy")
+  receiverId String @db.Uuid
+  receiver Users @relation(fields:[receiverId],references:[id],name:"messageReceivedBy")
+  groupId String @db.Uuid
+  groups  Group @relation(fields:[groupId],references:[id],name:"groupMessages")
+  taggedUsers String[] @default([])
+}
 
 enum WorkHourStatus {
   START
