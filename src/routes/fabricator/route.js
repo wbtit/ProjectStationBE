@@ -30,7 +30,7 @@ router.post("/fabricator/:fid/addbranch", Authenticate, isAdmin, AddBranch); // 
 
 router.delete("/fabricator/:id", Authenticate, isAdmin, DeleteFabricator); // Delete Fabricator By ID
 
-router.get("/fabricator", GetAllFabricator); // Get All The Fabricator
+router.get("/fabricator",Authenticate, GetAllFabricator); // Get All The Fabricator
 
 router.patch(
   "/fabricator/:id/updatefabricator",
