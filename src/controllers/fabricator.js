@@ -133,7 +133,7 @@ const AddBranch = async (req, res) => {
     });
   } catch (error) {
     return sendResponse({
-      message:error.message,
+      message: "Something went wrong",
       res,
       statusCode: 500,
       success: false,
@@ -189,8 +189,24 @@ const DeleteFabricator = async (req, res) => {
 };
 
 const GetAllFabricator = async (req, res) => {
+  const { id } = req.user;
+
   try {
-    const fabricators = await getFabricators();
+    const user = await prisma.users.findUnique({
+      where: { id },
+      select: { is_superuser: true }
+    });
+
+    let fabricators;
+
+    if (user?.is_superuser) {
+      fabricators = await getFabricators();
+    } else {
+      fabricators = await prisma.fabricator.findMany({
+        where: { createdById: id }
+      });
+    }
+
     return sendResponse({
       message: "Fetched all fabricators",
       res,
@@ -198,9 +214,11 @@ const GetAllFabricator = async (req, res) => {
       success: true,
       data: fabricators,
     });
+
   } catch (error) {
+    console.error("Error fetching fabricators:", error);
     return sendResponse({
-      message: "Soemthing went wrong.",
+      message: "Something went wrong.",
       res,
       statusCode: 500,
       success: false,
@@ -208,6 +226,7 @@ const GetAllFabricator = async (req, res) => {
     });
   }
 };
+
 
 const UpdateFabricator = async (req, res) => {
   const { id } = req.params;
