@@ -114,7 +114,7 @@ const AddChangeOrder = async (req, res) => {
     description,
     rows,
   } = req.body;
-  // console.log(req.body)
+   console.log("request body :",req.body)
 
 
   if (
@@ -144,7 +144,7 @@ const AddChangeOrder = async (req, res) => {
 
     const changeorder = await prisma.changeOrder.create({
       data: {
-        changeOrder: changeOrder,
+        changeOrder: parseInt(changeOrder),
         description: description,
         project: project,
         recipients: recipients,
@@ -154,6 +154,7 @@ const AddChangeOrder = async (req, res) => {
         files: fileDetails,
       },
     });
+    console.log("ChangeOrder from DB:",changeorder)
     
     //RLT 
     sendNotification(recipients,{
