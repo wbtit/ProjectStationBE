@@ -522,6 +522,8 @@ model Message{
   groupId String @db.Uuid
   groups  Group @relation(fields:[groupId],references:[id],name:"groupMessages")
   taggedUsers String[] @default([])
+
+  @@map("message")
 }
 
 enum WorkHourStatus {
