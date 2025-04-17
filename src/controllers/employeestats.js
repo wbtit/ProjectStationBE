@@ -12,8 +12,18 @@ const userStats=async(req,res)=>{
                 project:true,
                 tasks:{
                     include:{
-                        project:true
-                    }
+                        project:true,
+                        workingHourTask:{
+                            select:{
+                                duration:true
+                            },
+                        },
+                        taskcomment:{
+                            select:{
+                                data:true
+                            },
+                        },
+                    },
                 },
                 workingHourUser:{
                     select:{

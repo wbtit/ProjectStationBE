@@ -79,6 +79,7 @@ const addMemberToGroup=async(req,res)=>{
 
 const groupChatHistory=async(req,res)=>{
     const {groupId}=req.params
+    const {lastMessageId}=req.query
     try {
         if(!groupId){
         return sendResponse({
@@ -95,7 +96,12 @@ const groupChatHistory=async(req,res)=>{
                 sender:true,
                 taggedUsers :true,
             },
-            orderBy:{createdAt:'desc'}
+            ...(lastMessageId && {
+                skip: 1,
+                cursor: { id: lastMessageId },
+              }),
+            orderBy:{createdAt:'desc'},
+            
         })
 
         return sendResponse({
@@ -118,6 +124,7 @@ const groupChatHistory=async(req,res)=>{
 }
 const privateChatHistory=async(req,res)=>{
     const{user1,user2}=req.params
+    const {lastMessageId}=req.query
     try {
         if(!user1 || user2){
             return sendResponse({
@@ -139,8 +146,19 @@ const privateChatHistory=async(req,res)=>{
                 sender:true,
                 receiver:true
             },
+            ...(lastMessageId && {
+                skip: 1,
+                cursor: { id: lastMessageId },
+              }),
             orderBy:{createdAt:'desc'}
         })
+        return sendResponse({
+            message:"ChatHistory fetched successfully",
+            res,
+            statusCode:200,
+            success:true,
+            data:privateChats
+        }) 
     } catch (error) {
         return sendResponse({
             message:"Failed to load the Private ChatHistory",
