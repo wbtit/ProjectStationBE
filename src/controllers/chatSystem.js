@@ -76,4 +76,79 @@ const addMemberToGroup=async(req,res)=>{
         })
     }
 }
-export{createGroup,addMemberToGroup}
+
+const groupChatHistory=async(req,res)=>{
+    const {groupId}=req.params
+    try {
+        if(!groupId){
+        return sendResponse({
+            message:"groupId is required",
+            res,
+            statusCode:500,
+            success:false,
+            data:null
+        })
+        }
+        const groupMessages= await prisma.message.findMany({
+            where:{groupId:groupId},
+            include:{
+                sender:true,
+                taggedUsers :true,
+            },
+            orderBy:{createdAt:'desc'}
+        })
+
+        return sendResponse({
+            message:"ChatHistory fetched successfully",
+            res,
+            statusCode:200,
+            success:true,
+            data:groupMessages
+        })
+    } catch (error) {
+        console.log(error.message)
+        return sendResponse({
+            message:"Failed to load the Group ChatHistory",
+            res,
+            statusCode:500,
+            success:false,
+            data:null
+        })
+    }
+}
+const privateChatHistory=async(req,res)=>{
+    const{user1,user2}=req.params
+    try {
+        if(!user1 || user2){
+            return sendResponse({
+                message:"users IDs are required",
+                res,
+                statusCode:400,
+                success:false,
+                data:null
+            })
+        }
+        const privateChats= await prisma.message.findMany({
+            where:{
+                or:[
+                    {senderId:user1,receiverId:user2},
+                    {senderId:user2,receiverId:user1},
+                ]
+            },
+            include:{
+                sender:true,
+                receiver:true
+            },
+            orderBy:{createdAt:'desc'}
+        })
+    } catch (error) {
+        return sendResponse({
+            message:"Failed to load the Private ChatHistory",
+            res,
+            statusCode:500,
+            success:false,
+            data:null
+        })
+    }
+}
+export{createGroup,addMemberToGroup,groupChatHistory}
