@@ -557,14 +557,15 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       }
     });
 
-    const filteredTask=tasks.filter((task)=>{
-      const assignedList=task.taskInAssignedList;
-      return assignedList.length>0 && assignedList[assignedList.length-1].assigned_to===user_id;
-    })
+    // const filteredTask=tasks.filter((task)=>{
+    //   const assignedList=task.taskInAssignedList;
+    //   console.log(assignedList)
+    //   return assignedList.length>0 && assignedList[assignedList.length-1].assigned_to===user_id;
+    // })
 
-    // console.log
+    
 
-    if (!filteredTask) {
+    if (!tasks) {
       return sendResponse({
         message: "Failed to fetch My_tasks",
         res,
@@ -573,13 +574,13 @@ const getMyTaskByIdAndStatus = async (req, res) => {
         data: null,
       });
     }
-    if (filteredTask.length === 0) {
+    if (tasks.length === 0) {
       return sendResponse({
         message: "No tasks found for this user with status 'ASSIGNED",
         res,
         statusCode: 200,
         success: true,
-        data: filteredTask,
+        data: tasks,
       });
     }
     return sendResponse({
@@ -587,7 +588,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: filteredTask,
+      data: tasks,
     });
   } catch (error) {
     return sendResponse({
