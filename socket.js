@@ -2,6 +2,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import redis from "./redisClient.js";
 import prisma from "./src/lib/prisma.js";
+import { connect } from "pm2";
 
 const userSocketMap = new Map();
 
@@ -55,8 +56,8 @@ const initSocket = async(io) => {
         await prisma.notification.create({
           data:{
             userID:receiverId,
-            type:"PrivateMessage",
             payload: {
+              type:"PrivateMessage",
               content,
               senderId,
               receiverId,
@@ -65,6 +66,53 @@ const initSocket = async(io) => {
             delivered:false
           }
         })
+      }
+    })
+
+    socket.on("groupMessages",async({content,groupId,senderId,taggedUserIds=[]})=>{
+      const message = await prisma.message.create({
+        data: {
+          content,
+          senderId,
+          groupId,
+          taggedUsers: {
+            connect: taggedUserIds.map(id => ({ id }))
+          }
+        },
+        include: {
+          taggedUsers: true
+        }
+      });
+      const groupMembers= await prisma.groupuser.findMany({
+        where:{groupId},
+      })
+      for(const member of groupMembers){
+        if(member.memberId !== senderId){
+          const memberSocketId= await redis.get(`socket:${member.memberId}`)
+          const isTagged= taggedUserIds.includes(member.memberId)
+
+          const payload={
+            ...message,
+            isTagged
+          }
+
+          if(memberSocketId){
+            io.to(memberSocketId).emit("receiveGroupMessage",payload)
+          }else{
+            await prisma.notification.create({
+              data:{
+                userID:member.memberId,
+                payload:{
+                  type:"GroupMessages",
+                  groupId,
+                  content,
+                  isTagged
+                },
+                delivered:false
+              }
+            });
+          }
+        }
       }
     })
 
