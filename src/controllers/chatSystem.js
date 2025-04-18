@@ -79,7 +79,7 @@ const addMemberToGroup=async(req,res)=>{
 
 const groupChatHistory=async(req,res)=>{
     const {groupId}=req.params
-    const {lastMessageId}=req.query
+    const { lastMessageId, limit = 20 } = req.query;
     try {
         if(!groupId){
         return sendResponse({
@@ -100,6 +100,7 @@ const groupChatHistory=async(req,res)=>{
                 skip: 1,
                 cursor: { id: lastMessageId },
               }),
+              take: parseInt(limit),
             orderBy:{createdAt:'desc'},
             
         })
@@ -150,6 +151,7 @@ const privateChatHistory=async(req,res)=>{
                 skip: 1,
                 cursor: { id: lastMessageId },
               }),
+              take: parseInt(limit),  
             orderBy:{createdAt:'desc'}
         })
         return sendResponse({
@@ -169,4 +171,4 @@ const privateChatHistory=async(req,res)=>{
         })
     }
 }
-export{createGroup,addMemberToGroup,groupChatHistory}
+export{createGroup,addMemberToGroup,groupChatHistory,privateChatHistory}
