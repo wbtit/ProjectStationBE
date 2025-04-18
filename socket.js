@@ -38,6 +38,36 @@ const initSocket = async(io) => {
       }
     });
 
+    socket.on("privateMessages",async({content,senderId,receiverId})=>{
+
+      const message= await prisma.message.create({
+        data:{
+          content,
+          senderId,
+          receiverId
+        }
+      })
+
+      const receiverSockeId= await redis.get(`socket:${receiverId}`)
+      if(receiverSockeId){
+        io.to(receiverSockeId).emit("receivePrivateMessage",message)
+      }else{
+        await prisma.notification.create({
+          data:{
+            userID:receiverId,
+            type:"PrivateMessage",
+            payload: {
+              content,
+              senderId,
+              receiverId,
+              messageId: message.id
+            },
+            delivered:false
+          }
+        })
+      }
+    })
+
     socket.on("disconnect", async() => {
       const entries= await redis.keys("socket:*")
       for(const key of entries){

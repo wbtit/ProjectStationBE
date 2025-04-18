@@ -87,6 +87,8 @@ assignedToUsers Assigned_list[] @relation("assignedToUsers")
     messageReceivedBy Message[] @relation("messageReceivedBy")
     groupMembers GroupUser[] @relation("groupMembers")
     groupAdmin  Group[] @relation("groupAdmin")
+     taggedInMessages Message[] @relation("TaggedUsers")
+
 
 
     submittalRecepients Submittals[] @relation("UsersSubmittals")
@@ -521,7 +523,8 @@ model Message{
   receiver Users @relation(fields:[receiverId],references:[id],name:"messageReceivedBy")
   groupId String @db.Uuid
   groups  Group @relation(fields:[groupId],references:[id],name:"groupMessages")
-  taggedUsers String[] @default([])
+  taggedUsers Users[] @relation("TaggedUsers")
+
 
   @@map("message")
 }
