@@ -2,7 +2,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import redis from "./redisClient.js";
 import prisma from "./src/lib/prisma.js";
-import { connect } from "pm2";
+
 
 const userSocketMap = new Map();
 
