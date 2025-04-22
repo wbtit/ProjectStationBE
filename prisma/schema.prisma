@@ -290,22 +290,36 @@ model Submittals {
 }
 
 model RFI {
-  id            String     @id @default(uuid()) @db.Uuid
-  fabricator_id String     @db.Uuid
-  date          DateTime   @default(now())
-  project_id    String     @db.Uuid
-  recepient_id  String     @db.Uuid
-  sender_id     String     @db.Uuid
-  status        Boolean    @default(false)
+  id            String       @id @default(uuid()) @db.Uuid
+  fabricator_id String       @db.Uuid
+  date          DateTime     @default(now())
+  project_id    String       @db.Uuid
+  recepient_id  String       @db.Uuid
+  sender_id     String       @db.Uuid
+  status        Boolean      @default(false)
   subject       String
   description   String
-  files         Json[]     @default([])
-  fabricator    Fabricator @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
-  project       Project    @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
-  recepients    Users      @relation("UsersRFI", fields: [recepient_id], references: [id], onDelete: Cascade)
-  sender        Users      @relation("senderRFI", fields: [sender_id], references: [id], onDelete: Cascade)
+  files         Json[]       @default([])
+  fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
+  project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
+  recepients    Users        @relation("UsersRFI", fields: [recepient_id], references: [id], onDelete: Cascade)
+  sender        Users        @relation("senderRFI", fields: [sender_id], references: [id], onDelete: Cascade)
+  rfiresponse   RFIResponse? @relation("rfiresponse")
 
   @@map("rfi")
+}
+
+model RFIResponse {
+  id            String   @id @default(uuid()) @db.Uuid
+  files         Json[]   @default([])
+  responseState State
+  reason        String   @default("")
+  respondedAt   String   @default("")
+  createdAt     DateTime @default(now())
+  rfiId         String   @unique @db.Uuid
+  rfi           RFI      @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)
+
+  @@map("rfiresponse")
 }
 
 model RFQ {
@@ -350,21 +364,36 @@ model WorkingHours {
 }
 
 model ChangeOrder {
-  id          String   @id @default(uuid()) @db.Uuid
-  project     String   @db.Uuid
-  recipients  String   @db.Uuid
-  remarks     String   @default("")
-  changeOrder Int      @default(1)
-  description String   @default("")
-  rows        Json     @default("[]")
-  files       Json     @default("[]")
-  sender      String   @db.Uuid
-  sentOn      DateTime @default(now())
-  Project     Project  @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
-  Recipients  Users    @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
-  senders     Users    @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
+  id          String             @id @default(uuid()) @db.Uuid
+  project     String             @db.Uuid
+  recipients  String             @db.Uuid
+  remarks     String             @default("")
+  changeOrder Int                @default(1)
+  description String             @default("")
+  files       Json               @default("[]")
+  sender      String             @db.Uuid
+  sentOn      DateTime           @default(now())
+  Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
+  Recipients  Users              @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
+  senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
+  CoRefersTo  ChangeOrdertable[] @relation("CoRefersTo")
 
   @@map("changeorder")
+}
+
+model ChangeOrdertable {
+  id           String      @id @default(uuid()) @db.Uuid
+  siNo         Int         @default(0)
+  description  String      @default("")
+  referenceDoc String      @default("")
+  elements     String      @default("")
+  QtyNo        Int         @default(0)
+  hours        Float       @default(0.0)
+  cost         Float       @default(0.0)
+  CoId         String      @db.Uuid
+  CoRefersTo   ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
+
+  @@map("changeordertable")
 }
 
 model JobStudy {
@@ -407,8 +436,8 @@ model SubTasks {
 model Group {
   id        String      @id @default(uuid()) @db.Uuid
   name      String
-  createdAt DateTime    @default(now())
   adminId   String      @db.Uuid
+  createdAt DateTime    @default(now())
   admin     Users       @relation("groupAdmin", fields: [adminId], references: [id])
   members   GroupUser[] @relation("groupOfUsers")
   messages  Message[]   @relation("groupMessages")
@@ -430,9 +459,9 @@ model Message {
   id          String   @id @default(uuid()) @db.Uuid
   content     String
   createdAt   DateTime @default(now())
-  groupId     String   @db.Uuid
-  receiverId  String   @db.Uuid
   senderId    String   @db.Uuid
+  receiverId  String   @db.Uuid
+  groupId     String   @db.Uuid
   groups      Group    @relation("groupMessages", fields: [groupId], references: [id])
   receiver    Users    @relation("messageReceivedBy", fields: [receiverId], references: [id])
   sender      Users    @relation("messageSentBy", fields: [senderId], references: [id])
@@ -440,10 +469,6 @@ model Message {
 
   @@map("message")
 }
-
-
-
-
 
 enum WorkHourStatus {
   START
@@ -497,4 +522,9 @@ enum Activity {
   ERECTION_CHECKING
   DESIGNER
   DESIGN_CHECKING
+}
+
+enum State {
+  PARTIAL
+  COMPLETE
 }
