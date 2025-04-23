@@ -453,4 +453,57 @@ const viewRFIfiles = async (req, res) => {
   }
 };
 
-export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles };
+const addRFIResponse=async(req,res)=>{
+  const{rfiId}=req.params
+  const{id}=req.user
+  const{responseState,reason,respondedAt}=req.body
+  
+  try {
+    if(!responseState ||!reason||!respondedAt){
+      return sendResponse({
+        message:"Feilds are empty",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+
+    const fileDetails = req.files.map((file) => ({
+      filename: file.filename, // UUID + extension
+      originalName: file.originalname, // Original name of the file
+      id: file.filename.split(".")[0], // Extract UUID from the filename
+      path: `/public/rfiResponsetemp/${file.filename}`, // Relative path
+    }));
+
+    const addresponse= await prisma.rFIResponse.create({
+      data:{
+        responseState:responseState,
+        reason:reason,
+        respondedAt:respondedAt,
+        userId:id,
+        files:fileDetails,
+        rfiId:rfiId
+      }
+    })
+
+    return sendResponse({
+      message:"Response created",
+      res,
+      statusCode:200,
+      success:true,
+      data:addresponse
+    })
+    
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+  }
+}
+export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles,addRFIResponse};

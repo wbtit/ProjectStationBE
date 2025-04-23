@@ -45,48 +45,56 @@ const createGroup=async(req,res)=>{
     }
 }
 
-const addMemberToGroup=async(req,res)=>{
-    const{memberIds}=req.body
-    const{groupId}=req.params
-    try {
-        if(!memberIds || groupId || !Array.isArray(memberIds)){
-            return sendResponse({
-                message: "Please provide an array of memberIds and a groupId",
-                res,
-                statusCode:400,
-                success:false,
-                data:null
-            })
-        }
-        const membership=  await Promise.all(
-            memberIds.map(id=>
-                prisma.groupUser.create({
-                    data:{memberId:id,
-                    groupId:groupId
-                    }
-                })
-            )
-        )
-        //console.log("membership",membership)
-        return sendResponse({
-            message:"User Added successfully",
-            res,
-            statusCode:200,
-            success:true,
-            data:membership
-        })
-    } catch (error) {
-        console.log(error.message)
-        return sendResponse({
-            message:"Failed to add member to group",
-            res,
-            statusCode:500,
-            success:false,
-            data:null
-        })
-    }
-}
+const addMemberToGroup = async (req, res) => {
+    const memberIds  = req.body;
+    const { groupId } = req.params;
+  
+    console.log("Full req.body:",  );
+    
 
+  
+    try {
+      if (!memberIds || !groupId || !Array.isArray(memberIds)) {
+        return sendResponse({
+          message: "Please provide an array of memberIds and a groupId",
+          res,
+          statusCode: 400,
+          success: false,
+          data: null,
+        });
+      }
+  
+      const membership = await Promise.all(
+        memberIds.map((id) =>
+          prisma.groupUser.create({
+            data: {
+              memberId: id,
+              groupId: groupId,
+            },
+          })
+        )
+      );
+  
+      console.log("membership", membership);
+      return sendResponse({
+        message: "Users added successfully",
+        res,
+        statusCode: 200,
+        success: true,
+        data: membership,
+      });
+    } catch (error) {
+      console.log(error.message);
+      return sendResponse({
+        message: "Failed to add member(s) to group",
+        res,
+        statusCode: 500,
+        success: false,
+        data: null,
+      });
+    }
+  };
+  
 const groupChatHistory=async(req,res)=>{
     const {groupId}=req.params
     const { lastMessageId, limit = 20 } = req.query;
@@ -252,7 +260,7 @@ const recentchats = async (req, res) => {
       const allGroups = await prisma.group.findMany({
         where: { id: { in: groupIds } }
       });
-      console.log("allGroups",allGroups)
+      //console.log("allGroups",allGroups)
       const groupChatsSidebarItems = allGroups.map(group => {
         const msgInfo = groupMap.get(group.id) || {};
         return {

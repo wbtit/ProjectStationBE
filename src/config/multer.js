@@ -105,6 +105,34 @@ const storageRfi = multer.diskStorage({
 });
 
 
+const storageRfiResponse = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/rfiResponsetemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    rfiDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const  rfiResponseUploads = multer({
+  storage: storageRfiResponse,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
 
 const storageRfq = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -261,4 +289,5 @@ export {
   commentDataMap,
   changeorderUploads,
   changeOrderDataMap,
+  rfiResponseUploads
 };

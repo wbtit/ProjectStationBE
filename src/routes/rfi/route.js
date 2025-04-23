@@ -1,6 +1,6 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
-import { rfiUploads } from "../../config/multer.js";
+import { rfiUploads,rfiResponseUploads } from "../../config/multer.js";
 
 import {
   addRFI,
@@ -8,7 +8,8 @@ import {
   Inbox,
   RFIseen,
   RFIByID,
-  viewRFIfiles
+  viewRFIfiles,
+  addRFIResponse
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -26,5 +27,11 @@ router.get("/rfi/sent", Authenticate, sentRFIByUser);
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);
 router.get("/rfi/:id", Authenticate, RFIByID);
+
+router.post("/addresponse/:rfiId",
+  Authenticate,
+  rfiResponseUploads.any("files"),
+  addRFIResponse
+)
 
 export default router;
