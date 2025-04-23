@@ -3,7 +3,8 @@ import { Router } from "express";
 import { createGroup,
          addMemberToGroup,
         groupChatHistory,
-        privateChatHistory
+        privateChatHistory,
+        recentchats
  } from "../../controllers/chatSystem.js"; 
 
  import Authenticate from "../../middlewares/authenticate.js";
@@ -17,5 +18,7 @@ import { createGroup,
  router.post("/group/addmember/:groupId",Authenticate,addMemberToGroup)
  router.get("/groupMessages/:groupId",Authenticate,groupChatHistory)
  router.get("/privateChatRoom/:user1/:user2",Authenticate,privateChatHistory)
+ router.get("/recent-chats",Authenticate,recentchats)
+
 
  export {router as chatRouter}
