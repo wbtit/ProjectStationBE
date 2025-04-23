@@ -75,6 +75,7 @@ model Users {
   fabricators           Fabricator[]    @relation("FabricatorUsers")
   taggedInMessages      Message[]       @relation("TaggedUsers")
   COrespondedby         COResponse[]    @relation("COrespondedby")
+  rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
 
   @@map("users")
 }
@@ -331,6 +332,8 @@ model RFIResponse {
   responseState State
   reason        String   @default("")
   respondedAt   String   @default("")
+  userId        String    @db.Uuid
+  user          Users     @relation("rfiresponseBy",fields:[userId],references:[id])
   createdAt     DateTime @default(now())
   rfiId         String   @unique @db.Uuid
   rfi           RFI      @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)

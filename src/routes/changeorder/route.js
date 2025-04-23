@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { changeorderUploads } from "../../config/multer.js";
-import { AddChangeOrder,changeOrderReceived,changeOrderSent } from "../../controllers/changeorder.js";
+import { AddChangeOrder,changeOrderReceived,changeOrderSent,addCoResponse,getResponse} from "../../controllers/changeorder.js";
 import Authenticate from "../../middlewares/authenticate.js";
 
 const router = Router();
@@ -14,5 +14,7 @@ router.post(
 
 router.get("/receives",Authenticate,changeOrderReceived)
 router.get("/sents",Authenticate,changeOrderSent)
+router.post("/addResponse/:coId",Authenticate,addCoResponse)
+router.get("/getresponse/:id",Authenticate,getResponse)
     
 export { router as ChangeOrderRouter };

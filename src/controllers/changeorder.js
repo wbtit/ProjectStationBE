@@ -188,7 +188,8 @@ const  addCoResponse=async(req,res)=>{
     const coResponse= await prisma.coResponse.create({
       data:{
         approved:approved,
-        description:description
+        description:description,
+        userId:id
       }
     })
 
@@ -199,7 +200,7 @@ const  addCoResponse=async(req,res)=>{
       success:true,
       data:coResponse
     })
-    
+
   } catch (error) {
     console.log(error.message)
     return sendResponse({
@@ -211,5 +212,30 @@ const  addCoResponse=async(req,res)=>{
     });
   }
 }
+const getResponse=async(req,res)=>{
+  const{id}=req.params
+  try {
+    
+    const response= await prisma.coResponse({
+      where:{CoId:id}
+    })
+    return sendResponse({
+      message:"Respose is fetched successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:response
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"Failed to fetch responses",
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
 
-export { AddChangeOrder ,changeOrderReceived,changeOrderSent};
+export { AddChangeOrder ,changeOrderReceived,changeOrderSent,addCoResponse,getResponse};
