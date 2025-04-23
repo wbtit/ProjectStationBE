@@ -4,13 +4,18 @@ import { createGroup,
          addMemberToGroup,
         groupChatHistory,
         privateChatHistory
- } from "../../controllers/chatSystem"; 
+ } from "../../controllers/chatSystem.js"; 
 
- import Authenticate from "../../middlewares/authenticate";
+ import Authenticate from "../../middlewares/authenticate.js";
 
  const router= Router();
+
+
+ //{base_url}/api/chat/.......
 
  router.post("/createGroup",Authenticate,createGroup)
  router.post("/group/addmember/:groupId",Authenticate,addMemberToGroup)
  router.get("/groupMessages/:groupId",Authenticate,groupChatHistory)
  router.get("/privateChatRoom/:user1/:user2",Authenticate,privateChatHistory)
+
+ export {router as chatRouter}

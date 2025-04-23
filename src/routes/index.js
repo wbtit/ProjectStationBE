@@ -15,6 +15,7 @@ import { ChangeOrderRouter } from "./changeorder/route.js";
 import { WorkBreakDown } from "./workbreakdown/route.js";
 import WBSActivity from "./wbsactivity/route.js";
 import { SubTasksRouter } from "./subtasks/route.js";
+import {chatRouter}  from  "./chatSystem/routes.js"
 
 const routes = express.Router();
 
@@ -34,5 +35,6 @@ routes.use("/co", ChangeOrderRouter);
 routes.use("/br", WorkBreakDown);
 routes.use("/wbs", WBSActivity);
 routes.use("/st", SubTasksRouter);
+routes.use("/chat",chatRouter)
 
 export { routes };

@@ -380,6 +380,9 @@ const GetAllProjects = async (req, res) => {
         where: { fabricatorID: fabricatorId },
         include: {
           fabricator: true,
+          tasks:true,
+          team:true,
+          changeOrder:true,
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
           department: {
