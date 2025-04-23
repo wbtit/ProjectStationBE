@@ -1,420 +1,368 @@
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
-
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
   extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
+model Users {
+  id                    String          @id @default(uuid()) @db.Uuid
+  username              String          @unique
+  password              String
+  email                 String?         @db.VarChar(150)
+  f_name                String          @db.VarChar(50)
+  m_name                String?         @db.VarChar(50)
+  l_name                String?         @db.VarChar(50)
+  phone                 String          @db.VarChar(20)
+  landline              String?         @default("") @db.VarChar(20)
+  alt_landline          String?         @default("") @db.VarChar(20)
+  alt_phone             String?         @default("") @db.VarChar(20)
+  designation           String?         @default("") @db.VarChar(50)
+  city                  String?         @default("")
+  zip_code              String?         @default("")
+  state                 String?         @default("")
+  country               String?         @default("")
+  address               String?         @default("")
+  role                  UserRole
+  emp_code              String?         @default("WBT")
+  is_sales              Boolean?        @default(false)
+  is_manager            Boolean         @default(false)
+  is_active             Boolean         @default(true)
+  is_staff              Boolean         @default(false)
+  is_superuser          Boolean         @default(false)
+  is_firstLogin         Boolean         @default(true)
+  fabricatorId          String?         @db.Uuid
+  department            String?         @db.Uuid
+  is_deptmanager        Boolean         @default(false)
+  is_hr                 Boolean         @default(false)
+  accepttasks           AcceptTask[]    @relation("acceptTaskUser")
+  taskApprovedBy        Assigned_list[] @relation("taskApprovedBy")
+  taskAssignedby        Assigned_list[] @relation("taskAssignedby")
+  assignedToUsers       Assigned_list[] @relation("assignedToUsers")
+  approvedByUser        Assignes[]      @relation("approvedByUser")
+  assignedByUser        Assignes[]      @relation("assignedByUser")
+  assignedToUser        Assignes[]      @relation("assignedToUser")
+  changeorderRecipients ChangeOrder[]   @relation("ChangeOrderRecipients")
+  changeorderSender     ChangeOrder[]   @relation("ChangeOrderSender")
+  taskcommentuser       Comment[]       @relation("taskcommentuser")
+  approvedByConfirm     Confirm[]       @relation("approvedByUserConfirm")
+  assignedByConfirm     Confirm[]       @relation("assignedByUserConfirm")
+  assignedToConfirm     Confirm[]       @relation("assignedToUserConfirm")
+  createdDepartments    Department[]    @relation("Creator")
+  managedDepartments    Department[]    @relation("Manager")
+  createdFabricators    Fabricator[]    @relation("FabricatorCreatedBy")
+  groupAdmin            Group[]         @relation("groupAdmin")
+  groupMembers          GroupUser[]     @relation("groupMembers")
+  messageReceivedBy     Message[]       @relation("messageReceivedBy")
+  messageSentBy         Message[]       @relation("messageSentBy")
+  notification          Notification[]  @relation("Notification")
+  project               Project[]       @relation("projectManager")
+  rfiRecepients         RFI[]           @relation("UsersRFI")
+  rfisender             RFI[]           @relation("senderRFI")
+  UsersRFQ              RFQ[]           @relation("UsersRFQ")
+  senderRFQ             RFQ[]           @relation("senderRFQ")
+  submittalRecepients   Submittals[]    @relation("UsersSubmittals")
+  submittalsender       Submittals[]    @relation("senderSubmittals")
+  tasks                 Task[]          @relation("userTask")
+  teamManager           Team[]          @relation("TeamManager")
+  departmentId          Department?     @relation("userDepartment", fields: [department], references: [id], onDelete: Cascade)
+  fabricator            Fabricator?     @relation("UsersFabricator", fields: [fabricatorId], references: [id])
+  workingHourUser       WorkingHours[]  @relation("workingHourUser")
+  fabricators           Fabricator[]    @relation("FabricatorUsers")
+  taggedInMessages      Message[]       @relation("TaggedUsers")
 
-  model Users {
-    id            String   @id @default(uuid()) @db.Uuid
-    username      String   @unique
-    password      String   
-    email         String?  @db.VarChar(150)
-    f_name        String   @db.VarChar(50)
-    m_name        String?  @db.VarChar(50)
-    l_name        String?  @db.VarChar(50)
-    phone         String   @db.VarChar(20)
-    landline      String?  @db.VarChar(20) @default("")
-    alt_landline  String?  @db.VarChar(20) @default("")
-    alt_phone     String?  @db.VarChar(20) @default("")
-    designation   String?   @db.VarChar(50) @default("")
-    city          String?  @default("")
-    zip_code      String?  @default("")
-    state         String?  @default("")
-    country       String?  @default("")
-    address       String?  @default("")
-    role          UserRole
-    emp_code      String?   @default("WBT")
-    department    String?   @db.Uuid
-    departmentId Department? @relation(fields: [department], references: [id], onDelete: Cascade,name: "userDepartment")
-    is_sales      Boolean? @default(false)
-    is_manager    Boolean @default(false)
-    is_active     Boolean  @default(true)
-    is_staff      Boolean  @default(false)
-    is_superuser  Boolean  @default(false)
-    is_firstLogin Boolean  @default(true)
-    is_deptmanager Boolean @default(false)
-    is_hr Boolean @default(false)
-
-    fabricatorId  String?     @db.Uuid // Make fabricatorId unique for a one-to-one relation
-    fabricator    Fabricator? @relation(fields: [fabricatorId], references: [id], name: "UsersFabricator")
-
-
-    fabricators   Fabricator[] @relation("FabricatorUsers") // Relation for multiple fabricators
-
-
-    managedDepartments Department[] @relation("Manager") // Departments where the user is a manager
-    createdDepartments Department[] @relation("Creator") // Departments created by the user
-
-
-    teamManager Team[] @relation("TeamManager")
-
-
-    createdFabricators Fabricator[] @relation("FabricatorCreatedBy") // Opposite relation for createdBy
-
-
-    project Project[] @relation("projectManager")
-
-
-    tasks Task[] @relation("userTask")
-    taskAssignedby Assigned_list[] @relation("taskAssignedby")
-    taskApprovedBy Assigned_list[] @relation("taskApprovedBy")
-    assignedByUser Assignes[] @relation("assignedByUser")
-    assignedToUser Assignes[] @relation("assignedToUser")
-    approvedByUser Assignes[] @relation("approvedByUser")
-
-assignedToUsers Assigned_list[] @relation("assignedToUsers")
-    accepttasks AcceptTask[] @relation("acceptTaskUser")
-
-
-    taskcommentuser Comment[] @relation("taskcommentuser")
-
-
-    assignedByConfirm Confirm[] @relation("assignedByUserConfirm")
-    assignedToConfirm Confirm[] @relation("assignedToUserConfirm")
-    approvedByConfirm Confirm[] @relation("approvedByUserConfirm")
-
-
-
-    messageSentBy Message[] @relation("messageSentBy")
-    messageReceivedBy Message[] @relation("messageReceivedBy")
-    groupMembers GroupUser[] @relation("groupMembers")
-    groupAdmin  Group[] @relation("groupAdmin")
-     taggedInMessages Message[] @relation("TaggedUsers")
-
-
-
-    submittalRecepients Submittals[] @relation("UsersSubmittals")
-    submittalsender Submittals[] @relation("senderSubmittals")
-
-
-    rfiRecepients RFI[] @relation("UsersRFI")
-    rfisender RFI[] @relation("senderRFI")
-
-    UsersRFQ RFQ[] @relation("UsersRFQ")
-    senderRFQ RFQ[] @relation("senderRFQ")
-
-
-
-
-    notification Notification[] @relation("Notification")
-
-    workingHourUser WorkingHours[] @relation("workingHourUser")
-
-    changeorderRecipients ChangeOrder[] @relation("ChangeOrderRecipients")
-    changeorderSender ChangeOrder[] @relation("ChangeOrderSender")
-
-
-
-
-    @@map("users")
-  }
-
+  @@map("users")
+}
 
 model Fabricator {
-  id          String   @id @default(uuid()) @db.Uuid
-  createdById String   @db.Uuid
-  createdBy   Users    @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
-  fabName     String   @default("")
-  headquaters Json     @default("{}")
-  website     String?   @default("")
-  drive       String?   @default("")
-  branches    Json     @default("[]")
-  files       Json @default("[]")
-  is_bin      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-
-  users       Users[] @relation("FabricatorUsers") // Relation for multiple users
-  userss       Users[] @relation("UsersFabricator")
-
-
-  project    Project[] @relation("projectFabricator")
+  id          String       @id @default(uuid()) @db.Uuid
+  createdById String       @db.Uuid
+  fabName     String       @default("")
+  headquaters Json         @default("{}")
+  website     String?      @default("")
+  drive       String?      @default("")
+  branches    Json         @default("[]")
+  is_bin      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  files       Json         @default("[]")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
-  submittals Submittals[] @relation("FabricatorSubmittals")
-  rfi RFI[] @relation("FabricatorRFI")
-
-
-
+  createdBy   Users        @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  project     Project[]    @relation("projectFabricator")
+  rfi         RFI[]        @relation("FabricatorRFI")
+  submittals  Submittals[] @relation("FabricatorSubmittals")
+  userss      Users[]      @relation("UsersFabricator")
+  users       Users[]      @relation("FabricatorUsers")
 
   @@map("fabricators")
 }
 
-
-
-
 model Department {
-  id         String   @id @default(uuid()) @db.Uuid
-  name       String   @unique
-  managerId  String?  @db.Uuid // Foreign key to the Users model (UUID)
-  manager    Users?   @relation(fields: [managerId], references: [id], name: "Manager")
-  createdById String? @db.Uuid // Foreign key to the Users model (UUID)
-  createdBy  Users?   @relation(fields: [createdById], references: [id], name: "Creator")
-  isBin      Boolean  @default(false)
-  users Users[] @relation("userDepartment")
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique
+  managerId   String?   @db.Uuid
+  createdById String?   @db.Uuid
+  isBin       Boolean   @default(false)
+  createdBy   Users?    @relation("Creator", fields: [createdById], references: [id])
+  manager     Users?    @relation("Manager", fields: [managerId], references: [id])
+  project     Project[] @relation("projectDepartment")
+  users       Users[]   @relation("userDepartment")
 
-
-  project Project[] @relation("projectDepartment")
-
-
-  @@map("department") // Optional: Matches the Django table name
+  @@map("department")
 }
 
-
-
-
-
-
 model Team {
-  id  String @id @default(uuid()) @db.Uuid
-  name  String @unique
-  managerID String @db.Uuid
-  manager  Users @relation(fields: [managerID], references: [id], name: "TeamManager", onDelete: Cascade)
-  members Json @default("[]")
-
-
-  project Project[] @relation("projectTeam")
-
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique
+  managerID String    @db.Uuid
+  members   Json      @default("[]")
+  project   Project[] @relation("projectTeam")
+  manager   Users     @relation("TeamManager", fields: [managerID], references: [id], onDelete: Cascade)
 
   @@map("team")
 }
 
-
-  model Project {
-    id String @id @default(uuid()) @db.Uuid
-    name String @unique
-    description String
-    fabricatorID String @db.Uuid
-    fabricator  Fabricator @relation(fields: [fabricatorID], references: [id], name: "projectFabricator", onDelete: Cascade)
-    departmentID String @db.Uuid
-    department   Department @relation(fields: [departmentID], references: [id], name: "projectDepartment", onDelete: Cascade)
-    teamID String? @db.Uuid
-    team Team? @relation(fields: [teamID], references: [id], name: "projectTeam", onDelete: Cascade)
-    managerID  String @db.Uuid
-    manager Users @relation(fields: [managerID], references: [id], name: "projectManager", onDelete: Cascade)
-    status Status @default(ACTIVE)
-    stage Stage @default(RFI)
-    tools Tools @default(TEKLA) // Not sure about the default value
-    files Json @default("[]")
-    connectionDesign Boolean @default(true) // Not sure about the default value
-    miscDesign Boolean @default(true) // Not sure about the default value
-    customerDesign Boolean @default(false) // Not sure about the default value
-    startDate String  // Not sure about the default value
-    endDate String?
-    approvalDate String
-    estimatedHours Int
-    tasks Task[] @relation("projectTask")
-    accepttasks AcceptTask[] @relation("acceptTaskProject")
-
-
-   submittals Submittals[] @relation("ProjectSubmittals")
-    rfi RFI[] @relation("ProjectRFI")
-
-    changeOrder ChangeOrder[] @relation("ChangeOrderProject")
-    Jobstudy JobStudy[] @relation("projectJobStudy")
-  subTasks SubTasks[] @relation("subTasks")
-
+model Project {
+  id               String        @id @default(uuid()) @db.Uuid
+  name             String        @unique
+  description      String
+  fabricatorID     String        @db.Uuid
+  departmentID     String        @db.Uuid
+  teamID           String?       @db.Uuid
+  managerID        String        @db.Uuid
+  status           Status        @default(ACTIVE)
+  stage            Stage         @default(RFI)
+  tools            Tools         @default(TEKLA)
+  files            Json          @default("[]")
+  connectionDesign Boolean       @default(true)
+  miscDesign       Boolean       @default(true)
+  customerDesign   Boolean       @default(false)
+  startDate        String
+  endDate          String?
+  approvalDate     String
+  estimatedHours   Int
+  accepttasks      AcceptTask[]  @relation("acceptTaskProject")
+  changeOrder      ChangeOrder[] @relation("ChangeOrderProject")
+  Jobstudy         JobStudy[]    @relation("projectJobStudy")
+  department       Department    @relation("projectDepartment", fields: [departmentID], references: [id], onDelete: Cascade)
+  fabricator       Fabricator    @relation("projectFabricator", fields: [fabricatorID], references: [id], onDelete: Cascade)
+  manager          Users         @relation("projectManager", fields: [managerID], references: [id], onDelete: Cascade)
+  team             Team?         @relation("projectTeam", fields: [teamID], references: [id], onDelete: Cascade)
+  rfi              RFI[]         @relation("ProjectRFI")
+  subTasks         SubTasks[]    @relation("subTasks")
+  submittals       Submittals[]  @relation("ProjectSubmittals")
+  tasks            Task[]        @relation("projectTask")
 
   @@map("project")
 }
 
-
 model Task {
-  id          String    @id @default(uuid()) @db.Uuid
-  name        String
-  description String
-  status      String  
-  priority    Int
-  created_on  DateTime  @default(now())
-  due_date    String
-  start_date  String
-  duration    String
-  project_id String @db.Uuid
-  project Project @relation(fields: [project_id], references: [id], name: "projectTask", onDelete: Cascade)
-  user_id String @db.Uuid
-  user Users @relation(fields: [user_id], references: [id], name: "userTask", onDelete: Cascade)
-
-
+  id                 String          @id @default(uuid()) @db.Uuid
+  name               String
+  description        String
+  status             String
+  priority           Int
+  created_on         DateTime        @default(now())
+  due_date           String
+  duration           String
+  project_id         String          @db.Uuid
+  user_id            String          @db.Uuid
+  start_date         String
   taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
-  assignedTask Assignes[] @relation("assignedTask")
-  taskcomment Comment[] @relation("taskcomment")
+  assignedTask       Assignes[]      @relation("assignedTask")
+  taskcomment        Comment[]       @relation("taskcomment")
+  project            Project         @relation("projectTask", fields: [project_id], references: [id], onDelete: Cascade)
+  user               Users           @relation("userTask", fields: [user_id], references: [id], onDelete: Cascade)
+  workingHourTask    WorkingHours[]  @relation("workingHourTask")
 
-  workingHourTask WorkingHours[] @relation("workingHourTask")
   @@map("task")
 }
 
-
-
-
-model AcceptTask{
-  id String @id @default(uuid()) @db.Uuid
-  name String
-  description String
-  satus String
-  attachment String
-  priority Int
-  created_on DateTime @default(now())
-  due_date DateTime
-  duration String
-  project_id String @db.Uuid
-  project Project @relation(fields: [project_id],references: [id],name: "acceptTaskProject",onDelete: Cascade)
-  fabricator_id String @db.Uuid
-  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name: "acceptTaskFabricator",onDelete: Cascade)
-  user_id String @db.Uuid
-  user Users @relation(fields: [user_id],references: [id],name: "acceptTaskUser",onDelete: Cascade)
-
+model AcceptTask {
+  id            String     @id @default(uuid()) @db.Uuid
+  name          String
+  description   String
+  satus         String
+  attachment    String
+  priority      Int
+  created_on    DateTime   @default(now())
+  due_date      DateTime
+  duration      String
+  project_id    String     @db.Uuid
+  fabricator_id String     @db.Uuid
+  user_id       String     @db.Uuid
+  fabricator    Fabricator @relation("acceptTaskFabricator", fields: [fabricator_id], references: [id], onDelete: Cascade)
+  project       Project    @relation("acceptTaskProject", fields: [project_id], references: [id], onDelete: Cascade)
+  user          Users      @relation("acceptTaskUser", fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("accepttask")
 }
 
-
-model Assigned_list{
-  id  String @id @default(uuid()) @db.Uuid
+model Assigned_list {
+  id          String    @id @default(uuid()) @db.Uuid
   approved_on DateTime?
-  assigned_on DateTime @default(now())
-  approved Boolean 
-  comment String @default(" ")
-  task_id String @db.Uuid
-  task Task @relation(fields: [task_id],references: [id],name: "taskInAssignedList",onDelete: Cascade)
-  assigned_by String @db.Uuid
-  users Users @relation(fields: [assigned_by],references: [id],name: "taskAssignedby",onDelete: Cascade)
-  approved_by String? @db.Uuid 
-  user Users? @relation(fields: [approved_by],references: [id],name: "taskApprovedBy",onDelete: Cascade)
-  confirm Confirm[] @relation("assignedTaskConfirm")
-  assigned_to String @db.Uuid
-  userss Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUsers")
+  assigned_on DateTime  @default(now())
+  approved    Boolean
+  comment     String    @default(" ")
+  task_id     String    @db.Uuid
+  assigned_by String    @db.Uuid
+  approved_by String?   @db.Uuid
+  assigned_to String    @db.Uuid
+  user        Users?    @relation("taskApprovedBy", fields: [approved_by], references: [id], onDelete: Cascade)
+  users       Users     @relation("taskAssignedby", fields: [assigned_by], references: [id], onDelete: Cascade)
+  userss      Users     @relation("assignedToUsers", fields: [assigned_to], references: [id], onDelete: Cascade)
+  task        Task      @relation("taskInAssignedList", fields: [task_id], references: [id], onDelete: Cascade)
+  confirm     Confirm[] @relation("assignedTaskConfirm")
+
   @@map("assigendlist")
 }
 
-
 model Assignes {
- id String @id @default(uuid()) @db.Uuid
- approved_on DateTime @default(now())
- assigned_on DateTime @default(now())
- approved Boolean @default(true) //not sure about the default value
- comment String @default("")
-  task_id String  @db.Uuid
- task  Task @relation(fields: [task_id],references: [id],name: "assignedTask",onDelete: Cascade)
-  assigned_by String @db.Uuid
-  users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUser")
-  assigned_to String @db.Uuid
-  user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUser")
-  approved_by String? @db.Uuid
-  userss Users? @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUser")
- 
+  id          String   @id @default(uuid()) @db.Uuid
+  approved_on DateTime @default(now())
+  assigned_on DateTime @default(now())
+  approved    Boolean  @default(true)
+  comment     String   @default("")
+  task_id     String   @db.Uuid
+  assigned_by String   @db.Uuid
+  assigned_to String   @db.Uuid
+  approved_by String?  @db.Uuid
+  userss      Users?   @relation("approvedByUser", fields: [approved_by], references: [id], onDelete: Cascade)
+  users       Users    @relation("assignedByUser", fields: [assigned_by], references: [id], onDelete: Cascade)
+  user        Users    @relation("assignedToUser", fields: [assigned_to], references: [id], onDelete: Cascade)
+  task        Task     @relation("assignedTask", fields: [task_id], references: [id], onDelete: Cascade)
+
   @@map("assignes")
 }
-model Confirm {
- id String @id @default(uuid()) @db.Uuid
- approved_on DateTime @default(now())
- assigned_on DateTime @default(now())
- approved Boolean @default(false) //not sure about the default value
- comment String
-  assigned_task_id String  @db.Uuid
- task  Assigned_list? @relation(fields: [assigned_task_id],references: [id],name: "assignedTaskConfirm",onDelete: Cascade)
-  assigned_by String @db.Uuid
-  users Users @relation(fields: [assigned_by], references: [id], onDelete: Cascade, name: "assignedByUserConfirm")
-  assigned_to String @db.Uuid
-  user Users @relation(fields: [assigned_to], references: [id], onDelete: Cascade, name: "assignedToUserConfirm")
-  approved_by String @db.Uuid
-  userss Users @relation(fields: [approved_by] , references: [id], onDelete: Cascade, name: "approvedByUserConfirm")
 
+model Confirm {
+  id               String        @id @default(uuid()) @db.Uuid
+  approved_on      DateTime      @default(now())
+  assigned_on      DateTime      @default(now())
+  approved         Boolean       @default(false)
+  comment          String
+  assigned_task_id String        @db.Uuid
+  assigned_by      String        @db.Uuid
+  assigned_to      String        @db.Uuid
+  approved_by      String        @db.Uuid
+  userss           Users         @relation("approvedByUserConfirm", fields: [approved_by], references: [id], onDelete: Cascade)
+  users            Users         @relation("assignedByUserConfirm", fields: [assigned_by], references: [id], onDelete: Cascade)
+  task             Assigned_list @relation("assignedTaskConfirm", fields: [assigned_task_id], references: [id], onDelete: Cascade)
+  user             Users         @relation("assignedToUserConfirm", fields: [assigned_to], references: [id], onDelete: Cascade)
 
   @@map("confirm")
 }
-model Comment{
-  id String @id @default(uuid()) @db.Uuid
-  created_on DateTime @default(now())
-  data String
-  file Json @default("[]")
-  task_id String @db.Uuid
-  task Task @relation(fields: [task_id],references: [id],name: "taskcomment",onDelete: Cascade)
-  user_id String @db.Uuid
-  user Users @relation(fields: [user_id],references: [id],name: "taskcommentuser",onDelete: Cascade)
 
+model Comment {
+  id         String   @id @default(uuid()) @db.Uuid
+  created_on DateTime @default(now())
+  data       String
+  task_id    String   @db.Uuid
+  user_id    String   @db.Uuid
+  file       Json     @default("[]")
+  task       Task     @relation("taskcomment", fields: [task_id], references: [id], onDelete: Cascade)
+  user       Users    @relation("taskcommentuser", fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("comment")
-
-
 }
 
-model Submittals{
-  id String @id @default(uuid()) @db.Uuid
-  fabricator_id String @db.Uuid
-  date DateTime @default(now())
-  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorSubmittals",onDelete: Cascade)
-  project_id String @db.Uuid
-  project Project @relation(fields: [project_id],references: [id],name:"ProjectSubmittals",onDelete: Cascade)
-  recepient_id String @db.Uuid
-  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersSubmittals",onDelete: Cascade)
-  sender_id String @db.Uuid
-  sender Users @relation(fields: [sender_id],references: [id],name: "senderSubmittals",onDelete: Cascade)
-  status Boolean @default(false)
-  subject String
-  description String
-  files Json[] @default([])
-
-
-
+model Submittals {
+  id            String     @id @default(uuid()) @db.Uuid
+  fabricator_id String     @db.Uuid
+  date          DateTime   @default(now())
+  project_id    String     @db.Uuid
+  recepient_id  String     @db.Uuid
+  sender_id     String     @db.Uuid
+  status        Boolean    @default(false)
+  subject       String
+  description   String
+  files         Json[]     @default([])
+  fabricator    Fabricator @relation("FabricatorSubmittals", fields: [fabricator_id], references: [id], onDelete: Cascade)
+  project       Project    @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
+  recepients    Users      @relation("UsersSubmittals", fields: [recepient_id], references: [id], onDelete: Cascade)
+  sender        Users      @relation("senderSubmittals", fields: [sender_id], references: [id], onDelete: Cascade)
+  submittalsResponse  SubmittalsdResponse?  @relation("submittalsresponse")
 
   @@map("submittals")
 }
-model RFI{
-  id String @id @default(uuid()) @db.Uuid
-  fabricator_id String @db.Uuid
-  date DateTime @default(now())
-  fabricator Fabricator @relation(fields: [fabricator_id],references: [id],name:"FabricatorRFI",onDelete: Cascade)
-  project_id String @db.Uuid
-  project Project @relation(fields: [project_id],references: [id],name:"ProjectRFI",onDelete: Cascade)
-  recepient_id String @db.Uuid
-  recepients Users @relation(fields: [recepient_id],references: [id],name: "UsersRFI",onDelete: Cascade)
-  sender_id String @db.Uuid
-  sender Users @relation(fields: [sender_id],references: [id],name: "senderRFI",onDelete: Cascade)
-  status Boolean @default(false)
-  subject String
-  description String
-  files Json[] @default([])
 
+model SubmittalsdResponse {
+  id            String   @id @default(uuid()) @db.Uuid
+  files         Json[]   @default([])
+  responseState State
+  reason        String   @default("")
+  respondedAt   String   @default("")
+  createdAt     DateTime @default(now())
+  submittalsId    String   @unique @db.Uuid
+  approved      Boolean   @default(false)
+  submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
+
+  @@map("submittalsresponse")
+}
+
+model RFI {
+  id            String       @id @default(uuid()) @db.Uuid
+  fabricator_id String       @db.Uuid
+  date          DateTime     @default(now())
+  project_id    String       @db.Uuid
+  recepient_id  String       @db.Uuid
+  sender_id     String       @db.Uuid
+  status        Boolean      @default(false)
+  subject       String
+  description   String
+  files         Json[]       @default([])
+  fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
+  project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
+  recepients    Users        @relation("UsersRFI", fields: [recepient_id], references: [id], onDelete: Cascade)
+  sender        Users        @relation("senderRFI", fields: [sender_id], references: [id], onDelete: Cascade)
+  rfiresponse   RFIResponse? @relation("rfiresponse")
 
   @@map("rfi")
 }
 
-model RFQ{
-  id String @id @default(uuid()) @db.Uuid
-  projectName String
-  date DateTime @default(now())
-  recepient_id String @db.Uuid 
-  recepients Users @relation(fields:[recepient_id],references:[id],name:"UsersRFQ")
-  sender_id String @db.Uuid
-  sender Users @relation(fields:[sender_id],references:[id],name:"senderRFQ")
-  status Boolean @default(false)
-  subject String
-  description String
-  files Json[] @default([])
+model RFIResponse {
+  id            String   @id @default(uuid()) @db.Uuid
+  files         Json[]   @default([])
+  responseState State
+  reason        String   @default("")
+  respondedAt   String   @default("")
+  createdAt     DateTime @default(now())
+  rfiId         String   @unique @db.Uuid
+  rfi           RFI      @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)
+
+  @@map("rfiresponse")
+}
+
+model RFQ {
+  id           String   @id @default(uuid()) @db.Uuid
+  projectName  String
+  sender_id    String   @db.Uuid
+  status       Boolean  @default(false)
+  subject      String
+  description  String
+  files        Json[]   @default([])
+  date         DateTime @default(now())
+  recepient_id String   @db.Uuid
+  recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
+  sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
 
   @@map("rfq")
 }
 
-
 model Notification {
-  id String @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
-  userID String @db.Uuid
-  user Users @relation(fields: [userID], references: [id], onDelete: Cascade, name: "Notification")
-  payload Json
-  delivered Boolean @default(false)
- @@map("notification")
+  userID    String   @db.Uuid
+  payload   Json
+  delivered Boolean  @default(false)
+  user      Users    @relation("Notification", fields: [userID], references: [id], onDelete: Cascade)
 
-  }
-
+  @@map("notification")
+}
 
 model WorkingHours {
   id       String         @id @default(uuid()) @db.Uuid
@@ -422,109 +370,117 @@ model WorkingHours {
   task_id  String         @db.Uuid
   status   WorkHourStatus
   start    DateTime?
-  end      DateTime?  
-  duration Int @default(0)
+  duration Int            @default(0)
+  end      DateTime?
   task     Task           @relation("workingHourTask", fields: [task_id], references: [id], onDelete: Cascade)
   user     Users          @relation("workingHourUser", fields: [user_id], references: [id], onDelete: Cascade)
 
-@@map("workinghour")
-
+  @@map("workinghour")
 }
 
-
 model ChangeOrder {
-  id String @id @default(uuid()) @db.Uuid
-  project String @db.Uuid
-  Project Project @relation(fields: [project], references: [id], onDelete: Cascade, name: "ChangeOrderProject")
-  recipients String @db.Uuid
-  Recipients Users @relation(fields: [recipients], references: [id], onDelete: Cascade, name: "ChangeOrderRecipients")
-  sender String @db.Uuid
-  senders Users @relation(fields: [sender], references: [id], onDelete: Cascade, name: "ChangeOrderSender")
-  remarks String @default("")
-  changeOrder Int @default(1)
-  description String @default("")
-  rows Json @default("[]")
-  files Json @default("[]")
-  sentOn DateTime @default(now())
+  id          String             @id @default(uuid()) @db.Uuid
+  project     String             @db.Uuid
+  recipients  String             @db.Uuid
+  remarks     String             @default("")
+  changeOrder Int                @default(1)
+  description String             @default("")
+  files       Json               @default("[]")
+  sender      String             @db.Uuid
+  sentOn      DateTime           @default(now())
+  Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
+  Recipients  Users              @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
+  senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
+  CoRefersTo  ChangeOrdertable[] @relation("CoRefersTo")
 
   @@map("changeorder")
 }
 
-model JobStudy{
-  id String @id @default(uuid()) @db.Uuid
-  QtyNo Int 
-  unitTime Float @default(0.0) // Change from Int to Float
-  execTime Float @default(0.0) // Change from Int to Float
+model ChangeOrdertable {
+  id           String      @id @default(uuid()) @db.Uuid
+  siNo         Int         @default(0)
+  description  String      @default("")
+  referenceDoc String      @default("")
+  elements     String      @default("")
+  QtyNo        Int         @default(0)
+  hours        Float       @default(0.0)
+  cost         Float       @default(0.0)
+  CoId         String      @db.Uuid
+  CoRefersTo   ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
+
+  @@map("changeordertable")
+}
+
+model JobStudy {
+  id          String  @id @default(uuid()) @db.Uuid
+  QtyNo       Int
+  unitTime    Float   @default(0.0)
+  execTime    Float   @default(0.0)
+  projectId   String  @db.Uuid
   description String
-  projectId String @db.Uuid
-  projects Project @relation(fields: [projectId],references: [id],name: "projectJobStudy",onDelete: Cascade)
-  
+  projects    Project @relation("projectJobStudy", fields: [projectId], references: [id], onDelete: Cascade)
+
   @@map("jobStudy")
 }
 
-model WBSActivity{
-  id String @id @default(uuid()) @db.Uuid
-  type Activity 
-  name String
-  
+model WBSActivity {
+  id       String     @id @default(uuid()) @db.Uuid
+  type     Activity
+  name     String
   subTasks SubTasks[] @relation("subTasks")
-
 
   @@map("wbsactivity")
 }
 
-model SubTasks{
-  id String @id @default(uuid()) @db.Uuid
-  description String
-  QtyNo Int @default(0)
-  unitTime Float @default(0.0) // Change from Int to Float
-  execHr Float @default(0.0) // Change from Int to Float
-  CheckUnitTime Float @default(0.0) // Change from Int to Float
-  checkHr  Float @default(0.0) // Change from Int to Float
-  projectID String @db.Uuid
-  project Project @relation(fields: [projectID],references: [id],name: "subTasks",onDelete: Cascade)
-  wbsactivityID String @db.Uuid
-  WBSACTIVITY WBSActivity @relation(fields: [wbsactivityID],references: [id],name: "subTasks", onDelete: Cascade)
+model SubTasks {
+  id            String      @id @default(uuid()) @db.Uuid
+  description   String
+  unitTime      Float       @default(0.0)
+  CheckUnitTime Float       @default(0.0)
+  QtyNo         Int         @default(0)
+  checkHr       Float       @default(0.0)
+  execHr        Float       @default(0.0)
+  projectID     String      @db.Uuid
+  wbsactivityID String      @db.Uuid
+  project       Project     @relation("subTasks", fields: [projectID], references: [id], onDelete: Cascade)
+  WBSACTIVITY   WBSActivity @relation("subTasks", fields: [wbsactivityID], references: [id], onDelete: Cascade)
 
   @@map("subTasks")
 }
-model Group{
-  id String @id @default(uuid()) @db.Uuid
-  name String
-  createdAt DateTime @default(now())
-  adminId String @db.Uuid
-  admin Users @relation(fields:[adminId],references:[id],name:"groupAdmin")
-  members GroupUser[] @relation("groupOfUsers")
-  messages Message[] @relation("groupMessages")
+
+model Group {
+  id        String      @id @default(uuid()) @db.Uuid
+  name      String
+  adminId   String      @db.Uuid
+  createdAt DateTime    @default(now())
+  admin     Users       @relation("groupAdmin", fields: [adminId], references: [id])
+  members   GroupUser[] @relation("groupOfUsers")
+  messages  Message[]   @relation("groupMessages")
 
   @@map("group")
 }
 
-model GroupUser{
- id String @id @default(uuid()) @db.Uuid
+model GroupUser {
+  id       String @id @default(uuid()) @db.Uuid
+  memberId String @db.Uuid
+  groupId  String @db.Uuid
+  group    Group  @relation("groupOfUsers", fields: [groupId], references: [id])
+  members  Users  @relation("groupMembers", fields: [memberId], references: [id])
 
- memberId String @db.Uuid
- members Users @relation(fields:[memberId],references:[id],name:"groupMembers")
-
- groupId String @db.Uuid
- group Group @relation(fields:[groupId],references:[id],name:"groupOfUsers")
-
- @@map("groupuser")
+  @@map("groupuser")
 }
 
-
-model Message{
-  id String @id @default(uuid()) @db.Uuid
-  content String
-  createdAt DateTime @default(now())
-  senderId String @db.Uuid
-  sender Users @relation(fields:[senderId],references:[id],name:"messageSentBy")
-  receiverId String @db.Uuid
-  receiver Users @relation(fields:[receiverId],references:[id],name:"messageReceivedBy")
-  groupId String @db.Uuid
-  groups  Group @relation(fields:[groupId],references:[id],name:"groupMessages")
-  taggedUsers Users[] @relation("TaggedUsers")
-
+model Message {
+  id          String   @id @default(uuid()) @db.Uuid
+  content     String
+  createdAt   DateTime @default(now())
+  senderId    String   @db.Uuid
+  receiverId  String   @db.Uuid
+  groupId     String   @db.Uuid
+  groups      Group    @relation("groupMessages", fields: [groupId], references: [id])
+  receiver    Users    @relation("messageReceivedBy", fields: [receiverId], references: [id])
+  sender      Users    @relation("messageSentBy", fields: [senderId], references: [id])
+  taggedUsers Users[]  @relation("TaggedUsers")
 
   @@map("message")
 }
@@ -541,7 +497,7 @@ enum UserRole {
   CLIENT
   VENDOR
 }
-//task
+
 enum Status {
   ACTIVE
   ONHOLD
@@ -551,23 +507,20 @@ enum Status {
   ASSIGNED
 }
 
-
-//PROJECT AND TASK
 enum Stage {
   RFI
   IFA
   BFA
-  BFA_M // Not possible to use "-"
+  BFA_M
   RIFA
   RBFA
   IFC
   BFC
   RIFC
   REV
-  CO // Not possible to use "#"
+  CO
   COMPLETED
 }
-
 
 enum Tools {
   TEKLA
@@ -577,11 +530,16 @@ enum Tools {
 
 enum Activity {
   MODELING
-  MODEL_CHECKING
   DETAILING
-  DETAIL_CHECKING
   ERECTION
+  MODEL_CHECKING
+  DETAIL_CHECKING
   ERECTION_CHECKING
   DESIGNER
-  DESIGN_CHECKING  
+  DESIGN_CHECKING
+}
+
+enum State {
+  PARTIAL
+  COMPLETE
 }
