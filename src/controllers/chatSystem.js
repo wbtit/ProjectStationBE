@@ -40,24 +40,27 @@ const createGroup=async(req,res)=>{
 }
 
 const addMemberToGroup=async(req,res)=>{
-    const{memberId}=req.body
+    const{memberIds}=req.body
     const{groupId}=req.params
     try {
-        if(!memberId || groupId){
+        if(!memberIds || groupId || !Array.isArray(memberIds)){
             return sendResponse({
-                message:"Please provide memberId and groupId",
+                message: "Please provide an array of memberIds and a groupId",
                 res,
                 statusCode:400,
                 success:false,
                 data:null
             })
         }
-        const membership=  await prisma.groupuser.create({
-            data:{
-                memberId:memberId,
-                groupId:groupId
-            }
-        })
+        const membership=  await Promise.all(
+            memberIds.map(id=>
+                prisma.groupUser.create({
+                    data:{memberId:id,
+                    groupId:groupId
+                    }
+                })
+            )
+        )
         return sendResponse({
             message:"User Added successfully",
             res,
@@ -193,7 +196,16 @@ const recentchats=async(req,res)=>{
             const otheuserId=msg.senderId===id ? msg.receiverId : msg.senderId
             if(!PrivateMap.has(otheuserId)){
                 const user= await prisma.users.findUnique({
-                    where:{id:otheuserId}
+                    where:{id:otheuserId},
+                    select:{
+                        f_name:true,
+                        m_name:true,
+                        l_name:true,
+                        username:true,
+                        role:true,
+                        emp_code:true
+                        
+                    }
                 })
                 PrivateMap.set(otheuserId,{
                     type:"private",
