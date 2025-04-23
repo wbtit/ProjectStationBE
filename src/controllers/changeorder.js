@@ -170,24 +170,36 @@ const AddChangeOrder = async (req, res) => {
 };
 
 const  addCoResponse=async(req,res)=>{
+
   const {coId}=req.params
   const {id}=req.user
+  const {approved,description}=req.body
   
   try {
-    if(!coId){
+    if(!coId || !approved ||!description){
       return sendResponse({
-        message:"ChangeOrder is requires",
+        message:"feilds are required",
         res,
         statusCode: 400,
         success: false,
         data: null,  
       })
-      const coResponse= await prisma.coResponse.create({
-        data:{
-        
-        }
-      })
     }
+    const coResponse= await prisma.coResponse.create({
+      data:{
+        approved:approved,
+        description:description
+      }
+    })
+
+    return sendResponse({
+      message:"Coresponse created successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:coResponse
+    })
+    
   } catch (error) {
     console.log(error.message)
     return sendResponse({

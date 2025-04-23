@@ -20,6 +20,12 @@ const createGroup=async(req,res)=>{
                 adminId:id
             }
         })
+        await prisma.groupUser.create({
+            data:{
+                memberId:id,
+                groupId:newGroup.id
+            }
+        })
         return sendResponse({
             message:"Create a group successfully",
             res,
@@ -61,6 +67,7 @@ const addMemberToGroup=async(req,res)=>{
                 })
             )
         )
+        //console.log("membership",membership)
         return sendResponse({
             message:"User Added successfully",
             res,
@@ -177,7 +184,7 @@ const privateChatHistory=async(req,res)=>{
 
 const recentchats = async (req, res) => {
     const { id } = req.user;
-  
+  //console.log("userId",id)
     try {
       // Fetch recent private messages
       const privateMessages = await prisma.message.findMany({
@@ -187,7 +194,7 @@ const recentchats = async (req, res) => {
         },
         orderBy: { createdAt: 'desc' }
       });
-  
+      //console.log("Private Messages:", privateMessages);
       const privateMap = new Map();
   
       for (const msg of privateMessages) {
@@ -220,15 +227,15 @@ const recentchats = async (req, res) => {
         where: { memberId: id },
         select: { groupId: true }
       });
-  
+      console.log("Group Memberships:", groupMembership);
       const groupIds = groupMembership.map(g => g.groupId);
   
       const groupMessages = await prisma.message.findMany({
         where: { groupId: { in: groupIds } },
         orderBy: { createdAt: 'desc' }
       });
-  
-      const groupMap = new Map();recentChats
+      //console.log("Group Messages:", groupMessages);
+      const groupMap = new Map();
   
       for (const msg of groupMessages) {
         if (!groupMap.has(msg.groupId)) {
@@ -245,7 +252,7 @@ const recentchats = async (req, res) => {
       const allGroups = await prisma.group.findMany({
         where: { id: { in: groupIds } }
       });
-  
+      console.log("allGroups",allGroups)
       const groupChatsSidebarItems = allGroups.map(group => {
         const msgInfo = groupMap.get(group.id) || {};
         return {
@@ -255,6 +262,7 @@ const recentchats = async (req, res) => {
           timestamp: msgInfo.timestamp || null
         };
       });
+      //console.log("groupChatsSidebarItems",groupChatsSidebarItems)
   
       // Combine all chats and sort
       const combinedChats = [
