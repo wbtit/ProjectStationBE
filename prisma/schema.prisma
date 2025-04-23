@@ -349,8 +349,15 @@ model RFQ {
   recepient_id String   @db.Uuid
   recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
   sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
-
+  response     RFQResponse?  @relation("rfqResponses")
   @@map("rfq")
+}
+
+model RFQResponse{
+  id        String    @id @default(uuid()) @db.Uuid
+  files     Json[]    @default([])
+  rfqId     String    @db.Uuid  @unique
+  rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
 }
 
 model Notification {
