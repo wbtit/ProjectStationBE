@@ -285,8 +285,23 @@ model Submittals {
   project       Project    @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
   recepients    Users      @relation("UsersSubmittals", fields: [recepient_id], references: [id], onDelete: Cascade)
   sender        Users      @relation("senderSubmittals", fields: [sender_id], references: [id], onDelete: Cascade)
+  submittalsResponse  SubmittalsdResponse?  @relation("submittalsresponse")
 
   @@map("submittals")
+}
+
+model SubmittalsdResponse {
+  id            String   @id @default(uuid()) @db.Uuid
+  files         Json[]   @default([])
+  responseState State
+  reason        String   @default("")
+  respondedAt   String   @default("")
+  createdAt     DateTime @default(now())
+  submittalsId    String   @unique @db.Uuid
+  approved      Boolean   @default(false)
+  submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
+
+  @@map("submittalsresponse")
 }
 
 model RFI {
