@@ -112,19 +112,14 @@ const AddChangeOrder = async (req, res) => {
     remarks,
     changeOrder,
     description,
-    rows,
   } = req.body;
-
-  
-
 
   if (
     !project ||
     !recipients ||
     !remarks ||
     !changeOrder ||
-    !description ||
-    !rows
+    !description 
   ) {
     return sendResponse({
       message: "Fields are empty",
@@ -136,13 +131,7 @@ const AddChangeOrder = async (req, res) => {
   }
 
   try {
-    const fileDetails = req.files.map((file) => ({
-      filename: file.filename, // UUID + extension
-      originalName: file.originalname, // Original name of the file
-      id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/rfitemp/${file.filename}`, // Relative path
-    }));
-
+    
     const changeorder = await prisma.changeOrder.create({
       data: {
         changeOrder: parseInt(changeOrder),
@@ -150,12 +139,11 @@ const AddChangeOrder = async (req, res) => {
         project: project,
         recipients: recipients,
         remarks: remarks,
-        rows: rows,
         sender: req.user.id,
-        files: fileDetails,
+        
       },
     });
-    console.log("ChangeOrder from DB:",changeorder)
+    //console.log("ChangeOrder from DB:",changeorder)
     
     //RLT 
     sendNotification(recipients,{
@@ -180,5 +168,36 @@ const AddChangeOrder = async (req, res) => {
     });
   }
 };
+
+const  addCoResponse=async(req,res)=>{
+  const {coId}=req.params
+  const {id}=req.user
+  
+  try {
+    if(!coId){
+      return sendResponse({
+        message:"ChangeOrder is requires",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,  
+      })
+      const coResponse= await prisma.coResponse.create({
+        data:{
+        
+        }
+      })
+    }
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+}
 
 export { AddChangeOrder ,changeOrderReceived,changeOrderSent};

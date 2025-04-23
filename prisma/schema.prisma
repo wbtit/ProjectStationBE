@@ -74,6 +74,7 @@ model Users {
   workingHourUser       WorkingHours[]  @relation("workingHourUser")
   fabricators           Fabricator[]    @relation("FabricatorUsers")
   taggedInMessages      Message[]       @relation("TaggedUsers")
+  COrespondedby         COResponse[]    @relation("COrespondedby")
 
   @@map("users")
 }
@@ -425,6 +426,8 @@ model COResponse{
   description   String    @default("")
   CoId        String  @db.Uuid  @unique
   COResponse  ChangeOrder @relation("coResponse",fields:[CoId],references:[id])
+  userId        String  @db.Uuid
+  user      Users     @relation("COrespondedby",fields:[userId],references:[id])
 }
 
 model JobStudy {
@@ -491,11 +494,11 @@ model Message {
   content     String
   createdAt   DateTime @default(now())
   senderId    String   @db.Uuid
-  receiverId  String   @db.Uuid
-  groupId     String   @db.Uuid
-  groups      Group    @relation("groupMessages", fields: [groupId], references: [id])
-  receiver    Users    @relation("messageReceivedBy", fields: [receiverId], references: [id])
-  sender      Users    @relation("messageSentBy", fields: [senderId], references: [id])
+  receiverId  String?   @db.Uuid
+  groupId     String ?  @db.Uuid
+  groups      Group?    @relation("groupMessages", fields: [groupId], references: [id])
+  receiver    Users?    @relation("messageReceivedBy", fields: [receiverId], references: [id])
+  sender      Users?    @relation("messageSentBy", fields: [senderId], references: [id])
   taggedUsers Users[]  @relation("TaggedUsers")
 
   @@map("message")
