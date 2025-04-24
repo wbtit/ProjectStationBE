@@ -46,7 +46,7 @@ const AddSubmitals = async (req, res) => {
         status: true,
       },
       include: {
-        recipient: true, // Make sure this matches your Prisma schema
+        recepients: true, // Make sure this matches your Prisma schema
       },
     });
 
@@ -207,7 +207,7 @@ const AddSubmitals = async (req, res) => {
 
     sendEmail({
       html: htmlContent,
-      to: submitals.recipient.email, // Ensure it's `recipient`, not `recepients`
+      to: submitals.recepients.email, // Ensure it's `recipient`, not `recepients`
       subject: subject,
       text: description,
     });

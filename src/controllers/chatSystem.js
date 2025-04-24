@@ -235,7 +235,7 @@ const recentchats = async (req, res) => {
         where: { memberId: id },
         select: { groupId: true }
       });
-      console.log("Group Memberships:", groupMembership);
+      //console.log("Group Memberships:", groupMembership);
       const groupIds = groupMembership.map(g => g.groupId);
   
       const groupMessages = await prisma.message.findMany({

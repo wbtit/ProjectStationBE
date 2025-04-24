@@ -70,6 +70,7 @@ const initSocket = async(io) => {
     })
 
     socket.on("groupMessages",async({content,groupId,senderId,taggedUserIds=[]})=>{
+      // console.log("groupMessages got hit")
       const message = await prisma.message.create({
         data: {
           content,
@@ -83,9 +84,9 @@ const initSocket = async(io) => {
           taggedUsers: true
         }
       });
-      if(message){
-        console.log("message created",message)
-      }
+      // if(message){
+      //   console.log("message created",message)
+      // }
       const groupMembers= await prisma.groupUser.findMany({
         where:{groupId},
       })
@@ -100,6 +101,7 @@ const initSocket = async(io) => {
           }
 
           if(memberSocketId){
+            // console.log("memberSocketId:",memberSocketId)
             io.to(memberSocketId).emit("receiveGroupMessage",payload)
           }else{
             await prisma.notification.create({

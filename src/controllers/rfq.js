@@ -429,5 +429,84 @@ const RfqViewFiles = async (req, res) => {
       .json({ message: "Something went wrong while viewing the file" });
   }
 };
+const addRfqResponse=async(req,res)=>{
+const{rfqId}=req.params
+const{id}=req.user
+try {
+  if(!rfqId){
+    return sendResponse({
+      message:"RfqId is required",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  
+  const fileDetails = req.files.map((file) => ({
+    filename: file.filename, // UUID + extension
+    originalName: file.originalname, // Original name of the file
+    id: file.filename.split(".")[0], // Extract UUID from the filename
+    path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
+  })); 
 
-export { addRFQ,sentRFQByUser,Inbox,RFQseen,RFQByID,RfqViewFiles};
+  const addResponse= await prisma.rfqResponse.create({
+    data:{
+      userId:id,
+      rfqId:rfqId,
+      files:fileDetails
+    }
+
+  })
+  return sendResponse({
+    message:"Response created",
+    res,
+    statusCode:200,
+    success:true,
+    data:addResponse
+  })
+} catch (error) {
+  console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+}
+}
+const getRfqResponse=async(req,res)=>{
+  const{id}=req.params
+  try {
+    const response=await prisma.rfqResponse.findUnique({
+      where:{id:id}
+    })
+    return sendResponse({
+      message:"Respose is fetched successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:response
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+  }
+}
+export { 
+  addRFQ,
+  sentRFQByUser,
+  Inbox,
+  RFQseen,
+  RFQByID,
+  RfqViewFiles,
+  addRfqResponse,
+  getRfqResponse
+};
