@@ -189,7 +189,8 @@ const  addCoResponse=async(req,res)=>{
       data:{
         approved:approved,
         description:description,
-        userId:id
+        userId:id,
+        coId:coId
       }
     })
 
@@ -216,8 +217,8 @@ const getResponse=async(req,res)=>{
   const{id}=req.params
   try {
     
-    const response= await prisma.coResponse({
-      where:{CoId:id}
+    const response= await prisma.coResponse.findUnique({
+      where:{id:id}
     })
     return sendResponse({
       message:"Respose is fetched successfully",

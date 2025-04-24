@@ -506,4 +506,29 @@ const addRFIResponse=async(req,res)=>{
     })
   }
 }
-export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles,addRFIResponse};
+
+const getRfiresponse=async(req,res)=>{
+  const{id}=req.params
+  try {
+    const response= await prisma.rFIResponse.findUnique({
+      where:{id:id}
+    })
+    return sendResponse({
+      message:"Respose is fetched successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:response
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+  }
+}
+export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles,addRFIResponse,getRfiresponse};

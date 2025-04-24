@@ -83,7 +83,10 @@ const initSocket = async(io) => {
           taggedUsers: true
         }
       });
-      const groupMembers= await prisma.groupuser.findMany({
+      if(message){
+        console.log("message created",message)
+      }
+      const groupMembers= await prisma.groupUser.findMany({
         where:{groupId},
       })
       for(const member of groupMembers){
