@@ -9,7 +9,8 @@ import {
   RFIseen,
   RFIByID,
   viewRFIfiles,
-  addRFIResponse
+  addRFIResponse,
+  getRfiresponse
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -33,5 +34,6 @@ router.post("/addresponse/:rfiId",
   rfiResponseUploads.any("files"),
   addRFIResponse
 )
+router.get("/getResponse/:id",Authenticate,getRfiresponse)
 
 export default router;
