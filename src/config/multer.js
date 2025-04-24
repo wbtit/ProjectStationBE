@@ -5,6 +5,8 @@ import path from "path";
 const fileDataMap = {}; // Object to store file data (UUID and original name)
 const submittalsDataMap = {};
 const rfiDataMap = {};
+const rfiResponseDataMap={};
+const rfqresponseDataMap={};
 const rfqDataMap={};
 const fabricatorDataMap = {};
 const commentDataMap = {};
@@ -59,7 +61,7 @@ const storageSubmittals = multer.diskStorage({
 
     cb(null, newFileName);
   },
-});
+});rfiDataMap
 
 const submittalsUploads = multer({
   storage: storageSubmittals,
@@ -118,7 +120,7 @@ const storageRfiResponse = multer.diskStorage({
     const newFileName = `${uniqueId}${fileExt}`;
 
     // Add file data to the object
-    rfiDataMap[newFileName] = {
+    rfiResponseDataMap[newFileName] = {
       originalName: file.originalname,
       uuid: uniqueId,
     };
@@ -273,6 +275,34 @@ const changeorderUploads = multer({
   },
 });
 
+const storageRfqResponse = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/rfqResponsetemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    rfqresponseDataMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const rfqResponseUploads = multer({
+  storage: storageRfqResponse,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
 // Export the uploader and file data object
 export {
   uploads,
@@ -280,6 +310,8 @@ export {
   fabricatorDataMap,
   fabricatorsUploads,
   rfiDataMap,
+  rfiResponseDataMap,
+  rfqresponseDataMap,
   rfiUploads,
   rfqDataMap,
   rfqUploads,
@@ -289,5 +321,6 @@ export {
   commentDataMap,
   changeorderUploads,
   changeOrderDataMap,
-  rfiResponseUploads
+  rfiResponseUploads,
+  rfqResponseUploads
 };

@@ -76,6 +76,7 @@ model Users {
   taggedInMessages      Message[]       @relation("TaggedUsers")
   COrespondedby         COResponse[]    @relation("COrespondedby")
   rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
+  rfqresponseBy         RFQResponse[]   @relation("rfqresponseBy")
 
   @@map("users")
 }
@@ -295,7 +296,6 @@ model Submittals {
 model SubmittalsdResponse {
   id            String   @id @default(uuid()) @db.Uuid
   files         Json[]   @default([])
-  responseState State
   reason        String   @default("")
   respondedAt   String   @default("")
   createdAt     DateTime @default(now())
@@ -360,8 +360,12 @@ model RFQ {
 model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
+  userId        String    @db.Uuid
+  user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
   rfqId     String    @db.Uuid  @unique
   rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
+
+  @@map("rfqResponse")
 }
 
 model Notification {
