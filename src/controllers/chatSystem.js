@@ -298,4 +298,97 @@ const recentchats = async (req, res) => {
     }
   };
   
-export{createGroup,addMemberToGroup,groupChatHistory,privateChatHistory,recentchats}
+
+  const deleteMembersInGroup=async(req,res)=>{
+    const {groupId,memberId}=req.params
+    if(!groupId || !memberId){
+      return sendResponse({
+        message:"MemberId and GroupId is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+    })
+    }
+    try {
+      const groupmember= await prisma.groupUser.findFirst({
+        where:{
+          memberId:memberId,
+          groupId:groupId
+        }
+      })
+      if(!groupmember){
+        return sendResponse({
+          message:"No such user in the group",
+          res,
+          statusCode:404,
+          success:false,
+          data:null
+      }) 
+      }
+      const deletedmember= await prisma.groupUser.delete({
+        where:{id:groupmember.id}
+      })
+
+      return sendResponse({
+        message:"user removed from the group",
+        res,
+        statusCode:200,
+        success:true,
+        data:deletedmember
+    })
+    } catch (error) {
+      console.log(error.message);
+      return sendResponse({
+        message: "Failed to load the recent Chats",
+        res,
+        statusCode: 500,
+        success: false,
+        data: null
+      }); 
+    }
+  }
+
+  const getgroupMembers=async(req,res)=>{
+    const {groupId}=req.params
+    if(!groupId){
+      return sendResponse({
+        message:"GroupId is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+    })
+  }
+    try {
+      const deletedGroup= await prisma.group.delete({
+        where:{id:groupId}
+      })
+
+      return sendResponse({
+        message:"Removed the group successfully",
+        res,
+        statusCode:200,
+        success:true,
+        data:deletedGroup
+      })
+    } catch (error) {
+      return sendResponse({
+        message: "Failed to load the recent Chats",
+        res,
+        statusCode: 500,
+        success: false,
+        data: null
+      }); 
+    
+  }
+}
+export{
+  createGroup,
+  addMemberToGroup,
+  groupChatHistory,
+  privateChatHistory,
+  recentchats,
+  deleteMembersInGroup,
+  getgroupMembers
+}
