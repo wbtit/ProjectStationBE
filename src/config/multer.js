@@ -4,6 +4,7 @@ import path from "path";
 
 const fileDataMap = {}; // Object to store file data (UUID and original name)
 const submittalsDataMap = {};
+const submittalResponseMap={};
 const rfiDataMap = {};
 const rfiResponseDataMap={};
 const rfqresponseDataMap={};
@@ -304,6 +305,35 @@ const rfqResponseUploads = multer({
   },
 });
 // Export the uploader and file data object
+
+const storageSubmittalsResponse = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/rfqResponsetemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    submittalResponseMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const SubmittalsResponseUploads = multer({
+  storage:storageSubmittalsResponse ,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
 export {
   uploads,
   fileDataMap,
@@ -314,6 +344,7 @@ export {
   rfqresponseDataMap,
   rfiUploads,
   rfqDataMap,
+  submittalResponseMap,
   rfqUploads,
   submittalsDataMap,
   submittalsUploads,
@@ -322,5 +353,6 @@ export {
   changeorderUploads,
   changeOrderDataMap,
   rfiResponseUploads,
-  rfqResponseUploads
+  rfqResponseUploads,
+  SubmittalsResponseUploads
 };

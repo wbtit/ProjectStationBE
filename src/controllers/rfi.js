@@ -531,4 +531,13 @@ const getRfiresponse=async(req,res)=>{
     })
   }
 }
-export { addRFI, sentRFIByUser, Inbox, RFIseen, RFIByID,viewRFIfiles,addRFIResponse,getRfiresponse};
+export { 
+  addRFI, 
+  sentRFIByUser, 
+  Inbox, 
+  RFIseen, 
+  RFIByID,
+  viewRFIfiles,
+  addRFIResponse,
+  getRfiresponse
+};

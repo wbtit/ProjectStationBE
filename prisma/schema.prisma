@@ -77,6 +77,7 @@ model Users {
   COrespondedby         COResponse[]    @relation("COrespondedby")
   rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
   rfqresponseBy         RFQResponse[]   @relation("rfqresponseBy")
+  submittalsresponseBy  SubmittalsdResponse[]  @relation("submittalsresponseBy")
 
   @@map("users")
 }
@@ -299,8 +300,10 @@ model SubmittalsdResponse {
   reason        String   @default("")
   respondedAt   String   @default("")
   createdAt     DateTime @default(now())
-  submittalsId    String   @unique @db.Uuid
   approved      Boolean   @default(false)
+  userId        String    @db.Uuid
+  user          Users     @relation("submittalsresponseBy",fields:[userId],references:[id])
+  submittalsId    String   @unique @db.Uuid
   submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
 
   @@map("submittalsresponse")
