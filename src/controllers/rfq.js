@@ -474,7 +474,9 @@ const RfqresponseViewFiles = async (req, res) => {
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
+console.log("RFQID:,",rfqId)
 const{id}=req.user
+
 try {
   if(!rfqId){
     return sendResponse({
@@ -493,7 +495,7 @@ try {
     path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
   })); 
 
-  const addResponse= await prisma.rfqResponse.create({
+  const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
       rfqId:rfqId,
