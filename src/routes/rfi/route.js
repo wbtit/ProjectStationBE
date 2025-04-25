@@ -9,6 +9,7 @@ import {
   RFIseen,
   RFIByID,
   viewRFIfiles,
+  viewRFIResponsefiles,
   addRFIResponse,
   getRfiresponse
 } from "../../controllers/rfi.js";
@@ -23,6 +24,7 @@ router.post(
 );
 
 router.get("/rfi/viewfile/:id/:fid", viewRFIfiles);//view files in RFI
+router.get("/rfiResponse/viewfile/:id/:fid",viewRFIResponsefiles);//view files in RFIResponse
 
 router.get("/rfi/sent", Authenticate, sentRFIByUser);
 router.get("/rfi/inbox", Authenticate, Inbox);

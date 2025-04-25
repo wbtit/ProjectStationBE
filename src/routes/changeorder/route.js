@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { changeorderUploads } from "../../config/multer.js";
-import { AddChangeOrder,changeOrderReceived,changeOrderSent,addCoResponse,getResponse,AddChangeOrdertable,getRowCotable} from "../../controllers/changeorder.js";
+import { AddChangeOrder,changeOrderReceived,changeOrderSent,addCoResponse,getResponse,AddChangeOrdertable,getRowCotable,viewCOfiles} from "../../controllers/changeorder.js";
 import Authenticate from "../../middlewares/authenticate.js";
 
 const router = Router();
@@ -11,6 +11,8 @@ router.post(
   changeorderUploads.array("files"),
   AddChangeOrder
 );
+
+router.get("/viewfile/:id/:fid", viewCOfiles);
 
 router.get("/receives",Authenticate,changeOrderReceived)
 router.get("/sents",Authenticate,changeOrderSent)

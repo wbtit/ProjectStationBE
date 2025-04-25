@@ -135,7 +135,7 @@ const AddChangeOrder = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/rfiResponsetemp/${file.filename}`, // Relative path
+      path: `/public/changeordertemp/${file.filename}`, // Relative path
     }));
     
     const changeorder = await prisma.changeOrder.create({
@@ -327,6 +327,48 @@ const getRowCotable=async(req,res)=>{
   }
 }
 
+const viewCOfiles = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const CO = await prisma.changeOrder.findUnique({
+      where: { id },
+    });
+
+    if (!CO) {
+      return res.status(404).json({ message: "CO not found" });
+    }
+
+    const fileObject = CO.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 export { 
   AddChangeOrder ,
   changeOrderReceived,
@@ -334,5 +376,6 @@ export {
   addCoResponse,
   getResponse,
   AddChangeOrdertable,
-  getRowCotable
+  getRowCotable,
+  viewCOfiles,
 };

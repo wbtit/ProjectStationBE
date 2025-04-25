@@ -238,6 +238,58 @@ const AddSubmitals = async (req, res) => {
   }
 };
 
+const getSubmittal = async (req, res) => {
+  const { submittalId } = req.params;
+  console.log("submittalId:", submittalId);
+
+  try {
+    if (!submittalId) {
+      return sendResponse({
+        message: "SubmittalId is required",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    const submittal = await prisma.submittals.findUnique({
+      where: { id: submittalId },
+      include: {
+        sender: {
+          include: { fabricator: true },
+        },
+      },
+    });
+
+    if (!submittal) {
+      return sendResponse({
+        message: "Submittal not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    return sendResponse({
+      message: "Submittal fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: submittal,
+    });
+  } catch (error) {
+    console.error("Error fetching submittal:", error.message);
+    return sendResponse({
+      message: "Failed to fetch the submittal",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
 
 
 const SentSubmittals = async (req, res) => {
@@ -396,6 +448,48 @@ const submitalsViewFiles = async (req, res) => {
   }
 };
 
+const submitalsResponseViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const submittals = await prisma.submittalsdResponse.findUnique({
+      where: { id },
+    });
+
+    if (!submittals) {
+      return res.status(404).json({ message: "submittalsResponse not found" });
+    }
+
+    const fileObject = submittals.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
@@ -478,5 +572,7 @@ export {
   SubmittalsSeen,
   submitalsViewFiles,
   addSubmittalsResponse,
-  getSubmittalresponse
+  getSubmittalresponse,
+  submitalsResponseViewFiles,
+  getSubmittal
 };
