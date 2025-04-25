@@ -396,4 +396,87 @@ const submitalsViewFiles = async (req, res) => {
   }
 };
 
-export { AddSubmitals, RecievedSubmittals, SentSubmittals, SubmittalsSeen,submitalsViewFiles };
+const addSubmittalsResponse=async(req,res)=>{
+const{submittalId}=req.params
+const{id}=req.user
+const{reason,approved,respondedAt}=req.body
+
+try {
+  if(!responseState ||!reason||!respondedAt||!approved){
+    return sendResponse({
+      message:"Feilds are empty",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  const fileDetails = req.files.map((file) => ({
+    filename: file.filename, // UUID + extension
+    originalName: file.originalname, // Original name of the file
+    id: file.filename.split(".")[0], // Extract UUID from the filename
+    path: `/public/submittalsResponsetemp/${file.filename}`, // Relative path
+  }));
+  const addresponse= await prisma.submittalsdResponse.create({
+    data:{
+     reason:reason,
+     respondedAt:respondedAt,
+     approved:approved,
+     userId:id,
+     files:fileDetails,
+     submittalsId:submittalId 
+    }
+  })
+  return sendResponse({
+    message:"Response created",
+    res,
+    statusCode:200,
+    success:true,
+    data:addresponse
+  })
+  
+} catch (error) {
+  console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+}
+}
+const getSubmittalresponse=async(req,res)=>{
+  const{id}=req.params
+  try {
+    const response= await prisma.submittalsdResponse.findUnique({
+      where:{id:id}
+    })
+
+    return sendResponse({
+      message:"Respose is fetched successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:response
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"failed to create Response",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+  }
+}
+export { 
+  AddSubmitals,
+  RecievedSubmittals,
+  SentSubmittals, 
+  SubmittalsSeen,
+  submitalsViewFiles,
+  addSubmittalsResponse,
+  getSubmittalresponse
+};

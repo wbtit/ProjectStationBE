@@ -77,6 +77,7 @@ model Users {
   COrespondedby         COResponse[]    @relation("COrespondedby")
   rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
   rfqresponseBy         RFQResponse[]   @relation("rfqresponseBy")
+  submittalsresponseBy  SubmittalsdResponse[]  @relation("submittalsresponseBy")
 
   @@map("users")
 }
@@ -299,8 +300,10 @@ model SubmittalsdResponse {
   reason        String   @default("")
   respondedAt   String   @default("")
   createdAt     DateTime @default(now())
-  submittalsId    String   @unique @db.Uuid
   approved      Boolean   @default(false)
+  userId        String    @db.Uuid
+  user          Users     @relation("submittalsresponseBy",fields:[userId],references:[id])
+  submittalsId    String   @unique @db.Uuid
   submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
 
   @@map("submittalsresponse")
@@ -401,6 +404,7 @@ model ChangeOrder {
   changeOrder Int                @default(1)
   description String             @default("")
   sender      String             @db.Uuid
+  files        Json        @default("[]")
   sentOn      DateTime           @default(now())
   Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
   Recipients  Users              @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
@@ -420,7 +424,6 @@ model ChangeOrdertable {
   QtyNo        Int         @default(0)
   hours        Float       @default(0.0)
   cost         Float       @default(0.0)
-  files       Json               @default("[]")
   CoId         String      @db.Uuid 
   CoRefersTo   ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
 

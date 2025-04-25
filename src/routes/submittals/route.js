@@ -1,12 +1,14 @@
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
-import { submittalsUploads } from "../../config/multer.js";
+import { submittalsUploads,SubmittalsResponseUploads } from "../../config/multer.js";
 import {
   AddSubmitals,
   RecievedSubmittals,
   SentSubmittals,
   SubmittalsSeen,
-  submitalsViewFiles
+  submitalsViewFiles,
+  addSubmittalsResponse,
+  getSubmittalresponse
 } from "../../controllers/subbmitals.js";
 
 const router = Router();
@@ -23,5 +25,12 @@ router.get("/submittals/sent", Authenticate, SentSubmittals);
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
 
 router.patch("/submittals/:id", Authenticate, SubmittalsSeen);
+
+router.post("/addresponse/:submittalId",
+  Authenticate,
+  SubmittalsResponseUploads.any("files"),
+  addSubmittalsResponse
+)
+router.get("/getResponse/:id",Authenticate,getSubmittalresponse)
 
 export { router as Submittals };
