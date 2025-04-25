@@ -396,6 +396,48 @@ const submitalsViewFiles = async (req, res) => {
   }
 };
 
+const submitalsResponseViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const submittals = await prisma.submittalsdResponse.findUnique({
+      where: { id },
+    });
+
+    if (!submittals) {
+      return res.status(404).json({ message: "submittalsResponse not found" });
+    }
+
+    const fileObject = submittals.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
@@ -478,5 +520,6 @@ export {
   SubmittalsSeen,
   submitalsViewFiles,
   addSubmittalsResponse,
-  getSubmittalresponse
+  getSubmittalresponse,
+  submitalsResponseViewFiles
 };
