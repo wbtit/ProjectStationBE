@@ -9,7 +9,8 @@ import {
   submitalsViewFiles,
   addSubmittalsResponse,
   getSubmittalresponse,
-  submitalsResponseViewFiles
+  submitalsResponseViewFiles,
+  getSubmittal
 } from "../../controllers/subbmitals.js";
 
 const router = Router();
@@ -23,6 +24,8 @@ router.post(
 
 router.get("/submittals/:id/:fid",Authenticate,submitalsViewFiles)
 router.get("/submittalsresponse/:id/:fid",Authenticate,submitalsResponseViewFiles)
+
+router.get("/getsubmittals/:submittalId",Authenticate,getSubmittal)
 
 router.get("/submittals/sent", Authenticate, SentSubmittals);
 

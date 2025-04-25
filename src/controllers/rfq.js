@@ -501,8 +501,8 @@ try {
       rfqId:rfqId,
       files:fileDetails
     }
-
   })
+  console.log(addResponse)
   return sendResponse({
     message:"Response created",
     res,

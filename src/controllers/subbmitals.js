@@ -238,6 +238,58 @@ const AddSubmitals = async (req, res) => {
   }
 };
 
+const getSubmittal = async (req, res) => {
+  const { submittalId } = req.params;
+  console.log("submittalId:", submittalId);
+
+  try {
+    if (!submittalId) {
+      return sendResponse({
+        message: "SubmittalId is required",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    const submittal = await prisma.submittals.findUnique({
+      where: { id: submittalId },
+      include: {
+        sender: {
+          include: { fabricator: true },
+        },
+      },
+    });
+
+    if (!submittal) {
+      return sendResponse({
+        message: "Submittal not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    return sendResponse({
+      message: "Submittal fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: submittal,
+    });
+  } catch (error) {
+    console.error("Error fetching submittal:", error.message);
+    return sendResponse({
+      message: "Failed to fetch the submittal",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
 
 
 const SentSubmittals = async (req, res) => {
@@ -521,5 +573,6 @@ export {
   submitalsViewFiles,
   addSubmittalsResponse,
   getSubmittalresponse,
-  submitalsResponseViewFiles
+  submitalsResponseViewFiles,
+  getSubmittal
 };
