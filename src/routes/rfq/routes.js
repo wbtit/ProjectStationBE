@@ -10,7 +10,8 @@ import {
     RFQByID,
     RfqViewFiles,
     addRfqResponse,
-    getRfqResponse
+    getRfqResponse,
+    RfqresponseViewFiles
 } from "../../controllers/rfq.js"
 
 const router=Router()
@@ -21,12 +22,12 @@ addRFQ
 ),
 
 router.get("/rfq/:id/:fid",RfqViewFiles)
+router.get("/rfqresponse/:id/:fid",RfqresponseViewFiles)
 
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
 router.patch("/rfq/:id/update",Authenticate,RFQseen)
 router.get("/rfq/:id",Authenticate,RFQByID)
-
 
 
 router.post("/addresponse/:rfqId",
