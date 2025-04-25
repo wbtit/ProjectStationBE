@@ -12,6 +12,7 @@ const rfqDataMap={};
 const fabricatorDataMap = {};
 const commentDataMap = {};
 const changeOrderDataMap = {};
+const changeOrderTableDataMap={};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -334,6 +335,36 @@ const SubmittalsResponseUploads = multer({
     cb(null, true);
   },
 });
+const changeOrderTable = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/changeOrderTabletemp"); // Folder to store files
+  },
+  filename: (req, file, cb) => {
+    // Generate a UUID
+    const uniqueId = uuidv4();
+    // File's extension
+    const fileExt = path.extname(file.originalname);
+    // Set filename as UUID + file extension
+    const newFileName = `${uniqueId}${fileExt}`;
+
+    // Add file data to the object
+    submittalResponseMap[newFileName] = {
+      originalName: file.originalname,
+      uuid: uniqueId,
+    };
+
+    cb(null, newFileName);
+  },
+});
+
+const changeOrderTableUploads = multer({
+  storage:changeOrderTable ,
+  fileFilter: (req, file, cb) => {
+    cb(null, true);
+  },
+});
+
+
 export {
   uploads,
   fileDataMap,
@@ -342,6 +373,7 @@ export {
   rfiDataMap,
   rfiResponseDataMap,
   rfqresponseDataMap,
+  changeOrderTableDataMap,
   rfiUploads,
   rfqDataMap,
   submittalResponseMap,
@@ -354,5 +386,6 @@ export {
   changeOrderDataMap,
   rfiResponseUploads,
   rfqResponseUploads,
-  SubmittalsResponseUploads
+  SubmittalsResponseUploads,
+  changeOrderTableUploads
 };

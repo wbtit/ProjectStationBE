@@ -131,6 +131,12 @@ const AddChangeOrder = async (req, res) => {
   }
 
   try {
+    const fileDetails = req.files.map((file) => ({
+      filename: file.filename, // UUID + extension
+      originalName: file.originalname, // Original name of the file
+      id: file.filename.split(".")[0], // Extract UUID from the filename
+      path: `/public/rfiResponsetemp/${file.filename}`, // Relative path
+    }));
     
     const changeorder = await prisma.changeOrder.create({
       data: {
@@ -140,6 +146,7 @@ const AddChangeOrder = async (req, res) => {
         recipients: recipients,
         remarks: remarks,
         sender: req.user.id,
+        files:fileDetails
         
       },
     });
@@ -239,4 +246,93 @@ const getResponse=async(req,res)=>{
   }
 }
 
-export { AddChangeOrder ,changeOrderReceived,changeOrderSent,addCoResponse,getResponse};
+const AddChangeOrdertable=async(req,res)=>{
+const{coId}=req.params
+const{siNO,description,referenceDoc,elements,QtyNo,hours,cost}=req.body
+
+try {
+  if(!req.body){
+    return sendResponse({
+      message:"Feilds are empty",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  
+  const createTable= await prisma.changeOrdertable.createMany({
+    data:Object.values(req.body).map((co)=>({
+      siNO:co.siNO,
+      description:co.description,
+      referenceDoc:co.referenceDoc,
+      elements:co.elements,
+      QtyNo:co.QtyNo,
+      hours:co.hours,
+      cost:co.cost
+    }))
+  })
+
+  return sendResponse({
+    message:"Co Table created",
+    res,
+    statusCode:200,
+    success:true,
+    data:createTable
+  })
+  
+} catch (error) {
+  console.log(error.message)
+  return sendResponse({
+    message: error.message,
+    res,
+    statusCode: 500,
+    success: false,
+    data: null,
+  }); 
+}
+}
+
+const getRowCotable=async(req,res)=>{
+  const{coRowId}=req.params
+  try {
+    if(!coRowId){
+      return sendResponse({
+        message:"Feilds are empty",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      }) 
+    }
+    const coRow= await prisma.changeOrdertable.findMany({
+      where:{id:coRowId}
+    })
+    return sendResponse({
+      message:"Response created",
+      res,
+      statusCode:200,
+      success:true,
+      data:coRow
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:"failed to fetch the CoRow",
+      res,
+      statusCode:500,
+      success:false,
+      data:''
+    })
+  }
+}
+
+export { 
+  AddChangeOrder ,
+  changeOrderReceived,
+  changeOrderSent,
+  addCoResponse,
+  getResponse,
+  AddChangeOrdertable,
+  getRowCotable
+};
