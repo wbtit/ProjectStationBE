@@ -453,6 +453,49 @@ const viewRFIfiles = async (req, res) => {
   }
 };
 
+const viewRFIResponsefiles = async (req, res) => {
+  const { id, fid } = req.params;
+
+  try {
+    const rfiResponse = await prisma.rFIResponse.findUnique({
+      where: { id },
+    });
+
+    if (!rfi) {
+      return res.status(404).json({ message: "rfiresponse not found" });
+    }
+
+    const fileObject = rfi.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
+
 const addRFIResponse=async(req,res)=>{
   const{rfiId}=req.params
   const{id}=req.user
@@ -538,6 +581,7 @@ export {
   RFIseen, 
   RFIByID,
   viewRFIfiles,
+  viewRFIResponsefiles,
   addRFIResponse,
   getRfiresponse
 };

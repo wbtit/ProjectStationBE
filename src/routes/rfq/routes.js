@@ -27,6 +27,8 @@ router.get("/rfq/inbox",Authenticate,Inbox),
 router.patch("/rfq/:id/update",Authenticate,RFQseen)
 router.get("/rfq/:id",Authenticate,RFQByID)
 
+
+
 router.post("/addresponse/:rfqId",
     Authenticate,
     rfqResponseUploads.any("files"),
