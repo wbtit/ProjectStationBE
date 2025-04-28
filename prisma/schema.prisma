@@ -77,7 +77,7 @@ model Users {
   COrespondedby         COResponse[]    @relation("COrespondedby")
   rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
   rfqresponseBy         RFQResponse[]   @relation("rfqresponseBy")
-  submittalsresponseBy  SubmittalsdResponse[]  @relation("submittalsresponseBy")
+  submittalsresponseBy  SubmittalsResponse[]  @relation("submittalsresponseBy")
 
   @@map("users")
 }
@@ -289,12 +289,12 @@ model Submittals {
   project       Project    @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
   recepients    Users      @relation("UsersSubmittals", fields: [recepient_id], references: [id], onDelete: Cascade)
   sender        Users      @relation("senderSubmittals", fields: [sender_id], references: [id], onDelete: Cascade)
-  submittalsResponse  SubmittalsdResponse?  @relation("submittalsresponse")
+  submittalsResponse  SubmittalsResponse?  @relation("submittalsresponse")
 
   @@map("submittals")
 }
 
-model SubmittalsdResponse {
+model SubmittalsResponse {
   id            String   @id @default(uuid()) @db.Uuid
   files         Json[]   @default([])
   reason        String   @default("")

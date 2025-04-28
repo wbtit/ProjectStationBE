@@ -240,7 +240,7 @@ const AddSubmitals = async (req, res) => {
 
 const getSubmittal = async (req, res) => {
   const { submittalId } = req.params;
-  console.log("submittalId:", submittalId);
+  //console.log("submittalId:", submittalId);
 
   try {
     if (!submittalId) {
@@ -495,8 +495,10 @@ const{submittalId}=req.params
 const{id}=req.user
 const{reason,approved,respondedAt}=req.body
 
+console.log("Req Body:",req.body)
+
 try {
-  if(!responseState ||!reason||!respondedAt||!approved){
+  if(!respondedAt||!approved){
     return sendResponse({
       message:"Feilds are empty",
       res,
@@ -505,22 +507,27 @@ try {
       data:null
     })
   }
+  const approvedBoolean = approved === 'true'; // Converts string 'true' to true, anything else to false
+
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
     originalName: file.originalname, // Original name of the file
     id: file.filename.split(".")[0], // Extract UUID from the filename
     path: `/public/submittalsResponsetemp/${file.filename}`, // Relative path
   }));
-  const addresponse= await prisma.submittalsdResponse.create({
+
+  console.log("File deatiles in Submittals:",fileDetails)
+  const addresponse= await prisma.submittalsResponse.create({
     data:{
-     reason:reason,
+     reason:reason || "",
      respondedAt:respondedAt,
-     approved:approved,
+     approved:approvedBoolean,
      userId:id,
      files:fileDetails,
      submittalsId:submittalId 
     }
   })
+  console.log(addresponse)
   return sendResponse({
     message:"Response created",
     res,
@@ -530,7 +537,7 @@ try {
   })
   
 } catch (error) {
-  console.log(error.message)
+  console.log("Error message:",error.message)
     return sendResponse({
       message:"failed to create Response",
       res,
