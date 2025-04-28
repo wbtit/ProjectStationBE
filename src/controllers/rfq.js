@@ -494,7 +494,7 @@ try {
     id: file.filename.split(".")[0], // Extract UUID from the filename
     path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
   })); 
-
+  console.log("File deatiles in RFQ:",fileDetails)
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
@@ -502,7 +502,7 @@ try {
       files:fileDetails
     }
   })
-  console.log(addResponse)
+  //console.log(addResponse)
   return sendResponse({
     message:"Response created",
     res,

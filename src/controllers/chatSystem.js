@@ -361,20 +361,28 @@ const recentchats = async (req, res) => {
     })
   }
     try {
-      const deletedGroup= await prisma.group.delete({
-        where:{id:groupId}
+      const getGroupMembers= await prisma.group.findUnique({
+        where:{id:groupId},
+        include:{
+          members:{
+            include:{
+              members:true
+            }
+          }
+        }
       })
 
       return sendResponse({
-        message:"Removed the group successfully",
+        message:"Group members successfully fetched",
         res,
         statusCode:200,
         success:true,
-        data:deletedGroup
+        data:getGroupMembers
       })
     } catch (error) {
+      console.log(error.message)
       return sendResponse({
-        message: "Failed to load the recent Chats",
+        message: "Failed to load Group Members",
         res,
         statusCode: 500,
         success: false,
