@@ -22,7 +22,8 @@ addRFQ
 ),
 
 router.get("/rfq/:id/:fid",RfqViewFiles)
-router.get("/rfqresponse/:id/:fid",RfqresponseViewFiles)
+
+router.get("/rfqResponse/:id/:fid",RfqresponseViewFiles)
 
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
