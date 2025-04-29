@@ -17,27 +17,30 @@ const initSocket = async(io) => {
   io.adapter(createAdapter(pubClient,subClient))
 
 
-  io.on("connection", (socket) => {
+  io.on("connection", async(socket) => {
       console.log(`🔌 User connected socketId: ${socket.id}`);
 
-    socket.on("joinRoom",async (userId) => {
-      if (!userId) return;
-
-      await redis.set(`socket:${userId}`,socket.id)
-      console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
-
-      const pendingNotifications= await prisma.notification.findMany({
-        where:{userID:userId,delivered:false}
-      })
-      for( const notification of pendingNotifications){
-        global.io.to(socket.id).emit('customNotification',notification.payload)
-
-        await prisma.notification.update({
-          where:{id:notification.id},
-          data:{delivered:true},
-        })
+      const userId= socket.handshake.auth?.userId
+      if(!userId){
+        console.log("❌ No userId in handshake — disconnecting socket.");
+      return socket.disconnect(true);
       }
+
+    await redis.set(`socket:${userId}`,socket.id)
+    console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
+
+    const pendingNotifications = await prisma.notification.findMany({
+      where: { userID: userId, delivered: false }
     });
+
+    for (const notification of pendingNotifications) {
+      socket.emit("customNotification", notification.payload);
+
+      await prisma.notification.update({
+        where: { id: notification.id },
+        data: { delivered: true }
+      });
+    }
 
     socket.on("privateMessages",async({content,senderId,receiverId})=>{
 
