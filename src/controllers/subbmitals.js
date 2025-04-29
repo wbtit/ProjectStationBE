@@ -294,7 +294,7 @@ const getSubmittal = async (req, res) => {
 
 const SentSubmittals = async (req, res) => {
   const { id } = req.user;
-
+  //console.log("UserId:",id)
   try {
     const submittals = await prisma.submittals.findMany({
       where: {
@@ -307,7 +307,7 @@ const SentSubmittals = async (req, res) => {
         sender: true,
       },
     });
-
+    //console.log("sent submittals:",submittals)
     return sendResponse({
       message: "Retrived all sent submittals",
       res,
@@ -316,7 +316,7 @@ const SentSubmittals = async (req, res) => {
       data: submittals,
     });
   } catch (error) {
-    // console.log(error.message);
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

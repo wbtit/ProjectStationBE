@@ -244,6 +244,7 @@ const sentRFQByUser = async (req, res) => {
       },
       include: {
         recepients: true,
+        response:true
       },
     });
 
@@ -390,7 +391,7 @@ const RFQseen = async (req, res) => {
 
 const RfqViewFiles = async (req, res) => {
   const { id, fid } = req.params;
-
+  console.log("I am viewfile route",id)
   try {
     const rFQ = await prisma.rFQ.findUnique({
       where: { id },
@@ -523,10 +524,12 @@ try {
 }
 const getRfqResponse=async(req,res)=>{
   const{id}=req.params
+  console.log("RFQRESPONSEID",id)
   try {
-    const response=await prisma.rfqResponse.findUnique({
+    const response=await prisma.rFQResponse.findUnique({
       where:{id:id}
     })
+    console.log("Response:",response)
     return sendResponse({
       message:"Respose is fetched successfully",
       res,
