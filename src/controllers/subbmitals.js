@@ -240,7 +240,7 @@ const AddSubmitals = async (req, res) => {
 
 const getSubmittal = async (req, res) => {
   const { submittalId } = req.params;
-  //console.log("submittalId:", submittalId);
+  console.log("submittalId:", submittalId);
 
   try {
     if (!submittalId) {
