@@ -1,0 +1,45 @@
+name: 🚀 Auto Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to on-Prem server
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v3
+
+      - name: Deploy Application
+        run: |
+          echo "🎯 Switching to app directory"
+          source ~/.bashrc
+          pros  # custom bashrc command to cd into project
+
+          echo "📦 Fetching latest code"
+          git fetch origin
+          git reset --hard origin/main
+
+          echo "📦 Installing dependencies"
+          npm install
+
+          echo "🔄 Prisma generate & migrations"
+          npx prisma generate
+          npx prisma db push
+
+          echo "🚀 Restarting application with PM2"
+          pme
+          pmd
+          pm2 save
+          pmstart
+
+      - name: Notify on Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"🔥🎬 *Mass Entry Alert!* 🎬🔥\\n\\n🚀 **App Successfully Deployed!**\\n🌴 **Branch:** \`main\` — like the hero’s path, always clean and righteous!\\n🕒 **Time:** $(date)\\n💻 **Server:** On-Prem — our fortress, our battleground!\\n\\n💥 *Another mission accomplished, style-la!* 💥\\n🦸‍♂️ Powered by: GitHub Actions x Self-hosted Swag 😎\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
