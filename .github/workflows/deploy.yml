@@ -17,8 +17,7 @@ jobs:
       - name: Deploy Application
         run: |
           echo "🎯 Switching to app directory"
-          source ~/.bashrc
-          pros  # custom bashrc command to cd into project
+          cd ~/Desktop/ProjectStationBE
 
           echo "📦 Fetching latest code"
           git fetch origin
@@ -32,10 +31,12 @@ jobs:
           npx prisma db push
 
           echo "🚀 Restarting application with PM2"
-          pme
-          pmd
+          pm2 stop app1 app2 app3
+          pm2 delete app1 app2 app3
+          PORT=3000 pm2 start index.js --name app1
+          PORT=3001 pm2 start index.js --name app2
+          PORT=3002 pm2 start index.js --name app3
           pm2 save
-          pmstart
 
       - name: Notify on Discord
         run: |
