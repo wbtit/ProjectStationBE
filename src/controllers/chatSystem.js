@@ -49,7 +49,7 @@ const addMemberToGroup = async (req, res) => {
     const memberIds  = req.body;
     const { groupId } = req.params;
   
-    console.log("Full req.body:",  );
+    //console.log("Full req.body:",  );
     
 
   
