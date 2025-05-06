@@ -398,7 +398,7 @@ const End = async (req, res) => {
       } mins`,
       res,
       statusCode: 200,
-      success: false,
+      success: true,
       data: updatedWorkingHour,
     })
   });

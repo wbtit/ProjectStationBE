@@ -502,7 +502,7 @@ const{reason,approved,respondedAt,Stage}=req.body
 
 
 try {
-  if(!respondedAt||!approved||Stage){
+  if(!Stage||!approved||Stage){
     return sendResponse({
       message:"Feilds are empty",
       res,

@@ -6,7 +6,7 @@ import {
     addRFQ,
     sentRFQByUser,
     Inbox,
-    RFQseen,
+    RFQClosed,
     RFQByID,
     RfqViewFiles,
     addRfqResponse,
@@ -27,7 +27,8 @@ router.get("/rfqResponse/:id/:fid",RfqresponseViewFiles)
 
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
-router.patch("/rfq/:id/update",Authenticate,RFQseen)
+//route updated
+router.patch("/rfq/close/:id/",Authenticate,RFQClosed)
 router.get("/rfq/:id",Authenticate,RFQByID)
 
 

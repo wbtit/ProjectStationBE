@@ -349,7 +349,7 @@ model RFQ {
   id           String   @id @default(uuid()) @db.Uuid
   projectName  String
   sender_id    String   @db.Uuid
-  status       Boolean  @default(false)
+  status       RFQStatus  @default(OPEN)
   subject      String
   description  String
   files        Json[]   @default([])
@@ -357,7 +357,7 @@ model RFQ {
   recepient_id String   @db.Uuid
   recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
   sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
-  response     RFQResponse?  @relation("rfqResponses")
+  response     RFQResponse[]  @relation("rfqResponses")
   @@map("rfq")
 }
 
@@ -365,9 +365,10 @@ model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
   description  String   @default("")
+  createdAt    DateTime   @default(now())
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
-  rfqId     String    @db.Uuid  @unique
+  rfqId     String    @db.Uuid  
   rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
 
   @@map("rfqResponse")
