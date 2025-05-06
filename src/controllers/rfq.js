@@ -475,7 +475,8 @@ const RfqresponseViewFiles = async (req, res) => {
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
-console.log("RFQID:,",rfqId)
+const{description}=req.body
+//console.log("RFQID:,",rfqId)
 const{id}=req.user
 
 try {
@@ -499,6 +500,7 @@ try {
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
+      description:description,
       rfqId:rfqId,
       files:fileDetails
     }

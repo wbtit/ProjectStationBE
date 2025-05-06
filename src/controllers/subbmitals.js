@@ -240,7 +240,7 @@ const AddSubmitals = async (req, res) => {
 
 const getSubmittal = async (req, res) => {
   const { submittalId } = req.params;
-  console.log("submittalId:", submittalId);
+  //console.log("submittalId:", submittalId);
 
   try {
     if (!submittalId) {
@@ -257,8 +257,10 @@ const getSubmittal = async (req, res) => {
       where: { id: submittalId },
       include: {
         sender: {
-          include: { fabricator: true },
+          include: { 
+            fabricator: true },
         },
+        submittalsResponse:true
       },
     });
 
@@ -364,7 +366,7 @@ const RecievedSubmittals = async (req, res) => {
 
 const SubmittalsSeen = async (req, res) => {
   const { id } = req.params;
-
+  const{status}=req.body
   if (!id) {
     // console.log("Invalid ID");
     return sendResponse({
@@ -382,7 +384,7 @@ const SubmittalsSeen = async (req, res) => {
         id,
       },
       data: {
-        status: false,
+        status:status,
       },
     });
 
@@ -394,7 +396,7 @@ const SubmittalsSeen = async (req, res) => {
       data: submittals,
     });
   } catch (error) {
-    // console.log(error.message);
+     console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -493,12 +495,14 @@ const submitalsResponseViewFiles = async (req, res) => {
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
-const{reason,approved,respondedAt}=req.body
+const{reason,approved,respondedAt,Stage}=req.body
 
-console.log("Req Body:",req.body)
+// console.log("submittalId:",submittalId)
+// console.log("Req Body:",req.body)
+
 
 try {
-  if(!respondedAt||!approved){
+  if(!respondedAt||!approved||Stage){
     return sendResponse({
       message:"Feilds are empty",
       res,
@@ -516,12 +520,13 @@ try {
     path: `/public/submittalsResponsetemp/${file.filename}`, // Relative path
   }));
 
-  console.log("File deatiles in Submittals:",fileDetails)
+  // console.log("File deatiles in Submittals:",fileDetails)
   const addresponse= await prisma.submittalsResponse.create({
     data:{
      reason:reason || "",
      respondedAt:respondedAt,
      approved:approvedBoolean,
+     Stage:Stage,
      userId:id,
      files:fileDetails,
      submittalsId:submittalId 
@@ -549,10 +554,13 @@ try {
 }
 const getSubmittalresponse=async(req,res)=>{
   const{id}=req.params
+  // console.log("submittalsId:",id)
   try {
-    const response= await prisma.submittalsdResponse.findUnique({
+    const response= await prisma.submittalsResponse.findUnique({
       where:{id:id}
     })
+    // console.log("ResponseData created:",response)
+
 
     return sendResponse({
       message:"Respose is fetched successfully",

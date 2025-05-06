@@ -298,6 +298,7 @@ model SubmittalsResponse {
   id            String   @id @default(uuid()) @db.Uuid
   files         Json[]   @default([])
   reason        String   @default("")
+  Stage         Stage
   respondedAt   String   @default("")
   createdAt     DateTime @default(now())
   approved      Boolean   @default(false)
@@ -363,6 +364,7 @@ model RFQ {
 model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
+  description  String   @default("")
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
   rfqId     String    @db.Uuid  @unique
@@ -571,4 +573,9 @@ enum Activity {
 enum State {
   PARTIAL
   COMPLETE
+}
+enum RFQStatus {
+  OPEN
+  IN_REVIEW
+  CLOSED
 }

@@ -23,7 +23,7 @@ router.post(
 );
 
 router.get("/submittals/:id/:fid",Authenticate,submitalsViewFiles)
-router.get("/submittalsresponse/:id/:fid",Authenticate,submitalsResponseViewFiles)
+router.get("/submittalsResponse/:id/:fid",Authenticate,submitalsResponseViewFiles)
 
 router.get("/getSubmittals/:submittalId",Authenticate,getSubmittal)
 
@@ -31,7 +31,7 @@ router.get("/submittals/sent", Authenticate, SentSubmittals);
 
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
 
-router.patch("/submittals/:id", Authenticate, SubmittalsSeen);
+router.put("/submittalsStatus/:id", Authenticate, SubmittalsSeen);
 
 router.post("/addresponse/:submittalId",
   Authenticate,
