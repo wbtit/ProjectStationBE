@@ -9,7 +9,7 @@ import { sendNotification } from "../utils/notify.js";
 
 
 const addRFQ=async(req,res)=>{
-    const {projectName,recepient_id,subject,description}=req.body
+    const {projectName,recepient_id,subject,description,status}=req.body
     const {id}=req.user
     //// console.log("The Rfq data Input",req.body)
     try {
@@ -33,7 +33,7 @@ const addRFQ=async(req,res)=>{
             data:{
                 projectName,
                 sender_id:id,
-                status:OPEN,
+                status:"OPEN",
                 subject,
                 description,
                 files:fileDetails,
@@ -178,7 +178,7 @@ const addRFQ=async(req,res)=>{
                       <div class="card">
                           <div class="card-body">
                               ${newrfq.description}
-                          </div>
+                       OPEN   </div>
                       </div>
           
                       <p>Thanks & Regards,</p>
@@ -228,7 +228,7 @@ const addRFQ=async(req,res)=>{
             success: true,
             data: newrfq,})
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -371,7 +371,7 @@ const RFQClosed = async (req, res) => {
         id,
       },
       data: {
-        status: CLOSED,
+        status: "CLOSED",
       },
     });
     if (!rfqClosed) {
@@ -506,7 +506,7 @@ try {
       id,
     },
     data: {
-      status: IN_REVIEW,
+      status: "IN_REVIEW",
     },
   });
   if (!rfqInreview) {

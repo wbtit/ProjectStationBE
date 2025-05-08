@@ -8,13 +8,13 @@ import { sendNotification } from "../utils/notify.js";
 
 const AddSubmitals = async (req, res) => {
   const { id, fabricatorId } = req?.user;
-  const { fabricator_id, project_id, recepient_id, subject, description } =
+  const { fabricator_id, project_id, recepient_id, subject, description,Stage} =
     req.body;
 
   // console.log(fabricator_id, project_id, recepient_id, subject, description);
 
   try {
-    if (!project_id || !recepient_id || !subject || !description) {
+    if (!project_id || !recepient_id || !subject || !description||!Stage) {
       // console.log("Fields are empty");
       return sendResponse({
         message: "Fields are empty",
@@ -41,6 +41,7 @@ const AddSubmitals = async (req, res) => {
           fabricator_id !== "undefined" ? fabricator_id : fabricatorId,
         files: fileDetails,
         project_id,
+        Stage,
         recepient_id,
         sender_id: id,
         status: true,
@@ -307,6 +308,7 @@ const SentSubmittals = async (req, res) => {
         project: true,
         recepients: true,
         sender: true,
+        submittalsResponse:true
       },
     });
     //console.log("sent submittals:",submittals)
@@ -342,6 +344,7 @@ const RecievedSubmittals = async (req, res) => {
         project: true,
         recepients: true,
         sender: true,
+        submittalsResponse:true
       },
     });
 
@@ -386,6 +389,9 @@ const SubmittalsSeen = async (req, res) => {
       data: {
         status:status,
       },
+      include:{
+        submittalsResponse:true
+      }
     });
 
     return sendResponse({
@@ -495,14 +501,14 @@ const submitalsResponseViewFiles = async (req, res) => {
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
-const{reason,approved,respondedAt,Stage}=req.body
+const{reason,approved,respondedAt,status,description}=req.body
 
 // console.log("submittalId:",submittalId)
 // console.log("Req Body:",req.body)
 
 
 try {
-  if(!Stage||!approved||Stage){
+  if(!respondedAt||!approved||!status||!description){
     return sendResponse({
       message:"Feilds are empty",
       res,
@@ -526,7 +532,8 @@ try {
      reason:reason || "",
      respondedAt:respondedAt,
      approved:approvedBoolean,
-     Stage:Stage,
+     status:status,
+     description:description,
      userId:id,
      files:fileDetails,
      submittalsId:submittalId 
