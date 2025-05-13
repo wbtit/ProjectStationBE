@@ -366,6 +366,7 @@ model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
   description  String   @default("")
+  status       RFQStatus  @default(OPEN)
   createdAt    DateTime   @default(now())
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
@@ -580,6 +581,8 @@ enum RFQStatus {
   OPEN
   IN_REVIEW
   CLOSED
+  APPROVED
+  RE_APPROVAL
 }
 enum SubResStatus{
   APPROVED

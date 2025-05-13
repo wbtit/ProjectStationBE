@@ -8,6 +8,7 @@ import { sendNotification } from "../utils/notify.js";
 
 
 
+
 const addRFQ=async(req,res)=>{
     const {projectName,recepient_id,subject,description,status}=req.body
     const {id}=req.user
@@ -237,6 +238,47 @@ const addRFQ=async(req,res)=>{
       data: null,
     });
     }
+}
+
+const updateRfq=async(req,res)=>{
+  const{id}=req.params
+  try{
+    if(!id){
+    return sendResponse({
+      message:"RFQId is required",
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  const updatedRfq= await prisma.rFQ.update({
+    where:{id:id},
+    data:req?.body
+  })
+
+  if(!updateRfq){
+    return sendResponse({
+      message:"RFQ Failed to updated",
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+
+  return sendResponse({
+    message:"RFQ updated",
+    statusCode:200,
+    success:true,
+    data:updateRfq
+  })}catch(error){
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
 }
 const sentRFQByUser = async (req, res) => {
   const { id } = req.user;
@@ -488,7 +530,7 @@ const RfqresponseViewFiles = async (req, res) => {
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
 const{description}=req.body
-//console.log("RFQID:,",rfqId)
+console.log("RFQID:,",rfqId)
 const{id}=req.user
 
 try {
@@ -503,7 +545,7 @@ try {
   }
   const rfqInreview = await prisma.rFQ.update({
     where: {
-      id,
+      id:rfqId,
     },
     data: {
       status: "IN_REVIEW",
@@ -575,18 +617,22 @@ const getRfqResponse=async(req,res)=>{
       res,
       statusCode:500,
       success:false,
-      data:''
+      data:null
     })
   }
 }
+
+
 export { 
   addRFQ,
+  updateRfq,
   sentRFQByUser,
   Inbox,
   RFQClosed,
   RFQByID,
   RfqViewFiles,
   RfqresponseViewFiles,
+
   addRfqResponse,
   getRfqResponse
 };

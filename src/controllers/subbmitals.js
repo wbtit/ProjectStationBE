@@ -508,7 +508,7 @@ const{reason,approved,respondedAt,status,description}=req.body
 
 
 try {
-  if(!respondedAt||!approved||!status||!description){
+  if(!respondedAt||!status||!description){
     return sendResponse({
       message:"Feilds are empty",
       res,
@@ -517,7 +517,7 @@ try {
       data:null
     })
   }
-  const approvedBoolean = approved === 'true'; // Converts string 'true' to true, anything else to false
+  
 
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
@@ -531,7 +531,6 @@ try {
     data:{
      reason:reason || "",
      respondedAt:respondedAt,
-     approved:approvedBoolean,
      status:status,
      description:description,
      userId:id,
@@ -539,7 +538,7 @@ try {
      submittalsId:submittalId 
     }
   })
-  console.log(addresponse)
+  //console.log(addresponse)
   return sendResponse({
     message:"Response created",
     res,

@@ -11,7 +11,8 @@ import {
     RfqViewFiles,
     addRfqResponse,
     getRfqResponse,
-    RfqresponseViewFiles
+    RfqresponseViewFiles,
+    updateRfq
 } from "../../controllers/rfq.js"
 
 const router=Router()
@@ -21,7 +22,8 @@ router.post(
 addRFQ
 ),
 
-router.get("/rfq/:id/:fid",RfqViewFiles)
+router.get("/rfq/:id/:fid",Authenticate,RfqViewFiles)
+router.put("/rfq/update/:id",Authenticate,updateRfq)
 
 router.get("/rfqResponse/:id/:fid",RfqresponseViewFiles)
 

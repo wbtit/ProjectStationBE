@@ -282,7 +282,7 @@ const Resume = async (req, res) => {
 };
 
 const End = async (req, res) => {
-  const { work_id, task_id } = req.body;
+  const { work_id, task_id} = req.body;
   const { id } = req.user;
 
   if (!work_id || !task_id) {
