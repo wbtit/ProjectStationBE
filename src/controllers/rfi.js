@@ -255,9 +255,10 @@ const sentRFIByUser = async (req, res) => {
         fabricator: true,
         project: true,
         recepients: true,
+        rfiresponse:true
       },
     });
-
+    console.log("sentRFI:",sentRFI)
     if (!sentRFI) {
       return sendResponse({
         message: "Failed to get RFIs",
@@ -306,6 +307,7 @@ const RFIByID = async (req, res) => {
             },
           },
         },
+        rfiresponse:true
       },
     });
 
@@ -341,9 +343,10 @@ const Inbox = async (req, res) => {
         fabricator: true,
         project: true,
         recepients: true,
+        rfiresponse:true
       },
     });
-
+    console.log("Received RFI:",sentRFI)
     if (!sentRFI) {
       return sendResponse({
         message: "Failed to get RFIs",
@@ -502,7 +505,7 @@ const addRFIResponse=async(req,res)=>{
   const{responseState,reason,respondedAt}=req.body
   
   try {
-    if(!responseState ||!reason||!respondedAt){
+    if(!responseState ||!reason){
       return sendResponse({
         message:"Feilds are empty",
         res,
@@ -523,11 +526,11 @@ const addRFIResponse=async(req,res)=>{
       data:{
         responseState:responseState,
         reason:reason,
-        respondedAt:respondedAt,
         userId:id,
         files:fileDetails,
         rfiId:rfiId
-      }
+      },
+      
     })
 
     return sendResponse({

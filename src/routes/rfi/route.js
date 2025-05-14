@@ -24,18 +24,18 @@ router.post(
 );
 
 router.get("/rfi/viewfile/:id/:fid", viewRFIfiles);//view files in RFI
-router.get("/rfiResponse/viewfile/:id/:fid",viewRFIResponsefiles);//view files in RFIResponse
+router.get("/rfi/response/viewfile/:id/:fid",viewRFIResponsefiles);//view files in RFIResponse
 
 router.get("/rfi/sent", Authenticate, sentRFIByUser);
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);
 router.get("/rfi/:id", Authenticate, RFIByID);
 
-router.post("/addresponse/:rfiId",
+router.post("/rfi/addResponse/:rfiId",
   Authenticate,
   rfiResponseUploads.any("files"),
   addRFIResponse
 )
-router.get("/getResponse/:id",Authenticate,getRfiresponse)
+router.get("/rfi/getResponse/:id",Authenticate,getRfiresponse)
 
 export default router;

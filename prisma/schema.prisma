@@ -282,6 +282,7 @@ model Submittals {
   recepient_id  String     @db.Uuid
   sender_id     String     @db.Uuid
   status        Boolean    @default(false)
+  Stage         Stage      
   subject       String
   description   String
   files         Json[]     @default([])
@@ -298,9 +299,10 @@ model SubmittalsResponse {
   id            String   @id @default(uuid()) @db.Uuid
   files         Json[]   @default([])
   reason        String   @default("")
+  description   String   @default("")
   respondedAt   String   @default("")
   createdAt     DateTime @default(now())
-  approved      Boolean   @default(false)
+  status        SubResStatus  @default(NOT_APPROVED)
   userId        String    @db.Uuid
   user          Users     @relation("submittalsresponseBy",fields:[userId],references:[id])
   submittalsId    String   @unique @db.Uuid
@@ -348,7 +350,7 @@ model RFQ {
   id           String   @id @default(uuid()) @db.Uuid
   projectName  String
   sender_id    String   @db.Uuid
-  status       Boolean  @default(false)
+  status       RFQStatus  @default(OPEN)
   subject      String
   description  String
   files        Json[]   @default([])
@@ -356,16 +358,19 @@ model RFQ {
   recepient_id String   @db.Uuid
   recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
   sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
-  response     RFQResponse?  @relation("rfqResponses")
+  response     RFQResponse[]  @relation("rfqResponses")
   @@map("rfq")
 }
 
 model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
+  description  String   @default("")
+  status       RFQStatus  @default(OPEN)
+  createdAt    DateTime   @default(now())
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
-  rfqId     String    @db.Uuid  @unique
+  rfqId     String    @db.Uuid  
   rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
 
   @@map("rfqResponse")
@@ -571,4 +576,16 @@ enum Activity {
 enum State {
   PARTIAL
   COMPLETE
+}
+enum RFQStatus {
+  OPEN
+  IN_REVIEW
+  CLOSED
+  APPROVED
+  RE_APPROVAL
+}
+enum SubResStatus{
+  APPROVED
+  PARTIAL
+  NOT_APPROVED
 }

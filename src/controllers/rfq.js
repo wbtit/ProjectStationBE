@@ -6,8 +6,11 @@ import mime from "mime"
 import path from "path"
 import { sendNotification } from "../utils/notify.js";
 
+
+
+
 const addRFQ=async(req,res)=>{
-    const {projectName,recepient_id,subject,description}=req.body
+    const {projectName,recepient_id,subject,description,status}=req.body
     const {id}=req.user
     //// console.log("The Rfq data Input",req.body)
     try {
@@ -31,7 +34,7 @@ const addRFQ=async(req,res)=>{
             data:{
                 projectName,
                 sender_id:id,
-                status:false,
+                status:"OPEN",
                 subject,
                 description,
                 files:fileDetails,
@@ -176,7 +179,7 @@ const addRFQ=async(req,res)=>{
                       <div class="card">
                           <div class="card-body">
                               ${newrfq.description}
-                          </div>
+                       OPEN   </div>
                       </div>
           
                       <p>Thanks & Regards,</p>
@@ -212,6 +215,7 @@ const addRFQ=async(req,res)=>{
               data: null,
             });
           }
+          console.log("Newly created RFQ:",newrfq)
           // Emit real-time notification using socket.io
           sendNotification(recepient_id,{
             message:`New RFQ received:${recepient_id}`,
@@ -225,7 +229,7 @@ const addRFQ=async(req,res)=>{
             success: true,
             data: newrfq,})
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -234,6 +238,47 @@ const addRFQ=async(req,res)=>{
       data: null,
     });
     }
+}
+
+const updateRfq=async(req,res)=>{
+  const{id}=req.params
+  try{
+    if(!id){
+    return sendResponse({
+      message:"RFQId is required",
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  const updatedRfq= await prisma.rFQ.update({
+    where:{id:id},
+    data:req?.body
+  })
+
+  if(!updateRfq){
+    return sendResponse({
+      message:"RFQ Failed to updated",
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+
+  return sendResponse({
+    message:"RFQ updated",
+    statusCode:200,
+    success:true,
+    data:updateRfq
+  })}catch(error){
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
 }
 const sentRFQByUser = async (req, res) => {
   const { id } = req.user;
@@ -244,7 +289,9 @@ const sentRFQByUser = async (req, res) => {
       },
       include: {
         recepients: true,
-        response:true
+        response:{
+          orderBy: { createdAt: 'asc' },
+        }
       },
     });
 
@@ -286,7 +333,10 @@ const RFQByID = async (req, res) => {
         id,
       },
       include: {
-        recepients:true
+        recepients:true,
+        response:{
+          orderBy: { createdAt: 'asc' },
+        }
       },
     });
 
@@ -320,6 +370,9 @@ const Inbox = async (req, res) => {
       },
       include: {
         recepients: true,
+        response:{
+          orderBy: { createdAt: 'asc' },
+        }
       },
     });
 
@@ -349,20 +402,21 @@ const Inbox = async (req, res) => {
       data: null,
     });
   }
-};
+}
 
-const RFQseen = async (req, res) => {
+//to close the RFQ communication
+const RFQClosed = async (req, res) => {
   const { id } = req?.params;
   try {
-    const rfqseen = await prisma.rFQ.update({
+    const rfqClosed = await prisma.rFQ.update({
       where: {
         id,
       },
       data: {
-        status: true,
+        status: "CLOSED",
       },
     });
-    if (!rfqseen) {
+    if (!rfqClosed) {
       return sendResponse({
         message: "Failed to update",
         res,
@@ -475,6 +529,7 @@ const RfqresponseViewFiles = async (req, res) => {
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
+const{description}=req.body
 console.log("RFQID:,",rfqId)
 const{id}=req.user
 
@@ -488,6 +543,23 @@ try {
       data:null
     })
   }
+  const rfqInreview = await prisma.rFQ.update({
+    where: {
+      id:rfqId,
+    },
+    data: {
+      status: "IN_REVIEW",
+    },
+  });
+  if (!rfqInreview) {
+    return sendResponse({
+      message: "Failed to update the Status of the RFQ to IN_REVIEW",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
   
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
@@ -499,6 +571,7 @@ try {
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
+      description:description,
       rfqId:rfqId,
       files:fileDetails
     }
@@ -544,18 +617,22 @@ const getRfqResponse=async(req,res)=>{
       res,
       statusCode:500,
       success:false,
-      data:''
+      data:null
     })
   }
 }
+
+
 export { 
   addRFQ,
+  updateRfq,
   sentRFQByUser,
   Inbox,
-  RFQseen,
+  RFQClosed,
   RFQByID,
   RfqViewFiles,
   RfqresponseViewFiles,
+
   addRfqResponse,
   getRfqResponse
 };
