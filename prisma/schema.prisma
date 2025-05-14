@@ -35,6 +35,8 @@ model Users {
   is_staff              Boolean         @default(false)
   is_superuser          Boolean         @default(false)
   is_firstLogin         Boolean         @default(true)
+  is_pmo                Boolean         @default(false)
+  is_oe                 Boolean         @default(false)
   fabricatorId          String?         @db.Uuid
   department            String?         @db.Uuid
   is_deptmanager        Boolean         @default(false)
@@ -169,6 +171,7 @@ model Task {
   name               String
   description        String
   status             String
+  Stage              Stage            @default(IFA)
   priority           Int
   created_on         DateTime        @default(now())
   due_date           String
