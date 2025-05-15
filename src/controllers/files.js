@@ -18,7 +18,7 @@ const fileUpload=async(req,res)=>{
         success:false,
         data:null
     })
-  }
+  }lastAccess
   try {
     const uploadedFiles=[];
 
@@ -94,4 +94,40 @@ const viewFile=async(req,res)=>{
             data:null
         })
     }
+}
+
+const downloadFile=async(req,res)=>{
+    const {fileId}=req.params
+    try {
+       const file= await prisma.File.findUnique({where:{id:fileId}})
+        if(!file) return sendResponse({
+            message:"File not found",
+            statusCode:400,
+            success:false,
+            data:null
+        })
+
+        const fullPath= path.join(__dirname,'../../',file.path)
+        if(!fs.existsSync(fullPath)) return sendResponse({
+            message:"Missing file in server",
+            statusCode:404,
+            success:false,
+            data:null
+        })
+        res.download(fullPath,file.originalName)
+    } catch (error) {
+        console.log(error)
+        return sendResponse({
+            message:"Could not download the file",
+            statusCode:500,
+            success:false,
+            data:null
+        })
+    }
+}
+
+export{
+    fileUpload,
+    viewFile,
+    downloadFile
 }
