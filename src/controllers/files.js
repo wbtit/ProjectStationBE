@@ -59,3 +59,39 @@ const fileUpload=async(req,res)=>{
     })
   }
 }
+
+const viewFile=async(req,res)=>{
+    const{fileId}=req.params
+    try {
+        const file= await prisma.File.findUnique({where:{id:fileId}})
+        if(!file) return sendResponse({
+            message:"File not found",
+            statusCode:400,
+            success:false,
+            data:null
+        })
+
+        const fullPath= path.join(__dirname,'../../',file.path)
+        if(!fs.existsSync(fullPath)) return sendResponse({
+            message:"Missing file in server",
+            statusCode:404,
+            success:false,
+            data:null
+        })
+        res.setHeader('Content-Type', file.mimeType);
+        res.setHeader('Content-Disposition', 'inline');
+
+        const stream=fs.createReadStream(fullPath)
+        stream.pipe(res)
+
+        await prisma.File.update({where:{id:fileId},data:{lastAccess:new Date()}})
+    } catch (error) {
+        console.log(error.message)
+        return sendResponse({
+            message:"Could not view file",
+            statusCode:500,
+            success:false,
+            data:null
+        })
+    }
+}
