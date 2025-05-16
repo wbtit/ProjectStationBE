@@ -261,7 +261,8 @@ const getSubmittal = async (req, res) => {
           include: { 
             fabricator: true },
         },
-        submittalsResponse:true
+        submittalsResponse:true,
+        file:true
       },
     });
 
@@ -308,7 +309,8 @@ const SentSubmittals = async (req, res) => {
         project: true,
         recepients: true,
         sender: true,
-        submittalsResponse:true
+        submittalsResponse:true,
+        file:true
       },
     });
     //console.log("sent submittals:",submittals)
@@ -344,7 +346,8 @@ const RecievedSubmittals = async (req, res) => {
         project: true,
         recepients: true,
         sender: true,
-        submittalsResponse:true
+        submittalsResponse:true,
+        file:true
       },
     });
 
@@ -563,7 +566,10 @@ const getSubmittalresponse=async(req,res)=>{
   // console.log("submittalsId:",id)
   try {
     const response= await prisma.submittalsResponse.findUnique({
-      where:{id:id}
+      where:{id:id},
+      include:{
+        file:true
+      }
     })
     // console.log("ResponseData created:",response)
 

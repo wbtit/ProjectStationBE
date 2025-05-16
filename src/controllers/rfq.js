@@ -291,7 +291,8 @@ const sentRFQByUser = async (req, res) => {
         recepients: true,
         response:{
           orderBy: { createdAt: 'asc' },
-        }
+        },
+        file:true
       },
     });
 
@@ -336,7 +337,8 @@ const RFQByID = async (req, res) => {
         recepients:true,
         response:{
           orderBy: { createdAt: 'asc' },
-        }
+        },
+        file:true
       },
     });
 
@@ -372,7 +374,8 @@ const Inbox = async (req, res) => {
         recepients: true,
         response:{
           orderBy: { createdAt: 'asc' },
-        }
+        },
+        file:true
       },
     });
 
@@ -600,7 +603,10 @@ const getRfqResponse=async(req,res)=>{
   console.log("RFQRESPONSEID",id)
   try {
     const response=await prisma.rFQResponse.findUnique({
-      where:{id:id}
+      where:{id:id},
+      include:{
+        file:true
+      }
     })
     console.log("Response:",response)
     return sendResponse({

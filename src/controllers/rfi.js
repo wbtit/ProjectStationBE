@@ -255,7 +255,8 @@ const sentRFIByUser = async (req, res) => {
         fabricator: true,
         project: true,
         recepients: true,
-        rfiresponse:true
+        rfiresponse:true,
+        file:true
       },
     });
     console.log("sentRFI:",sentRFI)
@@ -307,7 +308,8 @@ const RFIByID = async (req, res) => {
             },
           },
         },
-        rfiresponse:true
+        rfiresponse:true,
+        file:true
       },
     });
 
@@ -343,7 +345,8 @@ const Inbox = async (req, res) => {
         fabricator: true,
         project: true,
         recepients: true,
-        rfiresponse:true
+        rfiresponse:true,
+        file:true
       },
     });
     console.log("Received RFI:",sentRFI)
@@ -557,7 +560,10 @@ const getRfiresponse=async(req,res)=>{
   const{id}=req.params
   try {
     const response= await prisma.rFIResponse.findUnique({
-      where:{id:id}
+      where:{id:id},
+      include:{
+        file:true
+      }
     })
     return sendResponse({
       message:"Respose is fetched successfully",
