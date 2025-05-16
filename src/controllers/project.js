@@ -364,6 +364,7 @@ const GetAllProjects = async (req, res) => {
     if (is_superuser|| is_hr || is_sales) {
       projects = await prisma.project.findMany({
         include: {
+          file:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
@@ -388,6 +389,7 @@ const GetAllProjects = async (req, res) => {
           department: {
             select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
+          file:true
         },
       });
     }
@@ -405,6 +407,7 @@ const GetAllProjects = async (req, res) => {
           department: {
             select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
+          file:true
         },
       });
     }
@@ -420,6 +423,7 @@ const GetAllProjects = async (req, res) => {
           department: {
             select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
+          file:true
         },
       });
     }
@@ -435,6 +439,7 @@ const GetAllProjects = async (req, res) => {
           department: {
             select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
+          file:true
         },
       });
     }
@@ -460,6 +465,7 @@ const GetAllProjects = async (req, res) => {
               select: { name: true, manager: { select: { f_name: true, l_name: true } } },
             },
           },
+          file:true
         });
       } else {
         projects = [];
@@ -517,6 +523,7 @@ const GetProjectByID = async (req, res) => {
         manager: true,
         tasks: true,
         accepttasks: true,
+        file:true
       },
     });
 

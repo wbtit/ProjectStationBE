@@ -24,7 +24,8 @@ const changeOrderReceived=async(req,res)=>{
                 remarks:true,
                 description:true,
                 changeOrder:true,
-                sentOn:true
+                sentOn:true,
+                file:true
                 
             }
         })
@@ -75,7 +76,8 @@ const changeOrderSent=async(req,res)=>{
                 remarks:true,
                 description:true,
                 changeOrder:true,
-                sentOn:true
+                sentOn:true,
+                file:true
                 
             }
         })
@@ -224,8 +226,11 @@ const getResponse=async(req,res)=>{
   const{id}=req.params
   try {
     
-    const response= await prisma.coResponse.findUnique({
-      where:{id:id}
+    const response= await prisma.cOResponse.findUnique({
+      where:{id:id},
+      include:{
+        file:true
+      }
     })
     return sendResponse({
       message:"Respose is fetched successfully",

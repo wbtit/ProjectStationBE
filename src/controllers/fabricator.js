@@ -384,7 +384,9 @@ const GetFabricatorByID = async (req, res) => {
     const fabricator = await prisma.fabricator.findUnique({
       where: {
         id,
-      },
+      },include:{
+        file:true
+      }
     });
 
     // console.log(fabricator);
