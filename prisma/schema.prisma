@@ -103,6 +103,7 @@ model Fabricator {
   submittals  Submittals[] @relation("FabricatorSubmittals")
   userss      Users[]      @relation("UsersFabricator")
   users       Users[]      @relation("FabricatorUsers")
+  file        File[]       @relation("fabricatorFiles")
 
   @@map("fabricators")
 }
@@ -162,6 +163,7 @@ model Project {
   subTasks         SubTasks[]    @relation("subTasks")
   submittals       Submittals[]  @relation("ProjectSubmittals")
   tasks            Task[]        @relation("projectTask")
+  file        File[]       @relation("projectFiles")
 
   @@map("project")
 }
@@ -294,7 +296,7 @@ model Submittals {
   recepients    Users      @relation("UsersSubmittals", fields: [recepient_id], references: [id], onDelete: Cascade)
   sender        Users      @relation("senderSubmittals", fields: [sender_id], references: [id], onDelete: Cascade)
   submittalsResponse  SubmittalsResponse?  @relation("submittalsresponse")
-
+  file        File[]       @relation("submittalsFiles")
   @@map("submittals")
 }
 
@@ -310,7 +312,7 @@ model SubmittalsResponse {
   user          Users     @relation("submittalsresponseBy",fields:[userId],references:[id])
   submittalsId    String   @unique @db.Uuid
   submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
-
+  file        File[]       @relation("submittalsResponseFiles")
   @@map("submittalsresponse")
 }
 
@@ -330,7 +332,7 @@ model RFI {
   recepients    Users        @relation("UsersRFI", fields: [recepient_id], references: [id], onDelete: Cascade)
   sender        Users        @relation("senderRFI", fields: [sender_id], references: [id], onDelete: Cascade)
   rfiresponse   RFIResponse? @relation("rfiresponse")
-
+  file        File[]       @relation("rfiFiles")
   @@map("rfi")
 }
 
@@ -345,7 +347,7 @@ model RFIResponse {
   createdAt     DateTime @default(now())
   rfiId         String   @unique @db.Uuid
   rfi           RFI      @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)
-
+  file        File[]       @relation("rfiResponseFiles")
   @@map("rfiresponse")
 }
 
@@ -354,6 +356,7 @@ model RFQ {
   projectName  String
   sender_id    String   @db.Uuid
   status       RFQStatus  @default(OPEN)
+  reason       String?   @default("")
   subject      String
   description  String
   files        Json[]   @default([])
@@ -362,6 +365,7 @@ model RFQ {
   recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
   sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
   response     RFQResponse[]  @relation("rfqResponses")
+  file        File[]       @relation("rfqFiles")
   @@map("rfq")
 }
 
@@ -375,7 +379,7 @@ model RFQResponse{
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
   rfqId     String    @db.Uuid  
   rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
-
+  file        File[]       @relation("rfqResponseFiles")
   @@map("rfqResponse")
 }
 
@@ -419,7 +423,7 @@ model ChangeOrder {
   senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
   CoRefersTo  ChangeOrdertable[] @relation("CoRefersTo")
   coResponse  COResponse?  @relation("coResponse")
-
+  file        File[]       @relation("changeorderFiles")
   @@map("changeorder")
 }
 
@@ -434,7 +438,7 @@ model ChangeOrdertable {
   cost         Float       @default(0.0)
   CoId         String      @db.Uuid 
   CoRefersTo   ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
-
+  
   @@map("changeordertable")
 }
 
@@ -443,9 +447,10 @@ model COResponse{
   approved  Boolean   @default(true)
   description   String    @default("")
   CoId        String  @db.Uuid  @unique
-  COResponse  ChangeOrder @relation("coResponse",fields:[CoId],references:[id])
+  COresponse  ChangeOrder @relation("coResponse",fields:[CoId],references:[id])
   userId        String  @db.Uuid
   user      Users     @relation("COrespondedby",fields:[userId],references:[id])
+  file        File[]       @relation("CoResponseFiles")
 }
 
 model JobStudy {
@@ -521,7 +526,46 @@ model Message {
 
   @@map("message")
 }
+model File{
+  id                      String    @id @default(uuid())  @db.Uuid
+  originalName            String
+  mimeType                String
+  size                    Int
+  path                    String
+  hash                    String   @unique
+  uploadedAt              DateTime  @default(now())
+  lastAccess              DateTime?
+  isArchived              Boolean     @default(false)
 
+  projectId               String?       @db.Uuid
+  project                 Project?     @relation("projectFiles",fields:[projectId],references:[id])
+
+  fabricatorId            String?       @db.Uuid  
+  fabricator              Fabricator?  @relation("fabricatorFiles",fields:[fabricatorId],references:[id])
+
+  submittalsId            String?       @db.Uuid
+  submittals              Submittals?  @relation("submittalsFiles",fields:[submittalsId],references:[id])
+  submittalsResponseId    String?       @db.Uuid
+  submittalsPesponse      SubmittalsResponse?  @relation("submittalsResponseFiles",fields:[submittalsResponseId],references:[id])
+
+  rfiId                   String?         @db.Uuid
+  rfi                     RFI?            @relation("rfiFiles",fields:[rfiId],references:[id])
+  rfiResponseId           String?         @db.Uuid
+  rfiresponse             RFIResponse?    @relation("rfiResponseFiles",fields:[rfiResponseId],references:[id])
+
+  rfqId                   String?         @db.Uuid
+  rfq                     RFQ?            @relation("rfqFiles",fields:[rfqId],references:[id])
+  rfqResponseId           String?         @db.Uuid
+  rfqresponse             RFQResponse?    @relation("rfqResponseFiles",fields:[rfqResponseId],references:[id])
+
+  CoId                    String?         @db.Uuid
+  changeorder             ChangeOrder?    @relation("changeorderFiles",fields:[CoId],references:[id])
+  CoResponseId            String?         @db.Uuid
+  CoResponse              COResponse?     @relation("CoResponseFiles",fields:[CoResponseId],references:[id])
+
+
+      @@map("file")
+}
 enum WorkHourStatus {
   START
   END
