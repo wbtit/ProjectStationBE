@@ -356,6 +356,7 @@ model RFQ {
   projectName  String
   sender_id    String   @db.Uuid
   status       RFQStatus  @default(OPEN)
+  reason       String?   @default("")
   subject      String
   description  String
   files        Json[]   @default([])
