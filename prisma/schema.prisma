@@ -515,6 +515,7 @@ model GroupUser {
 model Message {
   id          String   @id @default(uuid()) @db.Uuid
   content     String
+  contentCompressed     Bytes?
   createdAt   DateTime @default(now())
   senderId    String   @db.Uuid
   receiverId  String?   @db.Uuid

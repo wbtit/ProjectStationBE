@@ -1,5 +1,5 @@
-import prisma from "./src/lib/prisma.js";
-import { WBSActivity } from "./data/activitydata.js";
+import prisma from "../src/lib/prisma.js";
+import { WBSActivity } from "./activitydata.js";
 
 const createTasks = async () => {
   try {
