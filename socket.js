@@ -2,6 +2,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import redis from "./redisClient.js";
 import prisma from "./src/lib/prisma.js";
+import { Compression } from "./src/utils/Zstd.js";
 
 
 const userSocketMap = new Map();
@@ -46,7 +47,7 @@ const initSocket = async(io) => {
 
       const message= await prisma.message.create({
         data:{
-          content,
+          contentCompressed:await Compression(content),
           senderId,
           receiverId
         }
@@ -61,7 +62,7 @@ const initSocket = async(io) => {
             userID:receiverId,
             payload: {
               type:"PrivateMessage",
-              content,
+              contentCompressed:await Compression(content),
               senderId,
               receiverId,
               messageId: message.id
@@ -76,7 +77,7 @@ const initSocket = async(io) => {
       // console.log("groupMessages got hit")
       const message = await prisma.message.create({
         data: {
-          content,
+        contentCompressed:await Compression(content),
           senderId,
           groupId,
           taggedUsers: {
@@ -113,7 +114,7 @@ const initSocket = async(io) => {
                 payload:{
                   type:"GroupMessages",
                   groupId,
-                  content,
+                  contentCompressed:await Compression(content),
                   isTagged
                 },
                 delivered:false

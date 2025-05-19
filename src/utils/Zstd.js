@@ -1,14 +1,13 @@
 import zstd from '@mongodb-js/zstd';
-const { compressSync, decompressSync } = zstd;
+const { compress, decompress } = zstd;
 
-
-export function Compression(text){
-    const buffer=Buffer.from(text,'utf-8')
-    return compressSync(buffer)
-
+export async function Compression(text) {
+  const buffer = Buffer.from(text, 'utf-8');
+  const compressed = await compress(buffer);
+  return Buffer.from(compressed); 
 }
 
-export function decompression(buffer){
-    const decompressed= decompressSync(buffer)
-     return decompressed.toString('utf-8'); 
+export async function decompression(buffer) {
+  const decompressed = await decompress(buffer);
+  return Buffer.from(decompressed).toString('utf-8');
 }

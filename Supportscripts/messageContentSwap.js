@@ -9,8 +9,9 @@ async function migrateOldMessages() {
     }
  })  
  
- for( const msg in messages){
-    const compressed= Compression(msg.content)
+ for( const msg of messages){
+    // console.log(msg.content)
+    const compressed= await Compression(msg.content)
     await prisma.message.update({
         where:{id:msg.id},
         data:{contentCompressed:compressed}

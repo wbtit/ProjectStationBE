@@ -97,8 +97,10 @@ const Pause = async (req, res) => {
   const { work_id, task_id } = req.body;
 
   // console.log(req.body);
+  console.log("TaskId and WorkId:",work_id,task_id)
 
   if (!work_id || !task_id) {
+    console.log("TaskId and WorkId:",work_id,task_id)
     return sendResponse({
       message: "Invalid work_id or task_id",
       res,
@@ -193,8 +195,9 @@ const Pause = async (req, res) => {
 const Resume = async (req, res) => {
   const { work_id, task_id } = req.body;
   const { id } = req.user;
-
+    console.log("TaskId and WorkId:",work_id,task_id)
   if (!work_id || !task_id) {
+    console.log("TaskId and WorkId:",work_id,task_id)
     return sendResponse({
       message: "Invalid work_id or task_id",
       res,
