@@ -1,5 +1,7 @@
+
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import { decompression } from "../utils/Zstd.js";
 
 const createGroup=async(req,res)=>{
     const{name}=req.body
@@ -123,12 +125,26 @@ const groupChatHistory=async(req,res)=>{
             
         })
 
+        const decompressedMessages = await Promise.all(
+  groupMessages.map(async msg => {
+    const content = msg.contentCompressed
+      ? await decompression(msg.contentCompressed)
+      : null;
+
+    return {
+      ...msg,
+      content
+    };
+  })
+);
+
+
         return sendResponse({
             message:"ChatHistory fetched successfully",
             res,
             statusCode:200,
             success:true,
-            data:groupMessages
+            data:decompressedMessages
         })
     } catch (error) {
         console.log(error.message)
@@ -172,12 +188,26 @@ const privateChatHistory=async(req,res)=>{
               take: parseInt(limit),  
             orderBy:{createdAt:'desc'}
         })
+
+        const decompressedMessages = await Promise.all(
+  groupMessages.map(async msg => {
+    const content = msg.contentCompressed
+      ? await decompression(msg.contentCompressed)
+      : null;
+
+    return {
+      ...msg,
+      content
+    };
+  })
+);
+
         return sendResponse({
             message:"ChatHistory fetched successfully",
             res,
             statusCode:200,
             success:true,
-            data:privateChats
+            data:decompressedMessages
         }) 
     } catch (error) {
         return sendResponse({
@@ -191,23 +221,24 @@ const privateChatHistory=async(req,res)=>{
 }
 
 const recentchats = async (req, res) => {
-    const { id } = req.user;
-  //console.log("userId",id)
-    try {
-      // Fetch recent private messages
-      const privateMessages = await prisma.message.findMany({
-        where: {
-          OR: [{ senderId: id }, { receiverId: id }],
-          receiverId: { not: null }
-        },
-        orderBy: { createdAt: 'desc' }
-      });
-      //console.log("Private Messages:", privateMessages);
-      const privateMap = new Map();
-  
-      for (const msg of privateMessages) {
+  const { id } = req.user;
+
+  try {
+    // Fetch recent private messages
+    const privateMessages = await prisma.message.findMany({
+      where: {
+        OR: [{ senderId: id }, { receiverId: id }],
+        receiverId: { not: null }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const privateMap = new Map();
+
+    await Promise.all(
+      privateMessages.map(async (msg) => {
         const otherUserId = msg.senderId === id ? msg.receiverId : msg.senderId;
-  
+
         if (!privateMap.has(otherUserId)) {
           const user = await prisma.users.findUnique({
             where: { id: otherUserId },
@@ -220,83 +251,95 @@ const recentchats = async (req, res) => {
               emp_code: true
             }
           });
-  
+
+          const lastMessage = msg.contentCompressed
+            ? await decompression(msg.contentCompressed)
+            : null;
+
           privateMap.set(otherUserId, {
             type: "private",
             user,
-            lastMessage: msg.content,
+            lastMessage,
             timestamp: msg.createdAt
           });
         }
-      }
-  
-      // Fetch group messages + memberships
-      const groupMembership = await prisma.groupUser.findMany({
-        where: { memberId: id },
-        select: { groupId: true }
-      });
-      //console.log("Group Memberships:", groupMembership);
-      const groupIds = groupMembership.map(g => g.groupId);
-  
-      const groupMessages = await prisma.message.findMany({
-        where: { groupId: { in: groupIds } },
-        orderBy: { createdAt: 'desc' }
-      });
-      //console.log("Group Messages:", groupMessages);
-      const groupMap = new Map();
-  
-      for (const msg of groupMessages) {
+      })
+    );
+
+    // Fetch group messages + memberships
+    const groupMembership = await prisma.groupUser.findMany({
+      where: { memberId: id },
+      select: { groupId: true }
+    });
+
+    const groupIds = groupMembership.map(g => g.groupId);
+
+    const groupMessages = await prisma.message.findMany({
+      where: { groupId: { in: groupIds } },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const groupMap = new Map();
+
+    await Promise.all(
+      groupMessages.map(async (msg) => {
         if (!groupMap.has(msg.groupId)) {
           const group = await prisma.group.findUnique({ where: { id: msg.groupId } });
+
+          const lastMessage = msg.contentCompressed
+            ? await decompression(msg.contentCompressed)
+            : null;
+
           groupMap.set(msg.groupId, {
             type: "group",
             group,
-            lastMessage: msg.content,
+            lastMessage,
             timestamp: msg.createdAt
           });
         }
-      }
-  
-      const allGroups = await prisma.group.findMany({
-        where: { id: { in: groupIds } }
-      });
-      //console.log("allGroups",allGroups)
-      const groupChatsSidebarItems = allGroups.map(group => {
-        const msgInfo = groupMap.get(group.id) || {};
-        return {
-          type: "group",
-          group,
-          lastMessage: msgInfo.lastMessage || null,
-          timestamp: msgInfo.timestamp || null
-        };
-      });
-      //console.log("groupChatsSidebarItems",groupChatsSidebarItems)
-  
-      // Combine all chats and sort
-      const combinedChats = [
-        ...privateMap.values(),
-        ...groupChatsSidebarItems
-      ].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-  
-      return sendResponse({
-        message: "Fetched recent chats successfully",
-        res,
-        statusCode: 200,
-        success: true,
-        data: combinedChats
-      });
-  
-    } catch (error) {
-      console.log(error.message);
-      return sendResponse({
-        message: "Failed to load the recent Chats",
-        res,
-        statusCode: 500,
-        success: false,
-        data: null
-      });
-    }
-  };
+      })
+    );
+
+    const allGroups = await prisma.group.findMany({
+      where: { id: { in: groupIds } }
+    });
+
+    const groupChatsSidebarItems = allGroups.map(group => {
+      const msgInfo = groupMap.get(group.id) || {};
+      return {
+        type: "group",
+        group,
+        lastMessage: msgInfo.lastMessage || null,
+        timestamp: msgInfo.timestamp || null
+      };
+    });
+
+    // Combine all chats and sort
+    const combinedChats = [
+      ...privateMap.values(),
+      ...groupChatsSidebarItems
+    ].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+    return sendResponse({
+      message: "Fetched recent chats successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: combinedChats
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: "Failed to load the recent Chats",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null
+    });
+  }
+};
+
   
 
   const deleteMembersInGroup=async(req,res)=>{
