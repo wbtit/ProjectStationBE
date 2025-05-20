@@ -287,7 +287,7 @@ model Submittals {
   recepient_id  String     @db.Uuid
   sender_id     String     @db.Uuid
   status        Boolean    @default(false)
-  Stage         Stage      
+  Stage         Stage      @default(IFA)
   subject       String
   description   String
   files         Json[]     @default([])
@@ -618,6 +618,10 @@ enum Activity {
   DC
   EC
   DESIGNER
+  MODEL_CHECKING
+  DETAIL_CHECKING
+  ERECTION_CHECKING
+  DESIGN_CHECKING
   DWG_CHECKING
 }
 
