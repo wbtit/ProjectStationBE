@@ -436,7 +436,6 @@ model ChangeOrder {
 
 model ChangeOrdertable {
   id           String      @id @default(uuid()) @db.Uuid
-  siNo         Int         @default(0)
   description  String      @default("")
   referenceDoc String      @default("")
   elements     String      @default("")

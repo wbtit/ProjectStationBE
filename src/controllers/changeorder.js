@@ -253,7 +253,7 @@ const getResponse=async(req,res)=>{
 
 const AddChangeOrdertable=async(req,res)=>{
 const{coId}=req.params
-const{siNO,description,referenceDoc,elements,QtyNo,hours,cost}=req.body
+const{description,referenceDoc,elements,QtyNo,hours,cost}=req.body
 
 try {
   if(!req.body){
@@ -268,7 +268,6 @@ try {
   
   const createTable= await prisma.changeOrdertable.createMany({
     data:Object.values(req.body).map((co)=>({
-      siNO:co.siNO,
       description:co.description,
       referenceDoc:co.referenceDoc,
       elements:co.elements,
