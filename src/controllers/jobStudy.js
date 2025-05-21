@@ -2,7 +2,7 @@ import { sendResponse } from "../utils/responder.js";
 import prisma from "../lib/prisma.js";
 
 const addJobStudy = async (req, res) => {
-  // console.log(req.body);
+  console.log("JobStudy table:",req.body);
 
   try {
     if (!req.body) {

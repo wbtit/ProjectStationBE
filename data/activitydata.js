@@ -20,7 +20,7 @@ export const WBSActivity = [
   {
     id: "2d4d31b4-7f7e-48bf-89dd-2da53fe62e1a",
     type: "MODELING",
-    name: "Base Plate",
+    name: "MP - Base Plate",
     projectID: "",
   },
   {

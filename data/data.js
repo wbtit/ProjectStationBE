@@ -60,19 +60,19 @@ export const SubTasks = [
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Standard Pattern",
+    wbsactivityID: "2d4d31b4-7f7e-48bf-89dd-2da53fe62e1a",
+    description: "Plate Definition Schedule(Standard Pattern)",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Non-standard Pattern",
+    wbsactivityID: "2d4d31b4-7f7e-48bf-89dd-2da53fe62e1a",
+    description: "Plate Definition Schedule(Non-standard Pattern)",
     unitTime: 10.0,
     CheckUnitTime: 3.3,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
+    wbsactivityID: "2d4d31b4-7f7e-48bf-89dd-2da53fe62e1a",
     description: "Apply Base Plate",
     unitTime: 1.0,
     CheckUnitTime: 0.3,
@@ -210,18 +210,7 @@ export const SubTasks = [
     unitTime: 60.0,
     CheckUnitTime: 20.0,
   },
-  {
-    wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
-    description: "Slab Embed/ Bearing Plate - Section Details",
-    unitTime: 15.0,
-    CheckUnitTime: 5.0,
-  },
-  {
-    wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
-    description: "Slab Embed/ Bearing Plate - Embed/ Bearing Plate Detailing",
-    unitTime: 5.0,
-    CheckUnitTime: 1.7,
-  },
+  
   {
     wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
     description: "Slab Embed/ Bearing Plate - Sheet loading",
@@ -249,13 +238,7 @@ export const SubTasks = [
     unitTime: 60.0,
     CheckUnitTime: 20.0,
   },
-  {
-    wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
-    description:
-      "Panel/ Wall Embed/ Bearing Plate - Embed/ Bearing Plate Sections",
-    unitTime: 15.0,
-    CheckUnitTime: 5.0,
-  },
+ 
   {
     wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
     description:
@@ -361,34 +344,29 @@ export const SubTasks = [
   },
   {
     wbsactivityID: "dfcdf2e5-e307-4ecc-9e2c-fe8622eab1c4",
-    description: "Truss Placement New Profile Add",
+    description: "New Profile Add",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "dfcdf2e5-e307-4ecc-9e2c-fe8622eab1c4",
+    wbsactivityID: "2f3f9309-47d7-48d9-8130-de2004bad864",
     description: "Horizontal Sag Rod Placement",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
   },
   {
-    wbsactivityID: "dfcdf2e5-e307-4ecc-9e2c-fe8622eab1c4",
+    wbsactivityID: "2f3f9309-47d7-48d9-8130-de2004bad864",
     description: "Vertical Sag Rod Placement",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
   },
   {
-    wbsactivityID: "dfcdf2e5-e307-4ecc-9e2c-fe8622eab1c4",
+    wbsactivityID: "2f3f9309-47d7-48d9-8130-de2004bad864",
     description: "Inclined Sag Rod Placement",
     unitTime: 4.0,
     CheckUnitTime: 1.3,
   },
-  {
-    wbsactivityID: "31cb285d-2c13-402a-8710-f2b274a8cc64",
-    description: "ABM Generation",
-    unitTime: 0.3,
-    CheckUnitTime: 0.5,
-  },
+  
   {
     wbsactivityID: "af26ac6b-bd54-487a-8278-774bfc1facb9",
     description: "Cap Plate",
@@ -792,56 +770,56 @@ export const SubTasks = [
     CheckUnitTime: 0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Plain Input as plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Input as plate(Plain)",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Curved Input as plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: " Input as plate(Curved)",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "With Cut & Notch Input as plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Input as Plate (With Cut & Notch)",
     unitTime: 6.0,
     CheckUnitTime: 2.0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Plain Input as grating",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Input as grating (Plain)",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Curved Input as grating",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Input as grating(Curved)",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "With Cut & Notch Input as grating",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Input as grating(With Cut & Notch)",
     unitTime: 6.0,
     CheckUnitTime: 2.0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Plain Checkered Plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: " Checkered Plate(Plain)",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Curved Checkered Plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: " Checkered Plate(Curved)",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "With Cut & Notch Checkered Plate",
+    wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
+    description: "Checkered Plate(With Cut & Notch)",
     unitTime: 6.0,
     CheckUnitTime: 2.0,
   },
@@ -1246,6 +1224,27 @@ export const SubTasks = [
     description: "Sheet loading",
     unitTime: 1.0,
     CheckUnitTime: 0.0,
+  },
+  {
+    wbsactivityID: "239cf52f-f800-4bab-8a86-20f19b786ba5",
+    description: "Anchor Bolt Plan Generation-Complex",
+    unitTime: 240.0,
+    CheckUnitTime: 80.0,
+  },{
+    wbsactivityID: "239cf52f-f800-4bab-8a86-20f19b786ba5",
+    description: "Anchor Bolt Plan Generation-Moderate",
+    unitTime: 120.0,
+    CheckUnitTime: 40.0,
+  },{
+    wbsactivityID: "239cf52f-f800-4bab-8a86-20f19b786ba5",
+    description: "Anchor Bolt Plan Generation-Simple",
+    unitTime: 60.0,
+    CheckUnitTime: 20.0,
+  },{
+    wbsactivityID: "239cf52f-f800-4bab-8a86-20f19b786ba5",
+    description: "Anchor Bolt Setting Details",
+    unitTime: 15.0,
+    CheckUnitTime: 5.0,
   },
 ];
 

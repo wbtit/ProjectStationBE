@@ -251,51 +251,58 @@ const getResponse=async(req,res)=>{
   }
 }
 
-const AddChangeOrdertable=async(req,res)=>{
-const{coId}=req.params
-const{description,referenceDoc,elements,QtyNo,hours,cost}=req.body
+const AddChangeOrdertable = async (req, res) => {
+  const { coId } = req.params;
+  const changeOrderItems = Object.values(req.body);
 
-try {
-  if(!req.body){
+  console.log("ChangeOrderTable data:", changeOrderItems);
+
+  try {
+    if (!Array.isArray(changeOrderItems) || changeOrderItems.length === 0) {
+      return sendResponse({
+        message: "Fields are empty or invalid format",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null
+      });
+    }
+
+    const dataToInsert = changeOrderItems.map(co => ({
+      description: co.description,
+      referenceDoc: co.referenceDoc,
+      elements: co.elements,
+      QtyNo: co.QtyNo,
+      hours: co.hours,
+      cost: co.cost,
+      CoId: coId  // from params
+    }));
+
+    const created = await prisma.changeOrdertable.createMany({
+      data: dataToInsert,
+      skipDuplicates: true // optional: avoids inserting duplicates
+    });
+
     return sendResponse({
-      message:"Feilds are empty",
+      message: "Change Order Table created",
       res,
-      statusCode:400,
-      success:false,
-      data:null
-    })
-  }
-  
-  const createTable= await prisma.changeOrdertable.createMany({
-    data:Object.values(req.body).map((co)=>({
-      description:co.description,
-      referenceDoc:co.referenceDoc,
-      elements:co.elements,
-      QtyNo:co.QtyNo,
-      hours:co.hours,
-      cost:co.cost
-    }))
-  })
+      statusCode: 200,
+      success: true,
+      data: created
+    });
 
-  return sendResponse({
-    message:"Co Table created",
-    res,
-    statusCode:200,
-    success:true,
-    data:createTable
-  })
-  
-} catch (error) {
-  console.log(error.message)
-  return sendResponse({
-    message: error.message,
-    res,
-    statusCode: 500,
-    success: false,
-    data: null,
-  }); 
-}
-}
+  } catch (error) {
+    console.error(error);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
 
 const getRowCotable=async(req,res)=>{
   const{coRowId}=req.params
