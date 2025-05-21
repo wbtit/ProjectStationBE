@@ -287,12 +287,12 @@ export const WBSActivity = [
     name: "Misc Sheet Loading",
     projectID: "",
   },
-  {
-    id: "bb3f955d-e332-42bf-8c34-a845925956cb",
-    type: "DETAILING",
-    name: "Plate/ Grating",
-    projectID: "",
-  },
+  // {
+  //   id: "bb3f955d-e332-42bf-8c34-a845925956cb",
+  //   type: "DETAILING",
+  //   name: "Plate/ Grating",
+  //   projectID: "",
+  // },
   {
     id: "4b0846f0-01c2-4083-8c15-e030b2f8bd3e",
     type: "DETAILING",
