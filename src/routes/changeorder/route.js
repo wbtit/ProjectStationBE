@@ -19,6 +19,6 @@ router.get("/sents",Authenticate,changeOrderSent)
 router.post("/addResponse/:coId",Authenticate,addCoResponse)
 router.get("/getresponse/:id",Authenticate,getResponse)
 router.post("/coTable/:coId",Authenticate,AddChangeOrdertable)
-router.get("/CoRow/:coRowId",Authenticate,getRowCotable)
+router.get("/CoRow/:CoId",Authenticate,getRowCotable)
     
 export { router as ChangeOrderRouter };

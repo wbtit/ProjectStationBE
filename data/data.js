@@ -96,25 +96,25 @@ export const SubTasks = [
     CheckUnitTime: 20.0,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
+    wbsactivityID: "",
     description: "Anchor Bolt Setting Details",
     unitTime: 15.0,
     CheckUnitTime: 5.0,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
+    wbsactivityID: "a2cae691-5a64-49ad-8cfd-e11cedf07e61",
     description: "Anchor Bolt Detailing",
     unitTime: 10.0,
     CheckUnitTime: 3.3,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Template/ Leveling Plate detailing, as required",
+    wbsactivityID: "a2cae691-5a64-49ad-8cfd-e11cedf07e61",
+    description: "Template/ Leveling Plate detailing",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
+    wbsactivityID: "a2cae691-5a64-49ad-8cfd-e11cedf07e61",
     description: "Sheet loading",
     unitTime: 5.0,
     CheckUnitTime: 0,
@@ -239,13 +239,6 @@ export const SubTasks = [
     CheckUnitTime: 20.0,
   },
  
-  {
-    wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
-    description:
-      "Panel/ Wall Embed/ Bearing Plate - Embed/ Bearing Plate Detailing",
-    unitTime: 5.0,
-    CheckUnitTime: 1.7,
-  },
   {
     wbsactivityID: "0c466582-5522-4314-ad06-88f5b5c9edd1",
     description: "Sheet loading",
@@ -644,25 +637,25 @@ export const SubTasks = [
     CheckUnitTime: 2.7,
   },
   {
-    wbsactivityID: "ac6f620a-3435-42a0-9773-a745dfef3932",
+    wbsactivityID: "e40d0b97-fd4b-44a8-b561-5841f62a6f3a",
     description: "Simple Jamb",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "ac6f620a-3435-42a0-9773-a745dfef3932",
+    wbsactivityID: "e40d0b97-fd4b-44a8-b561-5841f62a6f3a",
     description: "Moderate Jamb",
     unitTime: 5.0,
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "ac6f620a-3435-42a0-9773-a745dfef3932",
+    wbsactivityID: "e40d0b97-fd4b-44a8-b561-5841f62a6f3a",
     description: "Complex Jamb",
     unitTime: 8.0,
     CheckUnitTime: 2.7,
   },
   {
-    wbsactivityID: "ac6f620a-3435-42a0-9773-a745dfef3932",
+    wbsactivityID: "e40d0b97-fd4b-44a8-b561-5841f62a6f3a",
     description: "Most Complex Jamb",
     unitTime: 10.0,
     CheckUnitTime: 3.3,
@@ -762,12 +755,6 @@ export const SubTasks = [
     description: "Complex Sag Rod",
     unitTime: 8.0,
     CheckUnitTime: 2.7,
-  },
-  {
-    wbsactivityID: "558a842a-c3ed-44c6-9ed1-06c1e9dcae91",
-    description: "Sheet loading",
-    unitTime: 1.0,
-    CheckUnitTime: 0,
   },
   {
     wbsactivityID: "141141f4-6cda-4d0d-887b-40b3ca886175",
@@ -956,7 +943,7 @@ export const SubTasks = [
     CheckUnitTime: 5.0,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
+    wbsactivityID: "0d265b8c-df7a-46a4-aa86-770099ee4975",
     description: "Pour Stop (Loose)",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
@@ -968,13 +955,13 @@ export const SubTasks = [
     CheckUnitTime: 1.7,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
+    wbsactivityID: "201ae984-60e3-4669-9f33-8560bc146170",
     description: "Loose Plate",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
+    wbsactivityID: "0d265b8c-df7a-46a4-aa86-770099ee4975",
     description: "Deck Support Angle",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
@@ -1059,24 +1046,24 @@ export const SubTasks = [
   },
   {
     wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
-    description: "Plate/ Grating - Moderate",
+    description: "late/ Grating - Moderate",
     unitTime: 6.0,
     CheckUnitTime: 2.0,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
-    description: "Pour Stop",
+    wbsactivityID: "4b0846f0-01c2-4083-8c15-e030b2f8bd3e",
+    description: "Pour Stop(Loose)",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
+    wbsactivityID: "b9687854-21a5-4fab-bd1a-8bcaa94a9831",
     description: "Kicker",
     unitTime: 3.0,
     CheckUnitTime: 1.0,
   },
   {
-    wbsactivityID: "06a12a2f-73c5-4a89-a66d-e96c8df117e3",
+    wbsactivityID: "0d265b8c-df7a-46a4-aa86-770099ee4975",
     description: "Loose Plate",
     unitTime: 2.0,
     CheckUnitTime: 0.7,
@@ -1245,6 +1232,172 @@ export const SubTasks = [
     description: "Anchor Bolt Setting Details",
     unitTime: 15.0,
     CheckUnitTime: 5.0,
+  },
+  {
+    wbsactivityID: "7a9ff7da-ba43-4ad8-a620-3e297a006fa7",
+    description: "Slab Embed/ Bearing Plate - Section Details",
+    unitTime: 15.0,
+    CheckUnitTime: 5.0,
+  },
+   {
+    wbsactivityID: "7a9ff7da-ba43-4ad8-a620-3e297a006fa7",
+    description:
+      "Slab Embed/ Bearing Plate - Sheet Loading",
+    unitTime: 5.0,
+    CheckUnitTime: 0.0,
+  },
+ {
+    wbsactivityID: "7a9ff7da-ba43-4ad8-a620-3e297a006fa7",
+    description:
+      "Panel/ Wall Embed/ Bearing Plate - Embed/ Bearing Plate Sections",
+    unitTime: 15.0,
+    CheckUnitTime: 5.0,
+  },
+   {
+    wbsactivityID: "7a9ff7da-ba43-4ad8-a620-3e297a006fa7",
+    description:
+      "Panel/ Wall Embed/ Bearing Plate - Sheet Loading",
+    unitTime: 5.0,
+    CheckUnitTime: 0.0,
+  },
+   {
+    wbsactivityID: "f6f9c87c-6ac5-4c77-9dc7-07340b66644f",
+    description:
+      "Plan - Complex",
+    unitTime: 240.0,
+    CheckUnitTime: 80.0,
+  },
+   {
+    wbsactivityID: "f6f9c87c-6ac5-4c77-9dc7-07340b66644f",
+    description:
+      "Plan - Moderate",
+    unitTime: 120.0,
+    CheckUnitTime: 40.0,
+  },
+   {
+    wbsactivityID: "f6f9c87c-6ac5-4c77-9dc7-07340b66644f",
+    description:
+      "Plan - Simple",
+    unitTime: 60.0,
+    CheckUnitTime: 20.0,
+  },
+   {
+    wbsactivityID: "83f574f4-ae5c-4220-8a9b-785de07d185f",
+    description:
+      "Elevation - Complex",
+    unitTime: 120.0,
+    CheckUnitTime: 40.0,
+  },
+   {
+    wbsactivityID: "83f574f4-ae5c-4220-8a9b-785de07d185f",
+    description:
+      "Elevation - Moderate",
+    unitTime: 60.0,
+    CheckUnitTime: 20.0,
+  },
+   {
+    wbsactivityID: "83f574f4-ae5c-4220-8a9b-785de07d185f",
+    description:
+      "Elevation - Simple",
+    unitTime: 30.0,
+    CheckUnitTime: 10.0,
+  },
+   {
+    wbsactivityID: "efc10079-31ab-4fa9-9a47-bc73a0751601",
+    description:
+      "Section",
+    unitTime: 15.0,
+    CheckUnitTime: 5.0,
+  },
+  {
+    wbsactivityID: "adf44ddf-c49a-459b-9b6b-ce5412f5ba4a",
+    description:
+      "Plan - Complex",
+    unitTime: 240.0,
+    CheckUnitTime: 80.0,
+  },
+   {
+    wbsactivityID: "adf44ddf-c49a-459b-9b6b-ce5412f5ba4a",
+    description:
+      "Plan - Moderate",
+    unitTime: 120.0,
+    CheckUnitTime: 40.0,
+  },
+   {
+    wbsactivityID: "adf44ddf-c49a-459b-9b6b-ce5412f5ba4a",
+    description:
+      "Plan - Simple",
+    unitTime: 60.0,
+    CheckUnitTime: 20.0,
+  },
+   {
+    wbsactivityID: "2a088f7f-f5ee-4891-8a44-a80937877dd7",
+    description:
+      "Elevation - Complex",
+    unitTime: 120.0,
+    CheckUnitTime: 40.0,
+  },
+   {
+    wbsactivityID: "2a088f7f-f5ee-4891-8a44-a80937877dd7",
+    description:
+      "Elevation - Moderate",
+    unitTime: 60.0,
+    CheckUnitTime: 20.0,
+  },
+   {
+    wbsactivityID: "2a088f7f-f5ee-4891-8a44-a80937877dd7",
+    description:
+      "Elevation - Simple",
+    unitTime: 30.0,
+    CheckUnitTime: 10.0,
+  },
+   {
+    wbsactivityID: "18c24139-164e-408d-858e-26feb9dbade7",
+    description:
+      "Section",
+    unitTime: 15.0,
+    CheckUnitTime: 5.0,
+  },
+  {
+    wbsactivityID: "163fb0b7-5a6c-49f8-a976-e076a66ba9c7",
+    description: "Slab Embed/ Bearing Plate - Embed/ Bearing Plate Detailing",
+    unitTime: 5.0,
+    CheckUnitTime: 1.7,
+  },
+  {
+    wbsactivityID: "163fb0b7-5a6c-49f8-a976-e076a66ba9c7",
+    description:
+      "Slab Embed/ Bearing Plate - Sheet Loading",
+    unitTime: 5.0,
+    CheckUnitTime: 0.0,
+  },
+ {
+    wbsactivityID: "163fb0b7-5a6c-49f8-a976-e076a66ba9c7",
+    description:
+      "Panel/ Wall Embed/ Bearing Plate - Embed/ Bearing Plate Detailing",
+    unitTime: 5.0,
+    CheckUnitTime: 1.7,
+  },
+  {
+    wbsactivityID: "163fb0b7-5a6c-49f8-a976-e076a66ba9c7",
+    description:
+      "Panel/ Wall Embed/ Bearing Plate - Sheet Loading",
+    unitTime: 5.0,
+    CheckUnitTime: 0.0,
+  },
+  {
+    wbsactivityID: "ef4127a5-1f6d-4892-b81d-d5283462d275",
+    description:
+      "Main Steel - Sheet Loading",
+    unitTime: 1.0,
+    CheckUnitTime: 0.0,
+  },
+  {
+    wbsactivityID: "74669e0a-9c18-4871-b6e2-b6285a3a0ad1",
+    description:
+      "Misc - Sheet Loading",
+    unitTime: 1.0,
+    CheckUnitTime: 0.0,
   },
 ];
 

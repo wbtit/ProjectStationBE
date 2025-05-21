@@ -25,7 +25,9 @@ const changeOrderReceived=async(req,res)=>{
                 description:true,
                 changeOrder:true,
                 sentOn:true,
-                file:true
+                files:true,
+                project:true,
+                recipients:true
                 
             }
         })
@@ -77,11 +79,14 @@ const changeOrderSent=async(req,res)=>{
                 description:true,
                 changeOrder:true,
                 sentOn:true,
-                file:true
+                files:true,
+                recipients:true,
+                project:true
+                
                 
             }
         })
-        if(receives.length===0){
+        if(sents.length===0){
             return sendResponse({
                 message:"No sents changeOrders for this user",
                 res,
@@ -305,9 +310,9 @@ const AddChangeOrdertable = async (req, res) => {
 
 
 const getRowCotable=async(req,res)=>{
-  const{coRowId}=req.params
+  const{CoId}=req.params
   try {
-    if(!coRowId){
+    if(!CoId){
       return sendResponse({
         message:"Feilds are empty",
         res,
@@ -317,7 +322,7 @@ const getRowCotable=async(req,res)=>{
       }) 
     }
     const coRow= await prisma.changeOrdertable.findMany({
-      where:{id:coRowId}
+      where:{id:CoId}
     })
     return sendResponse({
       message:"Response created",
