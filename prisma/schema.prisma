@@ -151,7 +151,14 @@ model Project {
   startDate        String
   endDate          String?
   approvalDate     String
-  estimatedHours   Int
+  estimatedHours   Float           @default(0)
+  modelingHours    Float           @default(0)
+  modelCheckingHours     Float      @default(0)
+  detailingHours   Float           @default(0)
+  detailCheckingHours    Float      @default(0)
+  executionHours   Float           @default(0)
+  executionCheckingHours Float     @default(0)
+
   accepttasks      AcceptTask[]  @relation("acceptTaskProject")
   changeOrder      ChangeOrder[] @relation("ChangeOrderProject")
   Jobstudy         JobStudy[]    @relation("projectJobStudy")

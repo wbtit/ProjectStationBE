@@ -31,6 +31,12 @@ const AddProject = async (req, res) => {
     end_date,
     approvalDate,
     estimatedHours,
+    modelingHours,
+    modelCheckingHours,
+    detailingHours,
+    detailCheckingHours,
+    erectionHours,
+    erectionCheckingHours
   } = req.body;
 
   // console.log(req.body);
@@ -43,7 +49,13 @@ const AddProject = async (req, res) => {
     !manager ||
     !start_date ||
     !estimatedHours||
-    !approvalDate
+    !approvalDate ||
+    !modelingHours||
+    !modelCheckingHours||
+    !detailingHours||
+    !detailCheckingHours||
+    !erectionHours||
+    !erectionCheckingHours
   ) {
     return sendResponse({
       message: "Fields are empty",
@@ -73,6 +85,12 @@ const AddProject = async (req, res) => {
         status: status,
         tools: tools,
         endDate: end_date,
+        modelingHours,
+      modelCheckingHours,
+      detailingHours,
+      detailCheckingHours,
+      erectionHours,
+      erectionCheckingHours
       },
     });
     const fabricatorData= await prisma.fabricator.findUnique({
@@ -311,7 +329,13 @@ const UpdateProject = async (req, res) => {
       "managerID",
       "team",
       "approvalDate",
-      "estimatedHours"
+      "estimatedHours",
+      "modelingHours",
+    "modelCheckingHours",
+    "detailingHours",
+    "detailCheckingHours",
+    "erectionHours",
+    "erectionCheckingHours"
     ];
 
     fieldsToUpdate.forEach((field) => {

@@ -24,7 +24,7 @@ const fileUpload=async(req,res)=>{
 
     for( const file of files){
         const hash= await generateFileHashStream(file.path)
-        const existing= await prisma.File.findUnique({where:{hash}})
+        const existing= await prisma.file.findUnique({where:{hash}})
 
         if(existing){
             fs.unlinkSync(file.path)//remove duplicate from disk
@@ -63,7 +63,7 @@ const fileUpload=async(req,res)=>{
 const viewFile=async(req,res)=>{
     const{fileId}=req.params
     try {
-        const file= await prisma.File.findUnique({where:{id:fileId}})
+        const file= await prisma.file.findUnique({where:{id:fileId}})
         if(!file) return sendResponse({
             message:"File not found",
             statusCode:400,
@@ -84,7 +84,7 @@ const viewFile=async(req,res)=>{
         const stream=fs.createReadStream(fullPath)
         stream.pipe(res)
 
-        await prisma.File.update({where:{id:fileId},data:{lastAccess:new Date()}})
+        await prisma.file.update({where:{id:fileId},data:{lastAccess:new Date()}})
     } catch (error) {
         console.log(error.message)
         return sendResponse({
@@ -99,11 +99,11 @@ const viewFile=async(req,res)=>{
 const downloadFile=async(req,res)=>{
     const {fileId}=req.params
     try {
-       const file= await prisma.File.findUnique({where:{id:fileId}})
+       const file= await prisma.file.findUnique({where:{id:fileId}})
         if(!file) return sendResponse({
             message:"File not found",
             statusCode:400,
-            success:false,
+            success:false,  
             data:null
         })
 
