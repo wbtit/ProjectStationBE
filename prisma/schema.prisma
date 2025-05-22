@@ -629,6 +629,7 @@ enum Activity {
   ERECTION_CHECKING
   DESIGN_CHECKING
   DWG_CHECKING
+  OTHERS
 }
 
 enum State {

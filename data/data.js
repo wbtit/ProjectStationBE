@@ -78,25 +78,7 @@ export const SubTasks = [
     CheckUnitTime: 0.3,
   },
   {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Anchor Bolt plan generation - Complex",
-    unitTime: 240.0,
-    CheckUnitTime: 80.0,
-  },
-  {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Anchor Bolt plan generation - Moderate",
-    unitTime: 120.0,
-    CheckUnitTime: 40.0,
-  },
-  {
-    wbsactivityID: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    description: "Anchor Bolt plan generation - Simple",
-    unitTime: 60.0,
-    CheckUnitTime: 20.0,
-  },
-  {
-    wbsactivityID: "",
+    wbsactivityID: "a2cae691-5a64-49ad-8cfd-e11cedf07e61",
     description: "Anchor Bolt Setting Details",
     unitTime: 15.0,
     CheckUnitTime: 5.0,
@@ -1061,6 +1043,12 @@ export const SubTasks = [
 
   {
     wbsactivityID: "0d265b8c-df7a-46a4-aa86-770099ee4975",
+    description: "Bollard",
+    unitTime: 8.0,
+    CheckUnitTime: 2.7,
+  },
+  {
+    wbsactivityID: "4dc9c5ea-7ecd-4428-bb78-ba3a64ad99e7",
     description: "Bollard",
     unitTime: 5.0,
     CheckUnitTime: 1.7,

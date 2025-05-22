@@ -49,13 +49,13 @@ const AddProject = async (req, res) => {
     !manager ||
     !start_date ||
     !estimatedHours||
-    !approvalDate ||
-    !modelingHours||
-    !modelCheckingHours||
-    !detailingHours||
-    !detailCheckingHours||
-    !erectionHours||
-    !erectionCheckingHours
+    !approvalDate //||
+    // !modelingHours||
+    // !modelCheckingHours||
+    // !detailingHours||
+    // !detailCheckingHours||
+    // !erectionHours||
+    // !erectionCheckingHours
   ) {
     return sendResponse({
       message: "Fields are empty",

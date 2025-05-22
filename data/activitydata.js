@@ -288,7 +288,7 @@ export const WBSActivity = [
      
   },
   // {
-  //   id: "bb3f955d-e332-42bf-8c34-a845925956cb",
+  //   id: "4  ",
   //   type: "DETAILING",
   //   name: "Plate/ Grating",
   //    
@@ -372,15 +372,15 @@ export const WBSActivity = [
      
   },
   {
-    id: "42fdcea1-1009-4410-94d8-ed25efb91b29",
-    type: "ERECTION",
-    name: "Anchor bolt plan",
-     
-  },
-  {
     id: "0d265b8c-df7a-46a4-aa86-770099ee4975",
     type: "MODELING",
     name: "MP- Misc",
+     
+  },
+    {
+    id: "6cc65db7-5dae-4f43-8cde-17c84e97e1d2",
+    type: "OTHERS",
+    name: "Submittals",
      
   },
 ];
