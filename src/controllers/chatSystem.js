@@ -224,7 +224,6 @@ const recentchats = async (req, res) => {
   const { id } = req.user;
 
   try {
-    // Fetch recent private messages
     const privateMessages = await prisma.message.findMany({
       where: {
         OR: [{ senderId: id }, { receiverId: id }],
@@ -235,38 +234,36 @@ const recentchats = async (req, res) => {
 
     const privateMap = new Map();
 
-    await Promise.all(
-      privateMessages.map(async (msg) => {
-        const otherUserId = msg.senderId === id ? msg.receiverId : msg.senderId;
+    for (const msg of privateMessages) {
+      const otherUserId = msg.senderId === id ? msg.receiverId : msg.senderId;
 
-        if (!privateMap.has(otherUserId)) {
-          const user = await prisma.users.findUnique({
-            where: { id: otherUserId },
-            select: {
-              f_name: true,
-              m_name: true,
-              l_name: true,
-              username: true,
-              role: true,
-              emp_code: true
-            }
-          });
+      const existing = privateMap.get(otherUserId);
+      if (!existing || new Date(existing.timestamp) < new Date(msg.createdAt)) {
+        const user = await prisma.users.findUnique({
+          where: { id: otherUserId },
+          select: {
+            f_name: true,
+            m_name: true,
+            l_name: true,
+            username: true,
+            role: true,
+            emp_code: true
+          }
+        });
 
-          const lastMessage = msg.contentCompressed
-            ? await decompression(msg.contentCompressed)
-            : null;
+        const lastMessage = msg.contentCompressed
+          ? await decompression(msg.contentCompressed)
+          : null;
 
-          privateMap.set(otherUserId, {
-            type: "private",
-            user,
-            lastMessage,
-            timestamp: msg.createdAt
-          });
-        }
-      })
-    );
+        privateMap.set(otherUserId, {
+          type: "private",
+          user,
+          lastMessage,
+          timestamp: msg.createdAt
+        });
+      }
+    }
 
-    // Fetch group messages + memberships
     const groupMembership = await prisma.groupUser.findMany({
       where: { memberId: id },
       select: { groupId: true }
@@ -281,25 +278,25 @@ const recentchats = async (req, res) => {
 
     const groupMap = new Map();
 
-    await Promise.all(
-      groupMessages.map(async (msg) => {
-        if (!groupMap.has(msg.groupId)) {
-          const group = await prisma.group.findUnique({ where: { id: msg.groupId } });
+    for (const msg of groupMessages) {
+      const existing = groupMap.get(msg.groupId);
+      if (!existing || new Date(existing.timestamp) < new Date(msg.createdAt)) {
+        const group = await prisma.group.findUnique({ where: { id: msg.groupId } });
 
-          const lastMessage = msg.contentCompressed
-            ? await decompression(msg.contentCompressed)
-            : null;
+        const lastMessage = msg.contentCompressed
+          ? await decompression(msg.contentCompressed)
+          : null;
 
-          groupMap.set(msg.groupId, {
-            type: "group",
-            group,
-            lastMessage,
-            timestamp: msg.createdAt
-          });
-        }
-      })
-    );
+        groupMap.set(msg.groupId, {
+          type: "group",
+          group,
+          lastMessage,
+          timestamp: msg.createdAt
+        });
+      }
+    }
 
+    // Ensure all joined groups show up, even if no messages
     const allGroups = await prisma.group.findMany({
       where: { id: { in: groupIds } }
     });
@@ -314,7 +311,6 @@ const recentchats = async (req, res) => {
       };
     });
 
-    // Combine all chats and sort
     const combinedChats = [
       ...privateMap.values(),
       ...groupChatsSidebarItems
