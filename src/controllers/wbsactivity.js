@@ -1,6 +1,12 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 
+
+// const addWbsActivity=async(req,res)=>{
+//   const {}
+
+// }
+
 const getWbsActivity = async (req, res) => {
   const { type,projectID} = req.params;
 
