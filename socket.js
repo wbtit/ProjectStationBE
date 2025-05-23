@@ -2,7 +2,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import redis from "./redisClient.js";
 import prisma from "./src/lib/prisma.js";
-import { Compression } from "./src/utils/Zstd.js";
+import { Compression, decompression } from "./src/utils/Zstd.js";
 
 
 const userSocketMap = new Map();
@@ -55,7 +55,10 @@ const initSocket = async(io) => {
 
       const receiverSockeId= await redis.get(`socket:${receiverId}`)
       if(receiverSockeId){
-        io.to(receiverSockeId).emit("receivePrivateMessage",message)
+        io.to(receiverSockeId).emit("receivePrivateMessage",{
+          ...message,
+          content: await decompression(message.contentCompressed)
+        })
       }else{
         await prisma.notification.create({
           data:{
@@ -101,6 +104,7 @@ const initSocket = async(io) => {
 
           const payload={
             ...message,
+            content:message.contentCompressed? await decompression(message.contentCompressed):null,
             isTagged
           }
 
