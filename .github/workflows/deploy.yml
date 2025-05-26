@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to on-Prem server
+    name: Deploy to On-Prem Server
     runs-on: self-hosted
 
     steps:
@@ -16,8 +16,8 @@ jobs:
 
       - name: Deploy Application
         run: |
-          echo "🎯 Switching to app directory"
-          cd ~/Desktop/ProjectStationBE
+          echo "🎯 Switching to checked-out app directory"
+          cd $GITHUB_WORKSPACE
 
           echo "🧼 Resetting local repo to match origin/main"
           git fetch origin main
@@ -32,11 +32,11 @@ jobs:
           npx prisma db push
 
           echo "🚀 Restarting application with PM2"
-          pm2 stop app1 app2 app3
-          pm2 delete app1 app2 app3
-          PORT=3000 pm2 start index.js --name app1
-          PORT=3001 pm2 start index.js --name app2
-          PORT=3002 pm2 start index.js --name app3
+          pm2 stop app1 app2 app3 || true
+          pm2 delete app1 app2 app3 || true
+          PORT=3000 pm2 start index.js --name app1 --cwd $GITHUB_WORKSPACE
+          PORT=3001 pm2 start index.js --name app2 --cwd $GITHUB_WORKSPACE
+          PORT=3002 pm2 start index.js --name app3 --cwd $GITHUB_WORKSPACE
           pm2 save
 
       - name: Notify on Discord
