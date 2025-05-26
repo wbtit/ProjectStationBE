@@ -20,9 +20,7 @@ jobs:
           cd $GITHUB_WORKSPACE
 
           echo "🧼 Resetting local repo to match origin/main"
-          git fetch origin main
-          git reset --hard origin/main
-          git clean -fd
+          git pull origin main
 
           echo "📦 Installing dependencies"
           npm install
