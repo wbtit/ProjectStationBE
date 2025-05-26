@@ -20,7 +20,8 @@ const changeOrderReceived=async(req,res)=>{
             where:{
                 recipients:id
             },
-            select:{
+              select:{
+                id:true,
                 remarks:true,
                 description:true,
                 changeOrder:true,
@@ -75,6 +76,7 @@ const changeOrderSent=async(req,res)=>{
                 sender:id
             },
             select:{
+                id:true,
                 remarks:true,
                 description:true,
                 changeOrder:true,
