@@ -236,7 +236,7 @@ const UpdateProject = async (req, res) => {
     });
   }
 
-  // console.log(req.body);
+   console.log(req.body);
 
   req.body = { ...req.body, fabricator: null };
 
@@ -348,6 +348,12 @@ const UpdateProject = async (req, res) => {
       }
     });
     // console.log(updateData);
+    const previousProjectStage= await prisma.project.findUnique({
+      where:{id:id},
+      select:{
+        stage:true
+      }
+    })
 
     const updatedProject = await prisma.project.update({
       where: {
@@ -356,6 +362,19 @@ const UpdateProject = async (req, res) => {
       data: updateData, // req.body must contains only fields present in the project schema
     });
 
+    if(req.body.stage && req.body.stage !== previousProjectStage.stage){
+     const SubtasksData = SubTasks.map((task) => ({
+      ...task,
+      projectID:id,
+      status:req.body.stage
+    }));
+    // console.log(SubtasksData);
+
+    const subtasks = await prisma.subTasks.createMany({
+      data: SubtasksData,
+    });
+    console.log("The subtasks created after updateing the stage",subtasks)
+    }
     return sendResponse({
       message: "Project Update Successfully",
       res,

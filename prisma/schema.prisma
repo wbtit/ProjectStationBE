@@ -474,6 +474,7 @@ model JobStudy {
 model WBSActivity {
   id       String     @id @default(uuid()) @db.Uuid
   type     Activity
+  status   Stage       @default(IFA)
   name     String
   subTasks SubTasks[] @relation("subTasks")
 
@@ -599,7 +600,7 @@ enum Stage {
   RFI
   IFA
   BFA
-  BFA_M
+  BFAM
   RIFA
   RBFA
   IFC
