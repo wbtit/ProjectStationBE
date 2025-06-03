@@ -4,10 +4,10 @@ import { sendResponse } from "../utils/responder.js";
 
 const addSubTask=async(req,res)=>{
   const{projectID,wbsactivityID}=req?.params
-  const{description,unitTime,CheckUnitTime}=req.body
+  const{description,unitTime,CheckUnitTime,stage,parentTemplateKey}=req.body
   // console.log(req.body)
 
-try{  if(!description ||!unitTime||!CheckUnitTime){
+try{  if(!description ||!unitTime||!CheckUnitTime ||!stage||!parentTemplateKey){
     return sendResponse({
       message:"Feilds are Empty while adding subtask",
       res,
@@ -23,7 +23,9 @@ try{  if(!description ||!unitTime||!CheckUnitTime){
       unitTime:unitTime,
       CheckUnitTime:CheckUnitTime,
       projectID:projectID,
-      wbsactivityID:wbsactivityID
+      wbsactivityID:wbsactivityID,
+      stage:stage,
+      parentTemplateKey:parentTemplateKey
     }
   })
     if(!subTask){

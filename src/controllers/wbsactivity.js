@@ -1,11 +1,52 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 
+const getWbsActivityByStage=async(req,res)=>{
+  try {
+    const{projectID}=req.params
+    const {stage,type}=req.body
 
-// const addWbsActivity=async(req,res)=>{
-//   const {}
+    if(!projectID ||!stage){
+      return sendResponse({
+        message:"ProjectId and stage is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
 
-// }
+    const WbsActivityByStage= await prisma.wBSActivity.findMany({
+      where:{
+        projectID:projectID,
+        stage:stage,
+        type:type.toUpperCase()
+      },
+      include:{subTasks},
+      orderBy:{
+        createdAt:'asc'
+      }
+    })
+
+    return sendResponse({
+      message:"WBS activities fetched by the stage",
+      res,
+      statusCode:200,
+      success:true,
+      data:WbsActivityByStage
+    })
+
+  } catch (error) {
+    console.error(error.message)
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    })
+  }
+}
 
 const getWbsActivity = async (req, res) => {
   const { type,projectID} = req.params;
@@ -72,4 +113,4 @@ const getAcivity = async (req, res) => {
   });
 };
 
-export { getWbsActivity, getAcivity };
+export { getWbsActivity, getAcivity,getWbsActivityByStage};
