@@ -11,6 +11,7 @@ import mime from "mime";
 import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
 import { SubTasks } from "../../data/data.js";
 import { sendNotification } from "../utils/notify.js";
+import cloneWBSAndSubtasks from "../utils/cloneWBSAndSubTasks.js";
 
 
 const AddProject = async (req, res) => {
@@ -79,7 +80,7 @@ const AddProject = async (req, res) => {
         fabricatorID: fabricator,
         managerID: manager,
         miscDesign: miscDesign,
-        stage: stage,
+        stage: stage || 'IFA',
         startDate: start_date,
         teamID: team || null,
         status: status,
@@ -109,16 +110,8 @@ const AddProject = async (req, res) => {
     }
     // console.log("THe 20th data", SubTasks[20]);
 
-    const SubtasksData = SubTasks.map((task) => ({
-      ...task,
-      projectID: project.id,
-    }));
-    // console.log(SubtasksData);
-
-    const subtasks = await prisma.subTasks.createMany({
-      data: SubtasksData,
-    });
-
+      console.log(`Creating WBS activities and subtasks for initial stage: ${project.stage}.`);
+    await cloneWBSAndSubtasks(project.id, project.stage, prisma);
 
     // console.log(project);
 
@@ -129,7 +122,6 @@ const AddProject = async (req, res) => {
       success: true,
       data: {
         project,
-        subtasks,
       },
     });
   } catch (error) {
@@ -363,17 +355,8 @@ const UpdateProject = async (req, res) => {
     });
 
     if(req.body.stage && req.body.stage !== previousProjectStage.stage){
-     const SubtasksData = SubTasks.map((task) => ({
-      ...task,
-      projectID:id,
-      status:req.body.stage
-    }));
-    // console.log(SubtasksData);
-
-    const subtasks = await prisma.subTasks.createMany({
-      data: SubtasksData,
-    });
-    console.log("The subtasks created after updateing the stage",subtasks)
+      console.log(`Project stage changed from ${previousProjectStage.stage} to ${req.body.stage}. Cloning WBS activities and subtasks.`);
+      await cloneWBSAndSubtasks(updatedProject.id, updatedProject.stage, prisma);
     }
     return sendResponse({
       message: "Project Update Successfully",
