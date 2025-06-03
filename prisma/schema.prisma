@@ -167,6 +167,7 @@ model Project {
   manager          Users         @relation("projectManager", fields: [managerID], references: [id], onDelete: Cascade)
   team             Team?         @relation("projectTeam", fields: [teamID], references: [id], onDelete: Cascade)
   rfi              RFI[]         @relation("ProjectRFI")
+  wbsActivities    WBSActivity[]
   subTasks         SubTasks[]    @relation("subTasks")
   submittals       Submittals[]  @relation("ProjectSubmittals")
   tasks            Task[]        @relation("projectTask")
@@ -476,6 +477,14 @@ model WBSActivity {
   type     Activity
   status   Stage       @default(IFA)
   name     String
+  templateKey   String @default("")
+
+  projectId     String    @db.Uuid
+  project       Project   @relation(fields:[projectId],references:[id],onDelete:Cascade)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
   subTasks SubTasks[] @relation("subTasks")
 
   @@map("wbsactivity")
@@ -484,15 +493,23 @@ model WBSActivity {
 model SubTasks {
   id            String      @id @default(uuid()) @db.Uuid
   description   String
+  stage         Stage       @default(IFA)
   unitTime      Float       @default(0.0)
   CheckUnitTime Float       @default(0.0)
   QtyNo         Int         @default(0)
   checkHr       Float       @default(0.0)
   execHr        Float       @default(0.0)
+  parentTemplateKey String  @default("")
+
   projectID     String      @db.Uuid
   wbsactivityID String      @db.Uuid
   project       Project     @relation("subTasks", fields: [projectID], references: [id], onDelete: Cascade)
   WBSACTIVITY   WBSActivity @relation("subTasks", fields: [wbsactivityID], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([wbsactivityID,parentTemplateKey,stage])
 
   @@map("subTasks")
 }
