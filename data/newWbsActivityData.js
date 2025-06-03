@@ -1,4 +1,4 @@
-export const WBSActivity = [
+ const newWBSActivity = [
       {
 	id: "0306b314-a815-48d0-a46e-2289a1b41158",
 	type: "MODELING",
@@ -185,7 +185,7 @@ export const WBSActivity = [
 	name: "Erection of Main Steel Elevations",
 	templateKey: "erectionOfMainSteelElevations"
   },
-  //-------------------------------------------------------------
+
   {
 	id: "efc10079-31ab-4fa9-9a47-bc73a0751601",
 	type: "ERECTION",
@@ -288,12 +288,6 @@ export const WBSActivity = [
 	name: "Misc Sheet Loading",
 	templateKey: "miscSheetLoading"
   },
-  // {
-  //   id: "4  ",
-  //   type: "DETAILING",
-  //   name: "Plate/ Grating",
-  //   templateKey: "plateGrating"
-  // },
   {
 	id: "4b0846f0-01c2-4083-8c15-e030b2f8bd3e",
 	type: "DETAILING",
@@ -388,3 +382,4 @@ export const WBSActivity = [
 
 
 ];
+export default newWBSActivity;

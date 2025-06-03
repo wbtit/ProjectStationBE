@@ -475,7 +475,7 @@ model JobStudy {
 model WBSActivity {
   id       String     @id @default(uuid()) @db.Uuid
   type     Activity
-  status   Stage       @default(IFA)
+  stage   Stage       @default(IFA)
   name     String
   templateKey   String @default("")
 
