@@ -25,7 +25,7 @@
     "mime": "^4.0.6",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
-    "nodemon": "^3.1.7",
+    "nodemon": "^3.1.10",
     "pm2": "^5.4.3",
     "projectstationbackend": "file:",
     "redis": "^4.7.0",
