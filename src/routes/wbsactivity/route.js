@@ -4,7 +4,7 @@ import { getWbsActivity, getAcivity,getWbsActivityByStage } from "../../controll
 
 const router = Router();
 
-router.get("/wbs/:type/:projectID", Authenticate, getWbsActivity);
+router.get("/wbs/:type/:projectId/:stage", Authenticate, getWbsActivity);
 router.get("/wbs/:projectID",Authenticate,getWbsActivityByStage)
 router.get("/wbs", getAcivity);
 

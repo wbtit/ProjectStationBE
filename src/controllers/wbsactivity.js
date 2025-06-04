@@ -49,37 +49,47 @@ const getWbsActivityByStage=async(req,res)=>{
 }
 
 const getWbsActivity = async (req, res) => {
-  const { type,projectID} = req.params;
+  const { type,projectId,stage} = req.params;
+  console.log(type)
+  console.log(projectId)
+  console.log(stage)
 
   try {
     const wbsActivity = await prisma.wBSActivity.findMany({
       where: {
         type: type.toUpperCase(),
-      },
+        projectId:projectId,
+        stage:stage
+      },include:{
+        subTasks:true
+      }
     });
 
-    const wbsActivityWithSum= await Promise.all(
-      wbsActivity.map(async(activity)=>{
-        const subTasksSum= await prisma.subTasks.aggregate({
-          where:{wbsactivityID:activity.id, 
-              ...(projectID && { projectID }),
-        },
-          _sum:{
-            QtyNo:true,
-            execHr:true,
-            checkHr:true
-          }
-        })
-        return {
-          id:activity.id,
-          name:activity.name,
-          totalQtyNo:subTasksSum._sum.QtyNo || 0,
-          totalExecHr:subTasksSum._sum.execHr || 0.0,
-          totalCheckHr:subTasksSum._sum.checkHr ||0.0,
-          
-        }
-      })
-    )
+    const wbsActivityWithSum = await Promise.all(
+  wbsActivity.map(async (activity) => {
+    const subTasksSum = await prisma.subTasks.aggregate({
+      where: {
+        wbsactivityID: activity.id,
+        projectID: projectId, // Ensure projectID is explicitly used
+        stage: stage,         // --- IMPORTANT: Filter by stage here ---
+      },
+      _sum: {
+        QtyNo: true,
+        execHr: true,
+        checkHr: true
+      }
+    });
+
+    return {
+      id: activity.id,
+      name: activity.name,
+      totalQtyNo: subTasksSum._sum.QtyNo || 0,
+      totalExecHr: subTasksSum._sum.execHr || 0.0,
+      totalCheckHr: subTasksSum._sum.checkHr || 0.0,
+      subTasks: activity.subTasks || [],
+    };
+  })
+);
     // console.log("The wbsActivityWithSum000000000000000000000000000",wbsActivityWithSum)
 
     return sendResponse({

@@ -9,7 +9,7 @@ router.post("/add/:projectID/:wbsactivityID",Authenticate,addSubTasks)
 
 //to add a single suntask
 router.post("/oneSubtask/:projectID/:wbsactivityID",Authenticate,addSubTask)
-router.get("/:projectID/:wbsactivityID", Authenticate, GetSubTasks);
+router.get("/:projectID/:wbsactivityID/:stage", Authenticate, GetSubTasks);
 router.patch("/:subtaskid", Authenticate, UpdateSubTasks);
 
 export { router as SubTasksRouter };

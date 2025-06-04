@@ -119,16 +119,20 @@ const addSubTasks = async (req, res) => {
 
 const GetSubTasks = async (req, res) => {
   try {
-    const { projectID, wbsactivityID } = req.params;
+    const { projectID, wbsactivityID,stage} = req.params;
+    console.log("The projectID",projectID)
+    console.log("The wbsactivityID",wbsactivityID)
+    console.log("The stage:",stage)
 
     const subtasks = await prisma.subTasks.findMany({
       where: {
         projectID,
         wbsactivityID,
+        stage
       },
     });
 
-    // console.log("The subTasks", subtasks)
+     console.log("The subTasks", subtasks)
 
     sendResponse({
       message: "Subtasks fetch success",

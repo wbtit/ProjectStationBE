@@ -38,7 +38,7 @@ router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Upda
 
 router.get("/projects", Authenticate  , GetAllProjects); // Get All Projects
 
-router.get("/projects/:id", Authenticate, isStaff, GetProjectByID); // Get Project by ID
+router.get("/projects/:id", Authenticate, GetProjectByID); // Get Project by ID
 
 router.get(
   "/projects/:id/files",

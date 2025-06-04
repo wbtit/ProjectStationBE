@@ -168,7 +168,7 @@ model Project {
   team             Team?         @relation("projectTeam", fields: [teamID], references: [id], onDelete: Cascade)
   rfi              RFI[]         @relation("ProjectRFI")
   wbsActivities    WBSActivity[]
-  subTasks         SubTasks[]    @relation("subTasks")
+  subTasks         SubTasks[]    @relation("subTasksproject")
   submittals       Submittals[]  @relation("ProjectSubmittals")
   tasks            Task[]        @relation("projectTask")
   file        File[]       @relation("projectFiles")
@@ -503,7 +503,7 @@ model SubTasks {
 
   projectID     String      @db.Uuid
   wbsactivityID String      @db.Uuid
-  project       Project     @relation("subTasks", fields: [projectID], references: [id], onDelete: Cascade)
+  project       Project     @relation("subTasksproject", fields: [projectID], references: [id], onDelete: Cascade)
   WBSACTIVITY   WBSActivity @relation("subTasks", fields: [wbsactivityID], references: [id], onDelete: Cascade)
 
   createdAt         DateTime     @default(now())

@@ -356,7 +356,7 @@ const UpdateProject = async (req, res) => {
 
     if(req.body.stage && req.body.stage !== previousProjectStage.stage){
       console.log(`Project stage changed from ${previousProjectStage.stage} to ${req.body.stage}. Cloning WBS activities and subtasks.`);
-      await cloneWBSAndSubtasks(updatedProject.id, updatedProject.stage, prisma);
+      await cloneWBSAndSubtasks(updatedProject.id, updatedProject.stage);
     }
     return sendResponse({
       message: "Project Update Successfully",
