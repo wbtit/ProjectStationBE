@@ -484,7 +484,10 @@ model WBSActivity {
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-
+  
+  totalQtyNo    Int            @default(0)
+  totalExecHr   Int            @default(0)
+  totalCheckHr  Int            @default(0)
   subTasks SubTasks[] @relation("subTasks")
 
   @@map("wbsactivity")

@@ -79,7 +79,18 @@ const getWbsActivity = async (req, res) => {
         checkHr: true
       }
     });
-
+    await prisma.wBSActivity.update({
+      where:{
+          id: activity.id,
+          projectId: projectId, // Ensure projectID is explicitly used
+          stage: stage,  
+      },
+      data:{
+        totalQtyNo:subTasksSum._sum.QtyNo,
+        totalExecHr:subTasksSum._sum.execHr,
+        totalCheckHr:subTasksSum._sum.checkHr
+      }
+    })
     return {
       id: activity.id,
       name: activity.name,
