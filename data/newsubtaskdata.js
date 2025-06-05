@@ -176,6 +176,13 @@ const newSubTasks = [
   },
   {
     wbsactivityID: "3607ef39-bbd7-4d41-be71-2397f6921cf3",
+    description: "Deck Support Angle",
+    unitTime: 5,
+    CheckUnitTime: 1.7,
+    parentTemplateKey: "mpEmbedPlacement-first-01"
+  },
+  {
+    wbsactivityID: "3607ef39-bbd7-4d41-be71-2397f6921cf3",
     description: "Beam Embeds/ Bearing Plate",
     unitTime: 5,
     CheckUnitTime: 1.7,
@@ -190,7 +197,7 @@ const newSubTasks = [
   },
   {
     wbsactivityID: "c89c2ff8-ffd5-40dd-bb5a-32c7c433f658",
-    description: "Deck Support/ Bearing Plate",
+    description: "Deck Support Angle",
     unitTime: 5,
     CheckUnitTime: 1.7,
     parentTemplateKey: "deckSupportAngle"
@@ -1210,6 +1217,13 @@ const newSubTasks = [
     unitTime: 8,
     CheckUnitTime: 2.7,
     parentTemplateKey: "mpMisc6"
+  },
+   {
+    wbsactivityID: "0d265b8c-df7a-46a4-aa86-770099ee4975",
+    description: "Kicker",
+    unitTime: 5,
+    CheckUnitTime: 1.7,
+    parentTemplateKey: "mpMisc2"
   },
   {
     wbsactivityID: "4dc9c5ea-7ecd-4428-bb78-ba3a64ad99e7",
