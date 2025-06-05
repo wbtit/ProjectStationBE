@@ -549,7 +549,10 @@ const GetProjectByID = async (req, res) => {
         manager: true,
         tasks: true,
         accepttasks: true,
-        file:true
+        file:true,
+        changeOrder:true,
+        rfi:true,
+        submittals:true
       },
     });
 
