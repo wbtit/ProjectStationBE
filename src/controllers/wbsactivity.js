@@ -51,7 +51,7 @@ const getWbsActivityByStage=async(req,res)=>{
 const getWbsActivity = async (req, res) => {
   const { type,projectId,stage} = req.params;
   console.log(type)
-  console.log(projectId)
+  console.log(projectId)+
   console.log(stage)
 
   try {
