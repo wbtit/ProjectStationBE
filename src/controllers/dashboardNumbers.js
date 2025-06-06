@@ -3,7 +3,7 @@ import { sendResponse } from "../utils/responder.js";
 
 const dashBoardNumbers=async(req,res)=>{
 try {
-    const [projectStats,totalProject,taskStats,employeeCount]= await Promise.all([
+    const [projectStats,totalProject,taskStats,totalNumberOfTasks,employeeCount]= await Promise.all([
         prisma.project.groupBy({
             by:['status'],
             _count:{
@@ -17,11 +17,13 @@ try {
                 _all:true
             }
         }),
+        prisma.task.count(),
         prisma.users.count()
     ])
     const response={
         totalProject,
         employeeCount,
+        totalNumberOfTasks,
         totalActiveProjects:0,
         totalCompleteProject:0,
         totalOnHoldProject:0,

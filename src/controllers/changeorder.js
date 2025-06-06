@@ -152,6 +152,7 @@ const AddChangeOrder = async (req, res) => {
         changeOrder: parseInt(changeOrder),
         description: description,
         project: project,
+        status:'NOT_REPLIED',
         recipients: recipients,
         remarks: remarks,
         sender: req.user.id,
@@ -284,7 +285,7 @@ const AddChangeOrdertable = async (req, res) => {
       cost: co.cost,
       CoId: coId  // from params
     }));
-
+    console.log("ChangeOrderTable data:", dataToInsert);
     const created = await prisma.changeOrdertable.createMany({
       data: dataToInsert,
       skipDuplicates: true // optional: avoids inserting duplicates
@@ -313,6 +314,7 @@ const AddChangeOrdertable = async (req, res) => {
 
 const getRowCotable=async(req,res)=>{
   const{CoId}=req.params
+  console.log("The CoID:",CoId)
   try {
     if(!CoId){
       return sendResponse({
@@ -324,8 +326,9 @@ const getRowCotable=async(req,res)=>{
       }) 
     }
     const coRow= await prisma.changeOrdertable.findMany({
-      where:{id:CoId}
+      where:{CoId:CoId}
     })
+    console.log(coRow)
     return sendResponse({
       message:"Response created",
       res,
@@ -386,7 +389,46 @@ const viewCOfiles = async (req, res) => {
       .json({ message: "Something went wrong while viewing the file" });
   }
 };
-
+const changeStatus=async(req,res)=>{
+  const {coId}=req.params
+  const{status,reason}=req.body
+  try {
+    if(!status){
+      return sendResponse({
+        message:"Status is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    const updateStatus= await prisma.changeOrder.update({
+      where:{
+        id:coId
+      },
+      data:{
+        status:status,
+        reason:reason
+      }
+    })
+    return sendResponse({
+      message:"Status updated successfully",
+      res,
+      statusCode:200,
+      success:true,
+      data:updateStatus
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
 export { 
   AddChangeOrder ,
   changeOrderReceived,
@@ -396,4 +438,5 @@ export {
   AddChangeOrdertable,
   getRowCotable,
   viewCOfiles,
+  changeStatus
 };
