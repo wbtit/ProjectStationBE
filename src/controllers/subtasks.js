@@ -7,7 +7,7 @@ const addSubTask=async(req,res)=>{
   const{description,unitTime,CheckUnitTime,stage,parentTemplateKey}=req.body
   // console.log(req.body)
 
-try{  if(!description ||!unitTime||!CheckUnitTime ||!stage||!parentTemplateKey){
+try{  if(!description ||!unitTime||!CheckUnitTime ||!stage){
     return sendResponse({
       message:"Feilds are Empty while adding subtask",
       res,

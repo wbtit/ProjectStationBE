@@ -86,9 +86,9 @@ const getWbsActivity = async (req, res) => {
           stage: stage,  
       },
       data:{
-        totalQtyNo:subTasksSum._sum.QtyNo,
-        totalExecHr:subTasksSum._sum.execHr,
-        totalCheckHr:subTasksSum._sum.checkHr
+        totalQtyNo:subTasksSum._sum.QtyNo||0,
+        totalExecHr:subTasksSum._sum.execHr||0,
+        totalCheckHr:subTasksSum._sum.checkHr||0
       }
     })
     return {
@@ -177,5 +177,47 @@ const getTotalHours=async(req,res)=>{
     });
   }
 }
+const createNewWBSActivity=async(req,res)=>{
+try {
+  const{projectId}=req.params
+  const{name,type,stage}=req.body
 
-export { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours};
+  if(!projectId||!name||!type||!stage){
+    return sendResponse({
+      message:"Feilds are Required",
+      res,
+      statusCode:200,
+      success:false,
+      data:null
+    })
+  }
+  const newWbsActivity= await prisma.wBSActivity.create({
+    data:{
+      name:name,
+      stage:stage,
+      type:type,
+      project:{
+        connect:{id:projectId}
+      }
+    }
+  })
+  return sendResponse({
+    message:"wbs rework added",
+    res,
+    statusCode:200,
+    success:true,
+    data:newWbsActivity
+  })
+} catch (error) {
+   // console.log(error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+}
+}
+
+export { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours,createNewWBSActivity};
