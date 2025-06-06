@@ -17,6 +17,7 @@ import WBSActivity from "./wbsactivity/route.js";
 import { SubTasksRouter } from "./subtasks/route.js";
 import {chatRouter}  from  "./chatSystem/routes.js"
 import  {File}       from   "./files/route.js"
+import { dashBoardStats } from "./dashboardNumbers/routes.js";
 
 const routes = express.Router();
 
@@ -38,5 +39,6 @@ routes.use("/wbs", WBSActivity);
 routes.use("/st", SubTasksRouter);
 routes.use("/chat",chatRouter)
 routes.use("/File",File)
+routes.use("/stats",dashBoardStats)
 
 export { routes };
