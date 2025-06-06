@@ -179,7 +179,7 @@ const newSubTasks = [
     description: "Deck Support Angle",
     unitTime: 5,
     CheckUnitTime: 1.7,
-    parentTemplateKey: "mpEmbedPlacement-first-01"
+    parentTemplateKey: "mpEmbedPlacement-4"
   },
   {
     wbsactivityID: "3607ef39-bbd7-4d41-be71-2397f6921cf3",
@@ -1223,7 +1223,7 @@ const newSubTasks = [
     description: "Kicker",
     unitTime: 5,
     CheckUnitTime: 1.7,
-    parentTemplateKey: "mpMisc2"
+    parentTemplateKey: "mpMisc22"
   },
   {
     wbsactivityID: "4dc9c5ea-7ecd-4428-bb78-ba3a64ad99e7",
