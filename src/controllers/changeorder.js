@@ -392,6 +392,7 @@ const viewCOfiles = async (req, res) => {
 const changeStatus=async(req,res)=>{
   const {coId}=req.params
   const{status,reason}=req.body
+  console.log(req.body)
   try {
     if(!status){
       return sendResponse({

@@ -220,4 +220,45 @@ try {
 }
 }
 
-export { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours,createNewWBSActivity};
+const getTotalWBSHours=async(req,res)=>{
+  const{projectId,stage}=req.params
+  try {
+    if(!projectId||!stage){
+      return sendResponse({
+        message:"projectId and stage is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    const gethours=await prisma.wBSActivity.aggregate({
+      where:{
+        projectId:projectId,
+        stage:stage
+      },
+      _sum:{
+        totalExecHr:true,
+        totalCheckHr:true
+      }
+    })
+    return sendResponse({
+      message:"Total WBS working hours",
+      res,
+      statusCode:200,
+      success:true,
+      data:gethours
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+    message:error.message,
+    res,
+    statusCode:500,
+    success:false,
+    data:null     
+    })
+  }
+}
+
+export { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours,createNewWBSActivity,getTotalWBSHours};
