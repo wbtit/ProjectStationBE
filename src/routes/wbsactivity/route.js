@@ -5,7 +5,9 @@ import { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours,createNe
 const router = Router();
 
 router.get("/wbs/:type/:projectId/:stage", Authenticate, getWbsActivity);
+//total hours in the all wbs line item 
 router.get("/wbs/totalHours/:type/:projectId/:stage",Authenticate,getTotalHours)
+
 router.get("/wbs/:projectID",Authenticate,getWbsActivityByStage)
 router.get("/wbs",Authenticate,getAcivity);
 router.post("/wbs/addWbsActivity/:projectId",Authenticate,createNewWBSActivity)

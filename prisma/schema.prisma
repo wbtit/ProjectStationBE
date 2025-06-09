@@ -489,7 +489,9 @@ model WBSActivity {
   
   totalQtyNo    Int            @default(0)
   totalExecHr   Int            @default(0)
+  totalExecHrWithRework       Float          @default(0.0)
   totalCheckHr  Int            @default(0)
+  totalCheckHrWithRework      Float          @default(0.0)
   subTasks SubTasks[] @relation("subTasks")
 
   @@map("wbsactivity")

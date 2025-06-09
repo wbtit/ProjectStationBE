@@ -49,59 +49,113 @@ const getWbsActivityByStage=async(req,res)=>{
 }
 
 const getWbsActivity = async (req, res) => {
-  const { type,projectId,stage} = req.params;
-  console.log(type)
-  console.log(projectId)+
-  console.log(stage)
+  const { type, projectId, stage } = req.params;
+  console.log(type);
+  console.log(projectId);
+  console.log(stage);
 
   try {
     const wbsActivity = await prisma.wBSActivity.findMany({
       where: {
         type: type.toUpperCase(),
-        projectId:projectId,
-        stage:stage
-      },include:{
-        subTasks:true
+        projectId: projectId,
+        stage: stage
+      },
+      include: {
+        subTasks: true
       }
     });
 
     const wbsActivityWithSum = await Promise.all(
-  wbsActivity.map(async (activity) => {
-    const subTasksSum = await prisma.subTasks.aggregate({
-      where: {
-        wbsactivityID: activity.id,
-        projectID: projectId, // Ensure projectID is explicitly used
-        stage: stage,         // --- IMPORTANT: Filter by stage here ---
-      },
-      _sum: {
-        QtyNo: true,
-        execHr: true,
-        checkHr: true
-      }
-    });
-    await prisma.wBSActivity.update({
+      wbsActivity.map(async (activity) => {
+        const subTasksSum = await prisma.subTasks.aggregate({
+          where: {
+            wbsactivityID: activity.id,
+            projectID: projectId,
+            stage: stage
+          },
+          _sum: {
+            QtyNo: true,
+            execHr: true,
+            checkHr: true
+          }
+        });
+
+        const project = await prisma.project.findUnique({
+          where: {
+            id: projectId
+          },
+          select: {
+            estimatedHours: true
+          }
+        });
+    const estimatedMins = project.estimatedHours * 60;
+console.log("Estimated Minutes:", estimatedMins);
+
+   const execHr = subTasksSum._sum.execHr || 0;
+  const checkHr = subTasksSum._sum.checkHr || 0;
+// console.log("Exec Hours:", execHr);
+// console.log("Check Hours:", checkHr);
+
+const gethours=await prisma.wBSActivity.aggregate({
       where:{
-          id: activity.id,
-          projectId: projectId, // Ensure projectID is explicitly used
-          stage: stage,  
+        projectId:projectId,
+        stage:stage
       },
-      data:{
-        totalQtyNo:subTasksSum._sum.QtyNo||0,
-        totalExecHr:subTasksSum._sum.execHr||0,
-        totalCheckHr:subTasksSum._sum.checkHr||0
+      _sum:{
+        totalExecHr:true,
+        totalCheckHr:true,
+        totalCheckHrWithRework:true,
+        totalExecHrWithRework:true
       }
     })
-    return {
-      id: activity.id,
-      name: activity.name,
-      totalQtyNo: subTasksSum._sum.QtyNo || 0,
-      totalExecHr: subTasksSum._sum.execHr || 0.0,
-      totalCheckHr: subTasksSum._sum.checkHr || 0.0,
-      subTasks: activity.subTasks || [],
-    };
-  })
-);
-    // console.log("The wbsActivityWithSum000000000000000000000000000",wbsActivityWithSum)
+const totalSubTaskHours = gethours._sum.totalExecHr + gethours._sum.totalCheckHr;
+console.log("Total SubTask Hours:", totalSubTaskHours);
+
+const reworkPercentage = estimatedMins
+  ? ((estimatedMins - totalSubTaskHours) / estimatedMins) * 100
+  : 0;
+console.log("Rework Percentage:", reworkPercentage);
+
+const reworkPercentPerLineItems = reworkPercentage / 63;
+console.log("Rework Percent Per Line Item:", reworkPercentPerLineItems);
+
+const totalExecHrWithRework = execHr * reworkPercentPerLineItems;
+const totalCheckHrWithRework = checkHr * reworkPercentPerLineItems;
+console.log("Total ExecHr With Rework:", totalExecHrWithRework);
+console.log("Total CheckHr With Rework:", totalCheckHrWithRework);
+
+
+
+        await prisma.wBSActivity.update({
+          where: {
+            id: activity.id,
+            projectId: projectId,
+            stage: stage
+          },
+          data: {
+            totalQtyNo: subTasksSum._sum.QtyNo || 0,
+            totalExecHr: execHr,
+            totalCheckHr: checkHr,
+            totalExecHrWithRework,
+            totalCheckHrWithRework
+          }
+        });
+
+        return {
+          id: activity.id,
+          name: activity.name,
+          totalQtyNo: subTasksSum._sum.QtyNo || 0,
+          totalExecHr: execHr,
+          totalCheckHr: checkHr,
+          subTasks: activity.subTasks || [],
+          reworkPercentage,
+          reworkPercentPerLineItems,
+          totalExecHrWithRework,
+          totalCheckHrWithRework
+        };
+      })
+    );
 
     return sendResponse({
       message: "WbsActivity found",
@@ -111,7 +165,6 @@ const getWbsActivity = async (req, res) => {
       data: wbsActivityWithSum,
     });
   } catch (error) {
-    // console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -121,6 +174,7 @@ const getWbsActivity = async (req, res) => {
     });
   }
 };
+
 
 const getAcivity = async (req, res) => {
   const activity = await prisma.wBSActivity.findMany();
@@ -156,7 +210,9 @@ const getTotalHours=async(req,res)=>{
       _sum:{
         totalQtyNo:true,
         totalCheckHr:true,
-        totalExecHr:true
+        totalExecHr:true,
+        totalExecHrWithRework:true,
+        totalCheckHrWithRework:true,
       }
     })
     return sendResponse({
@@ -239,7 +295,9 @@ const getTotalWBSHours=async(req,res)=>{
       },
       _sum:{
         totalExecHr:true,
-        totalCheckHr:true
+        totalCheckHr:true,
+        totalCheckHrWithRework:true,
+        totalExecHrWithRework:true
       }
     })
     return sendResponse({
@@ -260,5 +318,6 @@ const getTotalWBSHours=async(req,res)=>{
     })
   }
 }
+
 
 export { getWbsActivity, getAcivity,getWbsActivityByStage,getTotalHours,createNewWBSActivity,getTotalWBSHours};
