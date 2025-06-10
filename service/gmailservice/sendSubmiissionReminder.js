@@ -7,7 +7,7 @@ export default async function sendSubmissionReminder(project){
         from:"wbt.itdev@gmail.com",
         to:project.manager.email,
         subject:`Project Submission Reminder: ${project.name}`,
-        html:sendSubmissionReminder(project.name,project.approvalDate)
+        html:submissionReminderTemplate(project.name,project.approvalDate)
     }
     try {
         await transporter.sendMail(mailOptions)
