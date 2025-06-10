@@ -134,30 +134,32 @@ model Team {
 }
 
 model Project {
-  id               String        @id @default(uuid()) @db.Uuid
-  name             String        @unique
-  description      String
-  fabricatorID     String        @db.Uuid
-  departmentID     String        @db.Uuid
-  teamID           String?       @db.Uuid
-  managerID        String        @db.Uuid
-  status           Status        @default(ACTIVE)
-  stage            Stage         @default(RFI)
-  tools            Tools         @default(TEKLA)
-  files            Json          @default("[]")
-  connectionDesign Boolean       @default(true)
-  miscDesign       Boolean       @default(true)
-  customerDesign   Boolean       @default(false)
-  startDate        String
-  endDate          String?
-  approvalDate     String
-  estimatedHours   Float           @default(0)
-  modelingHours    Float           @default(0)
-  modelCheckingHours     Float      @default(0)
-  detailingHours   Float           @default(0)
-  detailCheckingHours    Float      @default(0)
-  executionHours   Float           @default(0)
-  executionCheckingHours Float     @default(0)
+  id                       String        @id @default(uuid()) @db.Uuid
+  name                     String        @unique
+  description              String
+  fabricatorID             String        @db.Uuid
+  departmentID             String        @db.Uuid
+  teamID                   String?       @db.Uuid
+  managerID                String        @db.Uuid
+  status                   Status        @default(ACTIVE)
+  stage                    Stage         @default(RFI)
+  tools                    Tools         @default(TEKLA)
+  files                    Json          @default("[]")
+  connectionDesign         Boolean       @default(true)
+  miscDesign               Boolean       @default(true)
+  customerDesign           Boolean       @default(false)
+  startDate                String
+  endDate                  String?
+  approvalDate             String
+  estimatedHours           Float           @default(0)
+  modelingHours            Float           @default(0)
+  modelCheckingHours       Float      @default(0)
+  detailingHours           Float           @default(0)
+  detailCheckingHours      Float      @default(0)
+  executionHours           Float           @default(0)
+  executionCheckingHours   Float     @default(0)
+  mailReminder     Boolean         @default(false)
+  submissionMailReminder   Boolean         @default(false)
 
   accepttasks      AcceptTask[]  @relation("acceptTaskProject")
   changeOrder      ChangeOrder[] @relation("ChangeOrderProject")
