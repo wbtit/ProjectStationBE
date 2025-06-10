@@ -1,0 +1,1 @@
+import { transporter } from "../../src/config/mailconfig.js";
