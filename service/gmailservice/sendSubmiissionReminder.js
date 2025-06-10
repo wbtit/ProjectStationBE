@@ -1,10 +1,12 @@
 import { transporter } from "../../src/config/mailconfig.js";
 import { submissionReminderTemplate } from "../../Templates/submissionDateReminder.js";
-
+import prisma from "../../src/lib/prisma.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 export default async function sendSubmissionReminder(project){
     const mailOptions={
-        from:"wbt.itdev@gmail.com",
+        from:process.env.EMAIL,
         to:project.manager.email,
         subject:`Project Submission Reminder: ${project.name}`,
         html:submissionReminderTemplate(project.name,project.approvalDate)

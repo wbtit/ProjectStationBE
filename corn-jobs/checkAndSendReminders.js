@@ -8,13 +8,22 @@ async function checkAndSendReminders() {
     const today= new Date()
     today.setHours(0,0,0,0)
 
-    const projects= await prisma.project.findMany()
+    const projects= await prisma.project.findMany({
+        include:{
+            manager:{
+                select:{
+                    email:true
+                }
+            }
+        }
+    })
 
     for(const project of projects){
+        // console.log("The project:",project);
         const approvalDate= new Date(project.approvalDate)
         const approvalTomorrow= new Date(approvalDate)//copy of approval date
 
-        approvalTomorrow=new Date(approvalTomorrow.getDate()-1)// Get the day before the approval date
+         approvalTomorrow.setDate(approvalTomorrow.getDate() - 1);// Get the day before the approval date
         approvalTomorrow.setHours(0,0,0,0)
 
         if(approvalTomorrow.getTime()=== today.getTime()){
@@ -29,7 +38,7 @@ async function checkAndSendReminders() {
         const submissionDate= new Date(project.endDate)
         const submissionTomorrow= new Date(submissionDate)
 
-        submissionTomorrow= new Date(submissionDate.getDate()-1)
+        submissionTomorrow.setDate(submissionDate.getDate()-1)
         submissionTomorrow.setHours(0,0,0,0)
 
         if(submissionTomorrow.getTime()=== today.getTime()){
@@ -50,6 +59,6 @@ nodeCron.schedule('1 0 * * *',()=>{
 })
 console.log('Scheduler started for daily reminders.')
 
-module.exports={
+export{
     checkAndSendReminders
 }

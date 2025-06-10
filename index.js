@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import {initSocket} from "./socket.js"
 
+import './corn-jobs/checkAndSendReminders.js'
 dotenv.config();
 
 const server = createServer(app)
