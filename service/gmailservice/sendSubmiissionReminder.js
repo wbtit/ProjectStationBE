@@ -12,9 +12,19 @@ export default async function sendSubmissionReminder(project){
     try {
         await transporter.sendMail(mailOptions)
         console.log(`Submission reminder sent for project: ${project.name}`);
-
+        await prisma.project.update({
+            where:{
+                id:project.id
+            },
+            data:{
+              submissionMailReminder:true  
+            }
+        })
+        console.log(`Updated submissionMailReminder for project: ${project.name}`)
+        return true
     } catch (error) {
         console.error(`Error sending submission reminder for project ${project.name}:`, error);
+        return false
     }
 }
 

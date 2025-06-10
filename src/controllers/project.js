@@ -323,11 +323,13 @@ const UpdateProject = async (req, res) => {
       "approvalDate",
       "estimatedHours",
       "modelingHours",
-    "modelCheckingHours",
-    "detailingHours",
-    "detailCheckingHours",
-    "erectionHours",
-    "erectionCheckingHours"
+      "modelCheckingHours",
+      "detailingHours",
+      "detailCheckingHours",
+      "erectionHours",
+      "erectionCheckingHours",
+      "mailReminder",
+      "submissionMailReminder"
     ];
 
     fieldsToUpdate.forEach((field) => {
@@ -343,9 +345,33 @@ const UpdateProject = async (req, res) => {
     const previousProjectStage= await prisma.project.findUnique({
       where:{id:id},
       select:{
-        stage:true
+        stage:true,
+        approvalDate:true,
+        endDate:true,
+        mailReminder:true,
+        submissionMailReminder:true
       }
     })
+
+
+    //Reset
+    if(approvalDate && new Date(approvalDate).toDateString()!==new Date(previousProjectStage.approvalDate).toDateString()){
+      fieldsToUpdate.approvalDate= new Date(approvalDate)
+      updateData.mailReminder= false
+    }else if (approvalDate) {
+            // If date is provided but not changed, ensure it's still a Date object
+            updateData.approvalDate = new Date(approvalDate);
+        }
+
+
+    //Reset
+    if(endDate && new Date(endDate).toDateString()!==new Date(previousProjectStage.endDate).toDateString()){
+      fieldsToUpdate.endDate= new Date(endDate)
+      updateData.submissionMailReminder= false
+    }else if (endDate) {
+            // If date is provided but not changed, ensure it's still a Date object
+            updateData.endDate = new Date(endDate);
+    }
 
     const updatedProject = await prisma.project.update({
       where: {

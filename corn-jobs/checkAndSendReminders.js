@@ -18,7 +18,12 @@ async function checkAndSendReminders() {
         approvalTomorrow.setHours(0,0,0,0)
 
         if(approvalTomorrow.getTime()=== today.getTime()){
-            await sendApprovalReminder(project)
+            if (!project.mailReminder) {
+                console.log(`Attempting to send approval reminder for project: ${project.name}`);
+                await sendApprovalReminder(project);
+            } else {
+                console.log(`Approval reminder already sent for project: ${project.name}. Skipping.`);
+            }
         }
 
         const submissionDate= new Date(project.endDate)
@@ -28,7 +33,12 @@ async function checkAndSendReminders() {
         submissionTomorrow.setHours(0,0,0,0)
 
         if(submissionTomorrow.getTime()=== today.getTime()){
-            sendSubmissionReminder(project)
+            if (!project.submissionMailReminder) {
+                console.log(`Attempting to send submission reminder for project: ${project.name}`);
+                await sendSubmissionReminder(project);
+            } else {
+                console.log(`Submission reminder already sent for project: ${project.name}. Skipping.`);
+            }
         }
     }
     console.log('Daily reminder check completed.');
