@@ -422,7 +422,7 @@ model ChangeOrder {
   id          String             @id @default(uuid()) @db.Uuid
   project     String             @db.Uuid
   recipients  String             @db.Uuid
-  remarks     String             @default("")
+         String             @default("")
   status      COSTATUS           @default(NOT_REPLIED)
   changeOrder Int                @default(1)
   description String             @default("")
