@@ -3,6 +3,7 @@
 import prisma from "../lib/prisma.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import { sendResponse } from "../utils/responder.js";
+import { sendNotification } from "../utils/notify.js";
 
 const addComment = async (req, res) => {
   const { task_id } = req.params;
@@ -44,6 +45,26 @@ const addComment = async (req, res) => {
         user_id: id,
       },
     });
+    const task = await prisma.task.findUnique({
+      where:{id:task_id},
+      include:{
+        project:{
+          select:{
+            managerID:true
+          }
+        },
+        user:true
+      }
+    })
+   const managerID = task?.project?.managerID;
+const taskName = task?.name || "Unnamed Task";
+const userName = task?.user?.f_name || "Someone";
+
+if (managerID) {
+  sendNotification(managerID, {
+    message: `Comment added in ${taskName} by ${userName}`,
+  });
+}
     return sendResponse({
       message: "comment Added Successfully",
       res,
