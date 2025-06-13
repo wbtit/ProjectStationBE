@@ -561,9 +561,7 @@ const GetProjectByID = async (req, res) => {
 
   try {
     const project = await prisma.project.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         team: {
           include: {
@@ -575,23 +573,36 @@ const GetProjectByID = async (req, res) => {
         manager: true,
         tasks: true,
         accepttasks: true,
-        file:true,
-        changeOrder:true,
-        rfi:true,
-        submittals:true
+        file: true,
+        changeOrder: true,
+        rfi: true,
+        submittals: true,
       },
     });
 
-    const ids = project.team.members.map((mem) => mem.id);
+    if (!project) {
+      return sendResponse({
+        message: "Project not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
 
-    const data = await fetchTeamDetails({ ids });
+    const ids = project.team?.members?.map((mem) => mem.id) || [];
 
-    const Data = project.team.members.map((m) => {
-      return { ...data[m.id], role: m.role };
-    });
+    const data = await fetchTeamDetails({ ids,id });
+
+    const filteredMembers = project.team.members
+      .map((member) => {
+        const user = data[member.id];
+        return user ? { ...user, role: member.role } : null;
+      })
+      .filter(Boolean); // Removes nulls
 
     return sendResponse({
-      message: "Project Retrived Successfully",
+      message: "Project Retrieved Successfully",
       res,
       statusCode: 200,
       success: true,
@@ -599,12 +610,12 @@ const GetProjectByID = async (req, res) => {
         ...project,
         team: {
           ...project.team,
-          members: Data,
+          members: filteredMembers,
         },
       },
     });
   } catch (error) {
-    // console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
+    console.error("Error in GetProjectByID:", error);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -614,6 +625,7 @@ const GetProjectByID = async (req, res) => {
     });
   }
 };
+
 
 const GetAllfiles = async (req, res) => {
   try {

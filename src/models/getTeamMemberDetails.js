@@ -1,26 +1,29 @@
-    import prisma from "../lib/prisma.js";
+import prisma from "../lib/prisma.js";
 
-    const fetchTeamDetails = async ({ ids }) => {
-    try {
-      const users = await prisma.users.findMany({
-        where: {
-          id: {
-            in: ids,
-          },
-        },
-      });
-
-      // Convert the array of users to a hashmap
-      const userMap = users.reduce((map, user) => {
+const fetchTeamDetails = async ({ ids,id }) => {
+  console.log(id)
+  try {
+    const tasks = await prisma.task.findMany({
+      where: { project_id: id },
+      include: {
+        user: true,
+      },
+    });
+    console.log(tasks.length)
+    // Convert the array of users from tasks to a hashmap (avoid duplicates)
+    const userMap = tasks.reduce((map, task) => {
+      const user = task.user;
+      if (user && !map[user.id]) {
         map[user.id] = user;
-        return map;
-      }, {});
+      }
+      return map;
+    }, {});
 
-      return userMap;
-    } catch (error) {
-      console.error("Error fetching team details:", error);
-      return null;
-    }
-    };
+    return userMap;
+  } catch (error) {
+    console.error("Error fetching team details:", error);
+    return null;
+  }
+};
 
-    export { fetchTeamDetails };
+export { fetchTeamDetails };
