@@ -5,6 +5,7 @@ import {
   signup,
   getuserbytoken,
   GetAllManager,
+  disableUser
 } from "../../controllers/auth.js";
 import Authenticate from "../../middlewares/authenticate.js";
 import { isAdmin } from "../../middlewares/isadmin.js";
@@ -24,4 +25,7 @@ router.post("/getuserbytoken", Authenticate, getuserbytoken); // Routing to Get 
 router.get("/getallmanagers", Authenticate, isAdmin, GetAllManager); // Getting all managers
 
 router.get("/exports/:model",Authenticate,exportcvs)
+
+router.patch("/disable/:userId",Authenticate,disableUser)//disable the user access/login
+
 export default router;
