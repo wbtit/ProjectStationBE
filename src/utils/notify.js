@@ -1,4 +1,4 @@
-import redis from "../../redisClient.js";
+import redis from "../../redis/redisClient.js";
 import prisma from "../lib/prisma.js";
 
 export const sendNotification = async(userId, payload) => {

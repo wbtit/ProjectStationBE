@@ -7,7 +7,7 @@ import { routes } from "./src/routes/index.js";
 import { app } from "./src/app.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import {initSocket} from "./socket.js"
+import {initSocket} from "./sockets/socket.js"
 
 import './corn-jobs/checkAndSendReminders.js'
 dotenv.config();

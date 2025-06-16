@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config(); // <--- This line is CRUCIAL here too!
 
 // Import the function directly
-import { checkAndSendReminders } from './corn-jobs/checkAndSendReminders.js'; // Adjust path if needed
+import { checkAndSendReminders } from '../corn-jobs/checkAndSendReminders.js'; // Adjust path if needed
 
 async function runTest() {
     console.log('Manually triggering checkAndSendReminders...');
