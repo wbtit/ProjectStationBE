@@ -53,18 +53,26 @@ const addComment = async (req, res) => {
             managerID:true
           }
         },
-        user:true
+        user:true,
+        user_id:true                  
       }
     })
    const managerID = task?.project?.managerID;
-const taskName = task?.name || "Unnamed Task";
-const userName = task?.user?.f_name || "Someone";
-
-if (managerID) {
+   const taskName = task?.name || "Unnamed Task";
+   const userName = task?.user?.f_name || "Someone";
+   const employer= task?.user_id
+if (managerID && id !== managerID) {
   sendNotification(managerID, {
-    message: `Comment added in ${taskName} by ${userName}`,
+    message: `Comment added in "${taskName}" by ${userName}`,
   });
 }
+
+if (employer && id === managerID && employer !== managerID) {
+  sendNotification(employer, {
+    message: `Comment added in "${taskName}" by Project Manager`,
+  });
+}
+
     return sendResponse({
       message: "comment Added Successfully",
       res,

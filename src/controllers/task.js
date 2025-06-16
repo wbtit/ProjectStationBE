@@ -552,7 +552,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
     const tasks = await prisma.task.findMany({
       where: {
         user_id: user_id,
-        status: { notIn: ["IN_REVIEW", "COMPLETE"] }, // Exclude these statuses
+        status: { notIn: ["COMPLETE"] }, // Exclude these statuses
       },
       include:{
         taskInAssignedList:true
