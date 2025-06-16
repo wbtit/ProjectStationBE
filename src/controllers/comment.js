@@ -53,8 +53,7 @@ const addComment = async (req, res) => {
             managerID:true
           }
         },
-        user:true,
-        user_id:true                  
+        user:true,                 
       }
     })
    const managerID = task?.project?.managerID;
