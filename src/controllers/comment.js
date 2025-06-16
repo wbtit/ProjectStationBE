@@ -91,6 +91,44 @@ if (employer && id === managerID && employer !== managerID) {
     prisma.$disconnect();
   }
 };
+const acknowledge=async(req,res)=>{
+  const {commentId}=req.params
+  try {
+    if(!commentId){
+      return sendResponse({
+        message:"CommentId is required",
+        res,
+        statusCode:400,
+        success:false,
+        data:null
+      })
+    }
+    const acknowledge= await prisma.comment.update({
+      where:{
+        id:commentId
+      },
+      data:{
+        acknowledged:true,
+        acknowledgedTime: new Date()
+      }
+    })
+    return sendResponse({
+      message:"acknowledgement triggered",
+      res,
+      statusCode:200,
+      success:true,
+      data:acknowledge
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
 
-
-export { addComment};
+export { addComment,acknowledge};

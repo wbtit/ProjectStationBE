@@ -27,7 +27,7 @@ import {
   updateTaskAssignes,
 } from "../../controllers/assignes.js";
 
-import { addComment } from "../../controllers/comment.js";
+import { addComment,acknowledge } from "../../controllers/comment.js";
 
 import {
   addAssignedList,
@@ -68,7 +68,10 @@ router.get("/tasks/:id/get_assignes", Authenticate, GetTaskByIDAssignes); //get 
 
 router.put("/tasks/:id/update_assignes", Authenticate, updateTaskAssignes); //update assignes
 
+
+//comments
 router.post("/tasks/add_comment/:task_id", Authenticate, addComment); //add comment
+router.patch("/tasks/acknowledge/:commentId",Authenticate,acknowledge)//acknowledge
 
 
 

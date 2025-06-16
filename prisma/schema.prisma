@@ -283,6 +283,8 @@ model Comment {
   task_id    String   @db.Uuid
   user_id    String   @db.Uuid
   file       Json     @default("[]")
+  acknowledged Boolean  @default(false)
+  acknowledgedTime  DateTime?
   task       Task     @relation("taskcomment", fields: [task_id], references: [id], onDelete: Cascade)
   user       Users    @relation("taskcommentuser", fields: [user_id], references: [id], onDelete: Cascade)
 
