@@ -549,6 +549,7 @@ const GetAllProjects = async (req, res) => {
 const GetProjectByID = async (req, res) => {
   const { id } = req.params;
 
+
   if (!isValidUUID(id)) {
     return sendResponse({
       message: "Invalid ID",
@@ -559,9 +560,12 @@ const GetProjectByID = async (req, res) => {
     });
   }
 
+
   try {
     const project = await prisma.project.findUnique({
-      where: { id },
+      where: {
+        id,
+      },
       include: {
         team: {
           include: {
@@ -573,36 +577,27 @@ const GetProjectByID = async (req, res) => {
         manager: true,
         tasks: true,
         accepttasks: true,
-        file: true,
-        changeOrder: true,
-        rfi: true,
-        submittals: true,
+        file:true,
+        changeOrder:true,
+        rfi:true,
+        submittals:true
       },
     });
 
-    if (!project) {
-      return sendResponse({
-        message: "Project not found",
-        res,
-        statusCode: 404,
-        success: false,
-        data: null,
-      });
-    }
 
-    const ids = project.team?.members?.map((mem) => mem.id) || [];
+    const ids = project.team.members.map((mem) => mem.id);
 
-    const data = await fetchTeamDetails({ ids,id });
 
-    const filteredMembers = project.team.members
-      .map((member) => {
-        const user = data[member.id];
-        return user ? { ...user, role: member.role } : null;
-      })
-      .filter(Boolean); // Removes nulls
+    const data = await fetchTeamDetails({ ids });
+
+
+    const Data = project.team.members.map((m) => {
+      return { ...data[m.id], role: m.role };
+    });
+
 
     return sendResponse({
-      message: "Project Retrieved Successfully",
+      message: "Project Retrived Successfully",
       res,
       statusCode: 200,
       success: true,
@@ -610,12 +605,12 @@ const GetProjectByID = async (req, res) => {
         ...project,
         team: {
           ...project.team,
-          members: filteredMembers,
+          members: Data,
         },
       },
     });
   } catch (error) {
-    console.error("Error in GetProjectByID:", error);
+    // console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -625,6 +620,7 @@ const GetProjectByID = async (req, res) => {
     });
   }
 };
+
 
 
 const GetAllfiles = async (req, res) => {
