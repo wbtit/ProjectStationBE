@@ -375,7 +375,8 @@ const Inbox = async (req, res) => {
         response:{
           orderBy: { createdAt: 'asc' },
         },
-        file:true
+        file:true,
+        sender:true
       },
     });
 

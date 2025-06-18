@@ -41,6 +41,7 @@ model Users {
   department            String?         @db.Uuid
   is_deptmanager        Boolean         @default(false)
   is_hr                 Boolean         @default(false)
+  is_est                Boolean         @default(false)
   is_disabled           Boolean         @default(false)
   accepttasks           AcceptTask[]    @relation("acceptTaskUser")
   taskApprovedBy        Assigned_list[] @relation("taskApprovedBy")
