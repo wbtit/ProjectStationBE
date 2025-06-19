@@ -325,16 +325,37 @@ const getRowCotable=async(req,res)=>{
         data:null
       }) 
     }
+   
     const coRow= await prisma.changeOrdertable.findMany({
       where:{CoId:CoId}
     })
+    const CO= await prisma.changeOrder.findUnique({
+      where:{
+        id:CoId
+      },
+      include:{
+        senders:{
+          select:{
+            f_name:true,
+            m_name:true,
+            l_name:true
+          }
+        },
+        Project:{
+          select:{
+            name:true
+          }
+        }
+      }
+    })
+    const response={coRow,CO}
     console.log(coRow)
     return sendResponse({
       message:"Response created",
       res,
       statusCode:200,
       success:true,
-      data:coRow
+      data:response
     })
   } catch (error) {
     console.log(error.message)

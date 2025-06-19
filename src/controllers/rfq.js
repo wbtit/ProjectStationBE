@@ -375,7 +375,8 @@ const Inbox = async (req, res) => {
         response:{
           orderBy: { createdAt: 'asc' },
         },
-        file:true
+        file:true,
+        sender:true
       },
     });
 
@@ -396,7 +397,7 @@ const Inbox = async (req, res) => {
       data: sentRFQ,
     });
   } catch (error) {
-    // console.log(error.message);
+     console.log(error.message);
     return sendResponse({
       message: error.message,
       res,

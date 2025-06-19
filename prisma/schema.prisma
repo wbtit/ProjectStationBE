@@ -10,7 +10,7 @@ datasource db {
 }
 
 model Users {
-  id                    String          @id @default(uuid()) @db.Uuid
+  id                    String          @id @default(uuid()) @db.Uuid 
   username              String          @unique
   password              String
   email                 String?         @db.VarChar(150)
@@ -41,6 +41,8 @@ model Users {
   department            String?         @db.Uuid
   is_deptmanager        Boolean         @default(false)
   is_hr                 Boolean         @default(false)
+  is_est                Boolean         @default(false)
+  is_disabled           Boolean         @default(false)
   accepttasks           AcceptTask[]    @relation("acceptTaskUser")
   taskApprovedBy        Assigned_list[] @relation("taskApprovedBy")
   taskAssignedby        Assigned_list[] @relation("taskAssignedby")
@@ -134,30 +136,32 @@ model Team {
 }
 
 model Project {
-  id               String        @id @default(uuid()) @db.Uuid
-  name             String        @unique
-  description      String
-  fabricatorID     String        @db.Uuid
-  departmentID     String        @db.Uuid
-  teamID           String?       @db.Uuid
-  managerID        String        @db.Uuid
-  status           Status        @default(ACTIVE)
-  stage            Stage         @default(RFI)
-  tools            Tools         @default(TEKLA)
-  files            Json          @default("[]")
-  connectionDesign Boolean       @default(true)
-  miscDesign       Boolean       @default(true)
-  customerDesign   Boolean       @default(false)
-  startDate        String
-  endDate          String?
-  approvalDate     String
-  estimatedHours   Float           @default(0)
-  modelingHours    Float           @default(0)
-  modelCheckingHours     Float      @default(0)
-  detailingHours   Float           @default(0)
-  detailCheckingHours    Float      @default(0)
-  executionHours   Float           @default(0)
-  executionCheckingHours Float     @default(0)
+  id                       String        @id @default(uuid()) @db.Uuid
+  name                     String        @unique
+  description              String
+  fabricatorID             String        @db.Uuid
+  departmentID             String        @db.Uuid
+  teamID                   String?       @db.Uuid
+  managerID                String        @db.Uuid
+  status                   Status        @default(ACTIVE)
+  stage                    Stage         @default(RFI)
+  tools                    Tools         @default(TEKLA)
+  files                    Json          @default("[]")
+  connectionDesign         Boolean       @default(true)
+  miscDesign               Boolean       @default(true)
+  customerDesign           Boolean       @default(false)
+  startDate                String
+  endDate                  String?
+  approvalDate             String
+  estimatedHours           Float           @default(0)
+  modelingHours            Float           @default(0)
+  modelCheckingHours       Float      @default(0)
+  detailingHours           Float           @default(0)
+  detailCheckingHours      Float      @default(0)
+  executionHours           Float           @default(0)
+  executionCheckingHours   Float     @default(0)
+  mailReminder     Boolean         @default(false)
+  submissionMailReminder   Boolean         @default(false)
 
   accepttasks      AcceptTask[]  @relation("acceptTaskProject")
   changeOrder      ChangeOrder[] @relation("ChangeOrderProject")
@@ -281,6 +285,8 @@ model Comment {
   task_id    String   @db.Uuid
   user_id    String   @db.Uuid
   file       Json     @default("[]")
+  acknowledged Boolean  @default(false)
+  acknowledgedTime  DateTime?
   task       Task     @relation("taskcomment", fields: [task_id], references: [id], onDelete: Cascade)
   user       Users    @relation("taskcommentuser", fields: [user_id], references: [id], onDelete: Cascade)
 

@@ -1,8 +1,8 @@
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
-import redis from "./redisClient.js";
-import prisma from "./src/lib/prisma.js";
-import { Compression, decompression } from "./src/utils/Zstd.js";
+import redis from "../redis/redisClient.js";
+import prisma from "../src/lib/prisma.js";
+import { Compression, decompression } from "../src/utils/Zstd.js";
 
 
 const userSocketMap = new Map();

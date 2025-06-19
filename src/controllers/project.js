@@ -323,11 +323,13 @@ const UpdateProject = async (req, res) => {
       "approvalDate",
       "estimatedHours",
       "modelingHours",
-    "modelCheckingHours",
-    "detailingHours",
-    "detailCheckingHours",
-    "erectionHours",
-    "erectionCheckingHours"
+      "modelCheckingHours",
+      "detailingHours",
+      "detailCheckingHours",
+      "erectionHours",
+      "erectionCheckingHours",
+      "mailReminder",
+      "submissionMailReminder"
     ];
 
     fieldsToUpdate.forEach((field) => {
@@ -343,9 +345,33 @@ const UpdateProject = async (req, res) => {
     const previousProjectStage= await prisma.project.findUnique({
       where:{id:id},
       select:{
-        stage:true
+        stage:true,
+        approvalDate:true,
+        endDate:true,
+        mailReminder:true,
+        submissionMailReminder:true
       }
     })
+
+
+    //Reset
+    if(approvalDate && new Date(approvalDate).toDateString()!==new Date(previousProjectStage.approvalDate).toDateString()){
+      fieldsToUpdate.approvalDate= new Date(approvalDate)
+      updateData.mailReminder= false
+    }else if (approvalDate) {
+            // If date is provided but not changed, ensure it's still a Date object
+            updateData.approvalDate = new Date(approvalDate);
+        }
+
+
+    //Reset
+    if(endDate && new Date(endDate).toDateString()!==new Date(previousProjectStage.endDate).toDateString()){
+      fieldsToUpdate.endDate= new Date(endDate)
+      updateData.submissionMailReminder= false
+    }else if (endDate) {
+            // If date is provided but not changed, ensure it's still a Date object
+            updateData.endDate = new Date(endDate);
+    }
 
     const updatedProject = await prisma.project.update({
       where: {
@@ -383,11 +409,11 @@ const GetAllProjects = async (req, res) => {
   try {
     // console.log("User Data:", req.user);
 
-    const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr,is_sales} = req.user;
+    const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr,is_sales,is_est} = req.user;
     let projects;
 
     // 🔹 Superuser: Fetch all projects
-    if (is_superuser|| is_hr || is_sales) {
+    if (is_superuser|| is_hr || is_sales||is_est) {
       projects = await prisma.project.findMany({
         include: {
           file:true,
@@ -523,6 +549,7 @@ const GetAllProjects = async (req, res) => {
 const GetProjectByID = async (req, res) => {
   const { id } = req.params;
 
+
   if (!isValidUUID(id)) {
     return sendResponse({
       message: "Invalid ID",
@@ -532,6 +559,7 @@ const GetProjectByID = async (req, res) => {
       data: null,
     });
   }
+
 
   try {
     const project = await prisma.project.findUnique({
@@ -556,13 +584,17 @@ const GetProjectByID = async (req, res) => {
       },
     });
 
+
     const ids = project.team.members.map((mem) => mem.id);
 
+
     const data = await fetchTeamDetails({ ids });
+
 
     const Data = project.team.members.map((m) => {
       return { ...data[m.id], role: m.role };
     });
+
 
     return sendResponse({
       message: "Project Retrived Successfully",
@@ -588,6 +620,8 @@ const GetProjectByID = async (req, res) => {
     });
   }
 };
+
+
 
 const GetAllfiles = async (req, res) => {
   try {

@@ -25,7 +25,7 @@ addRFQ
 router.get("/rfq/:id/:fid",Authenticate,RfqViewFiles)
 router.put("/rfq/update/:id",Authenticate,updateRfq)
 
-router.get("/rfqResponse/:id/:fid",RfqresponseViewFiles)
+router.get("/rfqResponse/:id/:fid",Authenticate,RfqresponseViewFiles)
 
 router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),

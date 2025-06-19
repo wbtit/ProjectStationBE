@@ -1,4 +1,6 @@
+
     import prisma from "../lib/prisma.js";
+
 
     const fetchTeamDetails = async ({ ids }) => {
     try {
@@ -10,11 +12,13 @@
         },
       });
 
+
       // Convert the array of users to a hashmap
       const userMap = users.reduce((map, user) => {
         map[user.id] = user;
         return map;
       }, {});
+
 
       return userMap;
     } catch (error) {
@@ -22,5 +26,6 @@
       return null;
     }
     };
+
 
     export { fetchTeamDetails };

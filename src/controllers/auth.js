@@ -297,4 +297,43 @@ const GetAllManager = async (req, res) => {
   }
 };
 
-export { login, signup, resetpassword, getuserbytoken, GetAllManager };
+const disableUser= async(req,res)=>{
+  const {userId}=req.params
+  if(!userId){
+    return sendResponse({
+      message:"UserId is required",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  try {
+   const userDisabled= await prisma.users.update({
+    where:{
+      id:userId
+    },
+    data:{
+      is_disabled:true
+    }
+   })
+   return sendResponse({
+    message:"userDisabled successfully",
+    res,
+    statusCode:200,
+    success:true,
+    data:userDisabled
+   }) 
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+    })
+  }
+}
+
+export { login, signup, resetpassword, getuserbytoken, GetAllManager,disableUser};
