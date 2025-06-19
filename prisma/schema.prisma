@@ -43,6 +43,7 @@ model Users {
   is_hr                 Boolean         @default(false)
   is_est                Boolean         @default(false)
   is_disabled           Boolean         @default(false)
+  updatedAt             DateTime        @updatedAt  @default(now())
   accepttasks           AcceptTask[]    @relation("acceptTaskUser")
   taskApprovedBy        Assigned_list[] @relation("taskApprovedBy")
   taskAssignedby        Assigned_list[] @relation("taskAssignedby")
@@ -82,6 +83,11 @@ model Users {
   rfiresponseBy         RFIResponse[]   @relation("rfiresponseBy")
   rfqresponseBy         RFQResponse[]   @relation("rfqresponseBy")
   submittalsresponseBy  SubmittalsResponse[]  @relation("submittalsresponseBy")
+
+  salesRfqs            RFQ[]              @relation("SalesPersonRFQ")
+  assignedEstimations  EstimationTask[]   @relation("AssignedEstimator")
+  reviewedEstimations  EstimationTask[]   @relation("ReviewedBy")
+  createdEstimations   Estimation[]       @relation("CreatedBy")
 
   @@map("users")
 }
@@ -366,20 +372,26 @@ model RFIResponse {
 }
 
 model RFQ {
-  id           String   @id @default(uuid()) @db.Uuid
-  projectName  String
-  sender_id    String   @db.Uuid
-  status       RFQStatus  @default(OPEN)
-  reason       String?   @default("")
-  subject      String
-  description  String
+  id            String   @id @default(uuid()) @db.Uuid
+  projectName   String
+  sender_id     String   @db.Uuid
+  createdById   String?
+  salesPersonId String?  @db.Uuid
+  status        RFQStatus  @default(RECEIVED)
+  reason        String?   @default("")
+  subject       String
+  description   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt    @default(now())
   files        Json[]   @default([])
   date         DateTime @default(now())
   recepient_id String   @db.Uuid
   recepients   Users    @relation("UsersRFQ", fields: [recepient_id], references: [id])
   sender       Users    @relation("senderRFQ", fields: [sender_id], references: [id])
+  salesPerson  Users?        @relation("SalesPersonRFQ", fields: [salesPersonId], references: [id])
   response     RFQResponse[]  @relation("rfqResponses")
   file        File[]       @relation("rfqFiles")
+  estimations   Estimation[]
   @@map("rfq")
 }
 
@@ -387,7 +399,7 @@ model RFQResponse{
   id        String    @id @default(uuid()) @db.Uuid
   files     Json[]    @default([])
   description  String   @default("")
-  status       RFQStatus  @default(OPEN)
+  status       RFQStatus  @default(RECEIVED)
   createdAt    DateTime   @default(now())
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
@@ -604,6 +616,148 @@ model File{
 
       @@map("file")
 }
+
+// Estimation Management
+model Estimation {
+  id               String            @id @default(uuid()) @db.Uuid
+  rfqId            String             @db.Uuid
+  estimationNumber String            @unique
+  fabricatorName   String?
+  projectName      String
+  estimateDate     DateTime          @default(now())
+  teklaOrSds       String?           // TEKLA/SDS
+  status           EstimationStatus  @default(DRAFT)
+  createdById      String            @db.Uuid
+  assignedById     String?
+  finalHours       Float?
+  finalWeeks       Float?
+  finalPrice       Float?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  rfq              RFQ               @relation(fields: [rfqId], references: [id])
+  createdBy        Users              @relation("CreatedBy", fields: [createdById], references: [id])
+  tasks            EstimationTask[]
+  lineItems        EstimationLineItem[]
+  template         EstimationTemplate?
+  @@map("estimations")
+}
+
+enum EstimationStatus {
+  DRAFT
+  IN_PROGRESS
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  RE_ESTIMATION_REQUIRED
+  QUOTED
+}
+
+// Individual Estimation Tasks (for tracking multiple estimators)
+model EstimationTask {
+  id           String           @id @default(uuid())   @db.Uuid
+  estimationId String           @db.Uuid
+  assignedToId String           @db.Uuid
+  assignedById String
+  status       TaskStatus       @default(ASSIGNED)
+  startDate    DateTime?
+  endDate      DateTime?
+  hoursSpent   Float?
+  notes        String?
+  reviewedById String?          @db.Uuid
+  reviewNotes  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  estimation   Estimation       @relation(fields: [estimationId], references: [id])
+  assignedTo   Users             @relation("AssignedEstimator", fields: [assignedToId], references: [id])
+  reviewedBy   Users?            @relation("ReviewedBy", fields: [reviewedById], references: [id])
+
+  @@map("estimation_tasks")
+}
+
+enum TaskStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  REVISION_REQUIRED
+}
+
+// Line Items for detailed estimation
+model EstimationLineItem {
+  id              String     @id @default(uuid())     @db.Uuid
+  scopeOfWork     String
+  estimationId    String     @db.Uuid
+  remarks         String
+  quantity        Float?
+  hoursPerQty     Float?
+  totalHours      Float?
+  weeks           Float?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  estimation      Estimation @relation(fields: [estimationId], references: [id], onDelete: Cascade)
+
+  @@map("estimation_line_items")
+}
+
+
+
+// Estimation Template (Email template data)
+model EstimationTemplate {
+  id                           String    @id @default(uuid())    @db.Uuid
+  estimationId                 String    @unique      @db.Uuid
+  detailingEstimatedHours      Float?
+  detailingEstimatedPrice      Float?
+  detailingEstimatedWeeks      Float?
+  connectionDesignRequired     Boolean   @default(false)
+  scopeSheetAvailable          Boolean   @default(false)
+  steelConsidered              String?   // "Main & Misc. Steel"
+  
+  // Inclusions
+  connectionDesignMainSteel    Boolean   @default(false)
+  connectionDesignMiscSteel    Boolean   @default(false)
+  peStampingIncluded           Boolean   @default(false)
+  
+  // Exclusions
+  exclusionNotes               String?
+  
+  // Pricing
+  mainSteelConnectionPrice     Float?
+  miscSteelDesignPrice         Float?
+  
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
+
+  estimation                   Estimation @relation(fields: [estimationId], references: [id], onDelete: Cascade)
+
+  @@map("estimation_templates")
+}
+
+
+// Analytics and Reporting Views
+model EstimatorEfficiency {
+  id                    String   @id @default(uuid())     @db.Uuid
+  estimatorId           String
+  month                 Int
+  year                  Int
+  totalEstimationsAssigned Int   @default(0)
+  totalEstimationsCompleted Int  @default(0)
+  totalHoursSpent       Float    @default(0)
+  averageTimePerEstimation Float @default(0)
+  accuracyRate          Float?   // Based on final vs estimated hours
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([estimatorId, month, year])
+  @@map("estimator_efficiency")
+}
+
+
+
 enum WorkHourStatus {
   START
   END
@@ -612,6 +766,14 @@ enum WorkHourStatus {
 }
 
 enum UserRole {
+  ADMIN           // CEO
+  SALES_PERSON    // Sales Team
+  DEPT_MANAGER    // Department Manager (Operation Executive)
+  ESTIMATION_HEAD // Estimation Head
+  ESTIMATOR       // Individual Estimators
+  PROJECT_MANAGER
+  PROJECT_MANAGER_OFFICER
+  OPERATION_EXECUTIVE
   STAFF
   CLIENT
   VENDOR
@@ -668,10 +830,18 @@ enum State {
   COMPLETE
 }
 enum RFQStatus {
-  OPEN
-  IN_REVIEW
-  CLOSED
-  APPROVED
+  RECEIVED
+  ASSIGNED_FOR_ESTIMATION
+  ESTIMATION_IN_PROGRESS
+  ESTIMATION_COMPLETED
+  QUOTED
+  AWARDED
+  REJECTED
+  RE_ESTIMATION_REQUESTED
+  OPEN 
+  IN_REVIEW 
+  CLOSED 
+  APPROVED 
   RE_APPROVAL
 }
 enum SubResStatus{
