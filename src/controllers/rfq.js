@@ -397,7 +397,7 @@ const Inbox = async (req, res) => {
       data: sentRFQ,
     });
   } catch (error) {
-    // console.log(error.message);
+     console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
