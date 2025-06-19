@@ -334,12 +334,17 @@ const UpdateProject = async (req, res) => {
 
     fieldsToUpdate.forEach((field) => {
       if (
-        req.body[field] !== null &&
-        req.body[field] !== undefined &&
-        req.body[field] !== ""
-      ) {
-        updateData[field] = req.body[field];
-      }
+  req.body[field] !== null &&
+  req.body[field] !== undefined &&
+  req.body[field] !== ""
+) {
+  if (["startDate", "endDate", "approvalDate"].includes(field)) {
+    updateData[field] = new Date(req.body[field]).toISOString(); // ✅ Convert to ISO string
+  } else {
+    updateData[field] = req.body[field];
+  }
+}
+
     });
     // console.log(updateData);
     const previousProjectStage= await prisma.project.findUnique({
@@ -355,22 +360,22 @@ const UpdateProject = async (req, res) => {
 
 
     //Reset
-    if(approvalDate && new Date(approvalDate).toDateString()!==new Date(previousProjectStage.approvalDate).toDateString()){
-      fieldsToUpdate.approvalDate= new Date(approvalDate)
+    if(req.body.approvalDate && new Date(req.body.approvalDate).toDateString()!==new Date(previousProjectStage.approvalDate).toDateString()){
+      fieldsToUpdate.approvalDate= new Date(req.body.approvalDate).toISOString()
       updateData.mailReminder= false
-    }else if (approvalDate) {
+    }else if (req.body.approvalDate) {
             // If date is provided but not changed, ensure it's still a Date object
-            updateData.approvalDate = new Date(approvalDate);
+            updateData.approvalDate = new Date(req.body.approvalDate).toISOString();
         }
 
 
     //Reset
-    if(endDate && new Date(endDate).toDateString()!==new Date(previousProjectStage.endDate).toDateString()){
-      fieldsToUpdate.endDate= new Date(endDate)
+    if(req.body.endDate && new Date(req.body.endDate).toDateString()!==new Date(previousProjectStage.endDate).toDateString()){
+      fieldsToUpdate.endDate= new Date(req.body.endDate).toISOString()
       updateData.submissionMailReminder= false
-    }else if (endDate) {
+    }else if (req.body.endDate) {
             // If date is provided but not changed, ensure it's still a Date object
-            updateData.endDate = new Date(endDate);
+            updateData.endDate = new Date(req.body.endDate).toISOString();
     }
 
     const updatedProject = await prisma.project.update({
@@ -392,7 +397,7 @@ const UpdateProject = async (req, res) => {
       data: updatedProject,
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return sendResponse({
       message: error.message,
       res,
