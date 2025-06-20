@@ -146,7 +146,14 @@ const updateEstimationData=async(req,res)=>{
     try {
         const updateEstimationData= await prisma.Estimation.update({
             where:{id:estimationId},
-            data:req?.body
+            data:req?.body,
+            include:{
+                 rfq:true,
+                 createdBy:true,
+                 tasks:true,
+                 lineItems:true,
+                 template:true 
+            }
         })
         return sendResponse({
             message:"Estimation data updated successfully",
@@ -216,7 +223,13 @@ const updateStatus=async(req,res)=>{
         where:{id:estimationId},
         data:{
             status:status
-        }
+        },include:{
+                 rfq:true,
+                 createdBy:true,
+                 tasks:true,
+                 lineItems:true,
+                 template:true 
+            }
     })
     return sendResponse({
         message:"Status got updated successfully",
