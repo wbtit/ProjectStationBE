@@ -203,10 +203,13 @@ const GetAllFabricator = async (req, res) => {
       fabricators = await getFabricators();
     } else {
       fabricators = await prisma.fabricator.findMany({
-        where: { createdById: id }
+        where: { createdById: id },
+        include:{
+          userss:true
+        }
       });
     }
-
+    console.log(fabricators)
     return sendResponse({
       message: "Fetched all fabricators",
       res,

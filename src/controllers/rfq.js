@@ -30,11 +30,20 @@ const addRFQ=async(req,res)=>{
             path: `/public/rfqtemp/${file.filename}`, // Relative path
           }));
 
+          let salesPersonId;
+           const user= await prisma.users.findUnique({where:{id:id}})
+            console.log(user.id)
+           if(user.role === 'SALES_PERSON' || user.role==='DEPT_MANAGER' || user.role==='OPERATION_EXECUTIVE'){
+              salesPersonId=user.id
+              console.log(salesPersonId)
+           }
           const newrfq= await prisma.rFQ.create({
             data:{
                 projectName,
                 sender_id:id,
-                status:"OPEN",
+                createdById:id,
+                salesPersonId:salesPersonId ||null,
+                status:"RECEIVED",
                 subject,
                 description,
                 files:fileDetails,
@@ -280,6 +289,7 @@ const updateRfq=async(req,res)=>{
     })
   }
 }
+
 const sentRFQByUser = async (req, res) => {
   const { id } = req.user;
   try {
