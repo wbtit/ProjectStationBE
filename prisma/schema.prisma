@@ -112,6 +112,7 @@ model Fabricator {
   userss      Users[]      @relation("UsersFabricator")
   users       Users[]      @relation("FabricatorUsers")
   file        File[]       @relation("fabricatorFiles")
+  estimation  Estimation[]   @relation("estimationUnderFabricator")
 
   @@map("fabricators")
 }
@@ -626,6 +627,7 @@ model Estimation {
   teklaOrSds       String?           // TEKLA/SDS
   status           EstimationStatus  @default(DRAFT)
   createdById      String            @db.Uuid
+  fabricatorId     String            @db.Uuid
   assignedById     String?
   finalHours       Float?
   finalWeeks       Float?
@@ -635,6 +637,7 @@ model Estimation {
 
   rfq              RFQ               @relation(fields: [rfqId], references: [id])
   createdBy        Users              @relation("CreatedBy", fields: [createdById], references: [id])
+  fabricators      Fabricator         @relation("estimationUnderFabricator",fields:[fabricatorId],references:[id])
   tasks            EstimationTask[]
   lineItems        EstimationLineItem[]
   template         EstimationTemplate?
