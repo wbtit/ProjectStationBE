@@ -20,6 +20,7 @@ import  {File}       from   "./files/route.js"
 import { dashBoardStats } from "./dashboardNumbers/routes.js";
 import {estimation} from "./estimation/route.js"
 import { EstimationTask } from "./estimationTask/routes.js";
+import {estimationWH} from './estimationTaskWorkingHours/route.js'
 
 const routes = express.Router();
 
@@ -44,5 +45,6 @@ routes.use("/File",File)
 routes.use("/stats",dashBoardStats)
 routes.use("/Estimation",estimation)
 routes.use("/EstimationTask",EstimationTask)
+routes.use("/EWH",estimationWH)
 
 export { routes };

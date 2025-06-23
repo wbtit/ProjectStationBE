@@ -388,7 +388,7 @@ const End = async (req, res) => {
       where: { id: estimationTaskId },
       data: { status: "UNDER_REVIEW" },
     });
-    
+
     return sendResponse({
       message: `Work Ended, Total time : ${
         workingHourRecord.duration + durationInMinutes
@@ -410,3 +410,5 @@ const End = async (req, res) => {
     });
   }
 };
+
+export { End, Pause, Resume, Start };
