@@ -18,6 +18,7 @@ import { SubTasksRouter } from "./subtasks/route.js";
 import {chatRouter}  from  "./chatSystem/routes.js"
 import  {File}       from   "./files/route.js"
 import { dashBoardStats } from "./dashboardNumbers/routes.js";
+import {estimation} from "./estimation/route.js"
 
 const routes = express.Router();
 
@@ -40,5 +41,6 @@ routes.use("/st", SubTasksRouter);
 routes.use("/chat",chatRouter)
 routes.use("/File",File)
 routes.use("/stats",dashBoardStats)
+ routes.use("/Estimation",estimation)
 
 export { routes };

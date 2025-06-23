@@ -33,7 +33,7 @@ try {
             data:null
         })
     }
-    const createEstimation = await prisma.Estimation.create({
+    const createEstimation = await prisma.estimation.create({
         data:{
           rfqId,
           estimationNumber,
@@ -65,7 +65,7 @@ try {
 }
 const getallEstimation=async(req,res)=>{
     try {
-        const getallEstimation= await prisma.Estimation.findMany({
+        const getallEstimation= await prisma.estimation.findMany({
             include:{
              rfq:true,
              createdBy:true,
@@ -104,7 +104,7 @@ const getEstimationById=async(req,res)=>{
         })
     }
     try {
-        const getEstimationById= await prisma.Estimation.findUnique({
+        const getEstimationById= await prisma.estimation.findUnique({
             where:{id:estimationId},
             include:{
                  rfq:true,
@@ -144,7 +144,7 @@ const updateEstimationData=async(req,res)=>{
         })
     }
     try {
-        const updateEstimationData= await prisma.Estimation.update({
+        const updateEstimationData= await prisma.estimation.update({
             where:{id:estimationId},
             data:req?.body,
             include:{
@@ -185,7 +185,7 @@ const deleteEstimationData=async(req,res)=>{
         })
     }
     try {
-        const deleteData= await prisma.Estimation.delete({
+        const deleteData= await prisma.estimation.delete({
             where:{id:estimationId}
         })
         return sendResponse({
@@ -219,7 +219,7 @@ const updateStatus=async(req,res)=>{
         })
     }
     try {
-        const statusUpdated= await prisma.Estimation.update({
+        const statusUpdated= await prisma.estimation.update({
         where:{id:estimationId},
         data:{
             status:status
