@@ -11,7 +11,7 @@ async function createEstimationLineItem(estimationId){
         ...item &&
         estimationId
     }))
-    const createItems= await prisma.EstimationLineItem.createMany({
+    const createItems= await prisma.estimationLineItem.createMany({
         data:lineItemsToInsert,
         EstimationLineItem:true
     })

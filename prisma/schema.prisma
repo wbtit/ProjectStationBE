@@ -423,10 +423,12 @@ model WorkingHours {
   id       String         @id @default(uuid()) @db.Uuid
   user_id  String         @db.Uuid
   task_id  String         @db.Uuid
+  estimationTask_id   String?    @db.Uuid   
   status   WorkHourStatus
   start    DateTime?
   duration Int            @default(0)
   end      DateTime?
+  estimationTask  EstimationTask?  @relation("workingHourEstimationTask",fields:[estimationTask_id],references:[id],onDelete:Cascade)
   task     Task           @relation("workingHourTask", fields: [task_id], references: [id], onDelete: Cascade)
   user     Users          @relation("workingHourUser", fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -673,6 +675,7 @@ model EstimationTask {
   estimation   Estimation       @relation(fields: [estimationId], references: [id])
   assignedTo   Users             @relation("AssignedEstimator", fields: [assignedToId], references: [id])
   reviewedBy   Users?            @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  workinghours WorkingHours[]     @relation("workingHourEstimationTask")
 
   @@map("estimation_tasks")
 }

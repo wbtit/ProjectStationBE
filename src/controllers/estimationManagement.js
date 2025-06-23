@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import createEstimationLineItem from "../utils/createEstimationLineItems.js";
-import lineItems from "../../data/estimationLineItems.js";
+
 
 //create the estimation
 const createEstimation=async(req,res)=>{
@@ -18,13 +18,13 @@ assignedById,
 
 try {
     if(
-    rfqId||
-    estimationNumber||
-    fabricatorName||
-    projectName||
-    estimateDate||
-    fabricatorId||
-    assignedById){
+    !rfqId||
+    !estimationNumber||
+    !fabricatorName||
+    !projectName||
+    !estimateDate||
+    !fabricatorId||
+    !assignedById){
         return sendResponse({
             message:"Fields are empty",
             res,
@@ -45,6 +45,8 @@ try {
           assignedById,  
         }
     })
+
+    await createEstimationLineItem(createEstimation.id)
     return sendResponse({
         message:"estimation created successfully",
         res,
