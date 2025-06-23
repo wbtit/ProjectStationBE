@@ -19,6 +19,7 @@ import {chatRouter}  from  "./chatSystem/routes.js"
 import  {File}       from   "./files/route.js"
 import { dashBoardStats } from "./dashboardNumbers/routes.js";
 import {estimation} from "./estimation/route.js"
+import { EstimationTask } from "./estimationTask/routes.js";
 
 const routes = express.Router();
 
@@ -41,6 +42,7 @@ routes.use("/st", SubTasksRouter);
 routes.use("/chat",chatRouter)
 routes.use("/File",File)
 routes.use("/stats",dashBoardStats)
- routes.use("/Estimation",estimation)
+routes.use("/Estimation",estimation)
+routes.use("/EstimationTask",EstimationTask)
 
 export { routes };
