@@ -152,19 +152,88 @@ const getEstimationTaskById=async(req,res)=>{
     } catch (error) {
         console.log(error.message)
         return sendResponse({
-       message:error.message,
-       res,
-       statusCode:500,
-       success:false,
-       data:null 
+            message:error.message,
+            res,
+            statusCode:500,
+            success:false,
+            data:null 
     }) 
     }
 }
 
-//update task details
-//delete task details
+
+const updateTask=async(req,res)=>{
+    const{estimationTaskId}=req.params
+    if(!estimationTaskId){
+            return sendResponse({
+                message:"EstimationTaskId is required",
+                res,
+                statusCode:401,
+                success:false,
+                data:null
+            })
+        }
+    try {
+        const updateTaskData= await prisma.estimationTask.update({
+            where:{id:estimationTaskId},
+            data:req.body
+        })
+        return sendResponse({
+            message:"Data updated successfully",
+            res,
+            statusCode:200,
+            success:true,
+            data:updateTaskData
+        })
+    } catch (error) {
+        console.log(error.message)
+        return sendResponse({
+            message:error.message,
+            res,
+            statusCode:500,
+            success:false,
+            data:null 
+    }) 
+    }
+}
+
+const deletetask=async(req,res)=>{
+    const{estimationTaskId}=req.params
+    if(!estimationTaskId){
+            return sendResponse({
+                message:"EstimationTaskId is required",
+                res,
+                statusCode:401,
+                success:false,
+                data:null
+            })
+        }
+        try {
+            const deleteTask = await prisma.estimationTask.delete({
+                where:{id:estimationTaskId},
+            })
+            return sendResponse({
+                message:"Task got delete successfully",
+                res,
+                statusCode:200,
+                success:true,
+                data:deleteTask
+            })
+        } catch (error) {
+            console.log(error.message)
+        return sendResponse({
+            message:error.message,
+            res,
+            statusCode:500,
+            success:false,
+            data:null 
+    }) 
+        }
+}
 export{assignEstimationTask,
     estimationTaskReview,
     getAllEstimationTasks,
-    getEstimationTaskById
+    getEstimationTaskById,
+    updateTask,
+    deletetask
 }
