@@ -148,7 +148,7 @@ const Pause = async (req, res) => {
       });
     }
 
-    const startTimestamp= new Date(workingHourRecord.start).getTime()// convert starttime to time stamp
+    const startTimetask_idstamp= new Date(workingHourRecord.start).getTime()// convert starttime to time stamp
     const currentTimeStamp= Date.now()
     const durationInMinutes=Math.floor((currentTimeStamp-startTimestamp)/60000)
 
@@ -195,7 +195,7 @@ const Pause = async (req, res) => {
 const Resume = async (req, res) => {
   const { work_id, task_id } = req.body;
   const { id } = req.user;
-    console.log("TaskId and WorkId:",work_id,task_id)
+    console.log("Tatask_idskId and WorkId:",work_id,task_id)
   if (!work_id || !task_id) {
     console.log("TaskId and WorkId:",work_id,task_id)
     return sendResponse({
