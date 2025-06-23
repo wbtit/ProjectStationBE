@@ -148,7 +148,19 @@ const updateEstimationData=async(req,res)=>{
     try {
         const updateEstimationData= await prisma.estimation.update({
             where:{id:estimationId},
-            data:req?.body,
+            data:{            
+                estimationNumber ,
+                fabricatorName,   
+                projectName,      
+                estimateDate,     
+                teklaOrSds,       
+                status,           
+                createdById,      
+                fabricatorId,     
+                assignedById,     
+                finalHours,       
+                finalWeeks       
+            },
             include:{
                  rfq:true,
                  createdBy:true,
@@ -251,11 +263,56 @@ const updateStatus=async(req,res)=>{
       })  
     }
 }
+
+const setFinalPrice=async(req,res)=>{
+    const{estimationId}=req.params
+    const{finalPrice}=req.body
+    if(!finalPrice){
+        return sendResponse({
+            mesetFinalPricessage:"Final Price is required",
+            res,
+            statusCode:401,
+            success:false,
+            data:null
+        })
+    }
+    try {
+        const setPrice = await prisma.estimation.update({
+            where:{id:estimationId},
+            data:{
+                finalPrice:finalPrice
+            },include:{
+                rfq:true,
+                createdBy:true,
+                tasks:true,
+                lineItems:true,
+                template:true  
+            }
+        })
+        return sendResponse({
+            message:"Final Price is updated",
+            res,
+            statusCode:200,
+            success:true,
+            data:setPrice
+        })
+    } catch (error) {
+        console.log(error.message)
+            return sendResponse({
+              message:error.message,
+              res,
+              statusCode:500,
+              success:false,
+              data:null
+      })  
+    }
+}
 export {
     createEstimation,
     getallEstimation,
     getEstimationById,
     updateEstimationData,
     deleteEstimationData,
-    updateStatus
+    updateStatus,
+    setFinalPrice
 }

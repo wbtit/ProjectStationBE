@@ -7,7 +7,8 @@ import {
     getEstimationById,
     updateEstimationData,
     deleteEstimationData,
-    updateStatus
+    updateStatus,
+    setFinalPrice
     }  from '../../controllers/estimationManagement.js'
 
     
@@ -20,5 +21,6 @@ router.get("/getEstimation/:estimationId",Authenticate,getEstimationById)
 router.put("/updateEstimation/:estimationId",Authenticate,updateEstimationData)
 router.delete("/deleteEstimation/:estimationId",Authenticate,deleteEstimationData)
 router.patch("/updateStatus/:estimationId/:status",Authenticate,updateStatus)
+router.patch("/setPrice/:estimationId",Authenticate,setFinalPrice)
 
 export  {router as estimation};
