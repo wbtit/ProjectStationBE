@@ -665,7 +665,6 @@ model EstimationTask {
   status       TaskStatus       @default(ASSIGNED)
   startDate    DateTime?
   endDate      DateTime?
-  hoursSpent   Float?
   notes        String?
   reviewedById String?          @db.Uuid
   reviewNotes  String?

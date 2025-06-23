@@ -81,8 +81,8 @@ const estimationTaskReview= async(req,res)=>{
             data:reviewTask
         })
     } catch (error) {
-       console.log(error.message)
-    return sendResponse({
+    console.log(error.message)
+        return sendResponse({
        message:error.message,
        res,
        statusCode:500,
@@ -91,4 +91,80 @@ const estimationTaskReview= async(req,res)=>{
     }) 
     }
 }
-export{assignEstimationTask,estimationTaskReview}
+
+const getAllEstimationTasks=async(req,res)=>{
+    try {
+        const getAllTasks= await prisma.estimationTask.findMany({
+            include:{
+               estimation:true,
+               assignedTo:true,
+               reviewedBy:true,
+               workinghours:true
+            }
+        })
+        return sendResponse({
+            message:"Estimation Tasks fetched successfully",
+            res,
+            statusCode:200,
+            success:true,
+            data:getAllTasks
+        })
+    } catch (error) {
+    console.log(error.message)
+        return sendResponse({
+       message:error.message,
+       res,
+       statusCode:500,
+       success:false,
+       data:null 
+    }) 
+    }
+}
+
+const getEstimationTaskById=async(req,res)=>{
+    const{estimationTaskId}=req.params
+    try {
+        if(!estimationTaskId){
+            return sendResponse({
+                message:"EstimationTaskId is required",
+                res,
+                statusCode:401,
+                success:false,
+                data:null
+            })
+        }
+        const getTaskById= await prisma.estimationTask.findUnique({
+            where:{id:estimationTaskId},
+            include:{
+               estimation:true,
+               assignedTo:true,
+               reviewedBy:true,
+               workinghours:true 
+            }
+        })
+        return sendResponse({
+            message:"TaskById fetched successfully",
+            res,
+            statusCode:200,
+            success:true,
+            data:getTaskById
+        })
+    } catch (error) {
+        console.log(error.message)
+        return sendResponse({
+       message:error.message,
+       res,
+       statusCode:500,
+       success:false,
+       data:null 
+    }) 
+    }
+}
+
+//update task details
+//delete task details
+export{assignEstimationTask,
+    estimationTaskReview,
+    getAllEstimationTasks,
+    getEstimationTaskById
+}
