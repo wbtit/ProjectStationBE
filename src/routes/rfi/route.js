@@ -11,7 +11,8 @@ import {
   viewRFIfiles,
   viewRFIResponsefiles,
   addRFIResponse,
-  getRfiresponse
+  getRfiresponse,
+  getRfiByProjectId 
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -27,6 +28,9 @@ router.get("/rfi/viewfile/:id/:fid", viewRFIfiles);//view files in RFI
 router.get("/rfi/response/viewfile/:id/:fid",viewRFIResponsefiles);//view files in RFIResponse
 
 router.get("/rfi/sent", Authenticate, sentRFIByUser);
+
+router.get("/:projectId",Authenticate,getRfiByProjectId)
+
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);
 router.get("/rfi/:id", Authenticate, RFIByID);

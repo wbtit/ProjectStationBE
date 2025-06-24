@@ -10,7 +10,8 @@ import {
   addSubmittalsResponse,
   getSubmittalresponse,
   submitalsResponseViewFiles,
-  getSubmittal
+  getSubmittal,
+  getSubmittalsByProjectId
 } from "../../controllers/subbmitals.js";
 
 const router = Router();
@@ -28,6 +29,7 @@ router.get("/submittalsResponse/:id/:fid",Authenticate,submitalsResponseViewFile
 router.get("/getSubmittals/:submittalId",Authenticate,getSubmittal)
 
 router.get("/submittals/sent", Authenticate, SentSubmittals);
+router.get("/:projectId",Authenticate,getSubmittalsByProjectId)
 
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
 

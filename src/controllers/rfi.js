@@ -583,6 +583,47 @@ const getRfiresponse=async(req,res)=>{
     })
   }
 }
+const getRfiByProjectId=async(req,res)=>{
+  const{projectId}=req.params
+  try {
+    if(!projectId){
+      return sendResponse({
+        message:"ProjectId is required",
+        res,
+        statusCode:401,
+        success:false,
+        data:null
+      })
+    }
+    const getRFI= await prisma.rFI.findMany({
+      where:{project_id:projectId},
+      include:{
+        fabricator:true,
+        project:true,
+        recepients:true,
+        sender:true,
+        rfiresponse:true
+      }
+    })
+    return sendResponse({
+      message:"RFI fetched by ProjectId",
+      res,
+      statusCode:200,
+      success:true,
+      data:getRFI
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+
+    })
+  }
+}
 export { 
   addRFI, 
   sentRFIByUser, 
@@ -592,5 +633,6 @@ export {
   viewRFIfiles,
   viewRFIResponsefiles,
   addRFIResponse,
-  getRfiresponse
+  getRfiresponse,
+  getRfiByProjectId
 };

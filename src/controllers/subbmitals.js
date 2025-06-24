@@ -592,6 +592,47 @@ const getSubmittalresponse=async(req,res)=>{
     })
   }
 }
+const getSubmittalsByProjectId=async(req,res)=>{
+  const{projectId}=req.params
+  try {
+    if(!projectId){
+      return sendResponse({
+        message:"ProjectId is required",
+        res,
+        statusCode:401,
+        success:false,
+        data:null
+      })
+    }
+    const getRFI= await prisma.submittals.findMany({
+      where:{project_id:projectId},
+      include:{
+        fabricator:true,
+        project:true,
+        recepients:true,
+        sender:true,
+        submittalsResponse:true
+      }
+    })
+    return sendResponse({
+      message:"RFI fetched by ProjectId",
+      res,
+      statusCode:200,
+      success:true,
+      data:getRFI
+    })
+  } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+      message:error.message,
+      res,
+      statusCode:500,
+      success:false,
+      data:null
+
+    })
+  }
+}
 export { 
   AddSubmitals,
   RecievedSubmittals,
@@ -601,5 +642,6 @@ export {
   addSubmittalsResponse,
   getSubmittalresponse,
   submitalsResponseViewFiles,
-  getSubmittal
+  getSubmittal,
+  getSubmittalsByProjectId
 };

@@ -348,6 +348,7 @@ model RFI {
   subject       String
   description   String
   files         Json[]       @default([])
+  
   fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
   recepients    Users        @relation("UsersRFI", fields: [recepient_id], references: [id], onDelete: Cascade)
