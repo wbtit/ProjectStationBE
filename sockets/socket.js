@@ -29,7 +29,7 @@ const initSocket = async(io) => {
 
     await redis.set(`socket:${userId}`,socket.id)
     console.log(`👤 User ${userId} joined. Socket ID mapped: ${socket.id}`);
-
+      // console.log("This the user id ```````````````````",userId)
     const pendingNotifications = await prisma.notification.findMany({
       where: { userID: userId, delivered: false }
     });

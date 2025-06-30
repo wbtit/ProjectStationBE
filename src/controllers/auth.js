@@ -58,7 +58,7 @@ const createUser = async ({
 const login = async (req, res) => {
   let { username, password } = req.body;
 
-  // console.log(username.length, password.length);
+  console.log(username.length, password.length);
 
   if (!username || !password) {
     return sendResponse({

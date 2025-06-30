@@ -136,6 +136,7 @@ model Team {
   name      String    @unique
   managerID String    @db.Uuid
   members   Json      @default("[]")
+  departmentID  String?   
   project   Project[] @relation("projectTeam")
   manager   Users     @relation("TeamManager", fields: [managerID], references: [id], onDelete: Cascade)
 

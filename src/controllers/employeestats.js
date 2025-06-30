@@ -20,7 +20,14 @@ const userStats=async(req,res)=>{
                         },
                         taskcomment:{
                             select:{
-                                data:true
+                                data:true,
+                                user:{
+                                    select:{
+                                        f_name:true,
+                                        m_name:true,
+                                        l_name:true
+                                    }
+                                }
                             },
                         },
                     },
