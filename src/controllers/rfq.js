@@ -543,7 +543,7 @@ const RfqresponseViewFiles = async (req, res) => {
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
-const{description}=req.body
+const{description,parentResponseId}=req.body
 console.log("RFQID:,",rfqId)
 const{id}=req.user
 
@@ -582,12 +582,14 @@ try {
     path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
   })); 
   console.log("File deatiles in RFQ:",fileDetails)
+
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
       description:description,
       rfqId:rfqId,
-      files:fileDetails
+      files:fileDetails,
+      parentResponseId:parentResponseId || null
     }
   })
   //console.log(addResponse)
@@ -616,7 +618,8 @@ const getRfqResponse=async(req,res)=>{
     const response=await prisma.rFQResponse.findUnique({
       where:{id:id},
       include:{
-        file:true
+        file:true,
+        childResponses:true
       }
     })
     console.log("Response:",response)

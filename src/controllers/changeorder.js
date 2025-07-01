@@ -190,7 +190,7 @@ const  addCoResponse=async(req,res)=>{
 
   const {coId}=req.params
   const {id}=req.user
-  const {approved,description}=req.body
+  const {approved,description,parentResponseId}=req.body
   
   try {
     if(!coId || !approved ||!description){
@@ -207,7 +207,8 @@ const  addCoResponse=async(req,res)=>{
         approved:approved,
         description:description,
         userId:id,
-        coId:coId
+        coId:coId,
+        parentResponseId:parentResponseId||null
       }
     })
 
@@ -237,7 +238,8 @@ const getResponse=async(req,res)=>{
     const response= await prisma.cOResponse.findUnique({
       where:{id:id},
       include:{
-        file:true
+        file:true,
+        childResponses:true
       }
     })
     return sendResponse({
@@ -497,8 +499,10 @@ export {
   AddChangeOrder ,
   changeOrderReceived,
   changeOrderSent,
+
   addCoResponse,
   getResponse,
+
   AddChangeOrdertable,
   getRowCotable,
   viewCOfiles,

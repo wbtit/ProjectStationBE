@@ -335,6 +335,12 @@ model SubmittalsResponse {
   submittalsId    String   @unique @db.Uuid
   submittals    Submittals    @relation("submittalsresponse", fields: [submittalsId], references: [id])
   file        File[]       @relation("submittalsResponseFiles")
+
+   // Self-referencing relationship
+  parentResponseId String?     @db.Uuid
+  parentResponse   SubmittalsResponse? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  childResponses   SubmittalsResponse[] @relation("ParentChildResponse")
+
   @@map("submittalsresponse")
 }
 
@@ -371,6 +377,12 @@ model RFIResponse {
   rfiId         String   @unique @db.Uuid
   rfi           RFI      @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)
   file        File[]       @relation("rfiResponseFiles")
+
+   // Self-referencing relationship
+  parentResponseId String?     @db.Uuid
+  parentResponse   RFIResponse? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  childResponses   RFIResponse[] @relation("ParentChildResponse")
+
   @@map("rfiresponse")
 }
 
@@ -407,6 +419,11 @@ model RFQResponse{
   rfqId     String    @db.Uuid  
   rfqResponses  RFQ   @relation("rfqResponses",fields:[rfqId],references:[id])
   file        File[]       @relation("rfqResponseFiles")
+
+   // Self-referencing relationship
+  parentResponseId String?     @db.Uuid
+  parentResponse   RFQResponse? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  childResponses   RFQResponse[] @relation("ParentChildResponse")
   @@map("rfqResponse")
 }
 
@@ -481,6 +498,11 @@ model COResponse{
   userId        String  @db.Uuid
   user      Users     @relation("COrespondedby",fields:[userId],references:[id])
   file        File[]       @relation("CoResponseFiles")
+   // Self-referencing relationship
+  parentResponseId String?     @db.Uuid
+  parentResponse   COResponse? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  childResponses   COResponse[] @relation("ParentChildResponse")
+  
 }
 
 model JobStudy {

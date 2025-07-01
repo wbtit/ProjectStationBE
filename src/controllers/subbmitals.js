@@ -504,7 +504,7 @@ const submitalsResponseViewFiles = async (req, res) => {
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
-const{reason,approved,respondedAt,status,description}=req.body
+const{reason,approved,respondedAt,status,description,parentResponseId}=req.body
 
 // console.log("submittalId:",submittalId)
 // console.log("Req Body:",req.body)
@@ -538,7 +538,8 @@ try {
      description:description,
      userId:id,
      files:fileDetails,
-     submittalsId:submittalId 
+     submittalsId:submittalId ,
+     parentResponseId:parentResponseId||null
     }
   })
   //console.log(addresponse)
@@ -568,7 +569,8 @@ const getSubmittalresponse=async(req,res)=>{
     const response= await prisma.submittalsResponse.findUnique({
       where:{id:id},
       include:{
-        file:true
+        file:true,
+        childResponses:true
       }
     })
     // console.log("ResponseData created:",response)
@@ -639,8 +641,10 @@ export {
   SentSubmittals, 
   SubmittalsSeen,
   submitalsViewFiles,
+
   addSubmittalsResponse,
   getSubmittalresponse,
+
   submitalsResponseViewFiles,
   getSubmittal,
   getSubmittalsByProjectId

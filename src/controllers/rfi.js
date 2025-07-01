@@ -505,7 +505,7 @@ const viewRFIResponsefiles = async (req, res) => {
 const addRFIResponse=async(req,res)=>{
   const{rfiId}=req.params
   const{id}=req.user
-  const{responseState,reason,respondedAt}=req.body
+  const{responseState,reason,respondedAt,parentResponseId}=req.body
   
   try {
     if(!responseState ||!reason){
@@ -531,7 +531,8 @@ const addRFIResponse=async(req,res)=>{
         reason:reason,
         userId:id,
         files:fileDetails,
-        rfiId:rfiId
+        rfiId:rfiId,
+        parentResponseId:parentResponseId||null
       },
       
     })
@@ -562,7 +563,8 @@ const getRfiresponse=async(req,res)=>{
     const response= await prisma.rFIResponse.findUnique({
       where:{id:id},
       include:{
-        file:true
+        file:true,
+        childResponses:true
       }
     })
     return sendResponse({
@@ -632,7 +634,9 @@ export {
   RFIByID,
   viewRFIfiles,
   viewRFIResponsefiles,
+
   addRFIResponse,
   getRfiresponse,
+
   getRfiByProjectId
 };
