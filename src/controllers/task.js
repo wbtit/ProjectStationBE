@@ -216,7 +216,13 @@ const GetTask = async (req, res) => {
         include: {
           project: { include: { manager: true, department: true } },
           user: true,
-          taskcomment: { include: { user: true, task: true } },
+          taskcomment: { include: { user:{
+            select:{
+              f_name:true,
+              m_name:true,
+              l_name:true
+            }
+          }, task: true } },
           assignedTask: true,
           taskInAssignedList: true,
           workingHourTask: true,
@@ -233,7 +239,13 @@ const GetTask = async (req, res) => {
             include: {
               user: true,
               taskcomment: {
-                include: { user: true, task: true },
+                include: { user:{
+                  select:{
+                    f_name:true,
+                    m_name:true,
+                    l_name:true
+                  }
+                }, task: true },
               },
               assignedTask: true,
               taskInAssignedList: true,

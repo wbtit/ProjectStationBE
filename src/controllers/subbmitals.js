@@ -570,7 +570,14 @@ const getSubmittalresponse=async(req,res)=>{
       where:{id:id},
       include:{
         file:true,
-        childResponses:true
+        childResponses:true,
+        user:{
+          select:{
+            f_name:true,
+            m_name:true,
+            l_name:true
+          }
+        }
       }
     })
     // console.log("ResponseData created:",response)

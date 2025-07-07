@@ -5,6 +5,7 @@ import fs from "fs"
 import mime from "mime"
 import path from "path"
 import { sendNotification } from "../utils/notify.js";
+import { response } from "express";
 
 
 
@@ -301,11 +302,29 @@ const sentRFQByUser = async (req, res) => {
         recepients: true,
         response:{
           orderBy: { createdAt: 'asc' },
+           select:{
+            id:true,
+            file:true,
+            description:true,
+            status:true,
+            createdAt:true,
+            userId:true,
+            rfqId:true,
+            parentResponseId:true
+          }
         },
         file:true
       },
     });
-
+    const filtered = sentRFQ.map(rfq => {
+     
+      return {
+        ...rfq,
+        response: Array.isArray(rfq.response)
+          ? rfq.response.filter(resp => resp.parentResponseId === null)
+          : [],
+      };
+    });
     if (!sentRFQ) {
       return sendResponse({
         message: "Failed to get RFQs",
@@ -320,7 +339,7 @@ const sentRFQByUser = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: sentRFQ,
+      data: filtered,
     });
   } catch (error) {
     return sendResponse({
@@ -347,11 +366,28 @@ const RFQByID = async (req, res) => {
         recepients:true,
         response:{
           orderBy: { createdAt: 'asc' },
+           select:{
+            id:true,
+            file:true,
+            description:true,
+            status:true,
+            createdAt:true,
+            userId:true,
+            rfqId:true,
+            parentResponseId:true
+          }
         },
         file:true
       },
     });
-
+    const filtered = rfq
+  ? {
+      ...rfq,
+      response: Array.isArray(rfq.response)
+        ? rfq.response.filter(res => res.parentResponseId === null)
+        : [],
+    }
+  : null;
     //// console.log(rfq, "This is rfq");
 
     sendResponse({
@@ -359,7 +395,7 @@ const RFQByID = async (req, res) => {
       res,
       statusCode: 200,
       success: true,
-      data: rfi,
+      data: filtered,
     });
   } catch (error) {
     // console.log(error.message);
@@ -384,6 +420,16 @@ const Inbox = async (req, res) => {
         recepients: true,
         response:{
           orderBy: { createdAt: 'asc' },
+          select:{
+            id:true,
+            file:true,
+            description:true,
+            status:true,
+            createdAt:true,
+            userId:true,
+            rfqId:true,
+            parentResponseId:true
+          }
         },
         file:true,
         sender:true
@@ -399,12 +445,21 @@ const Inbox = async (req, res) => {
         data: null,
       });
     }
+    const filtered = sentRFQ.map(rfq => {
+     
+      return {
+        ...rfq,
+        response: Array.isArray(rfq.response)
+          ? rfq.response.filter(resp => resp.parentResponseId === null)
+          : [],
+      };
+    });
     return sendResponse({
       message: "Inbox RFQs fetched success",
       res,
       statusCode: 200,
       success: true,
-      data: sentRFQ,
+      data: filtered,
     });
   } catch (error) {
      console.log(error.message);
@@ -543,8 +598,8 @@ const RfqresponseViewFiles = async (req, res) => {
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
-const{description,parentResponseId}=req.body
-console.log("RFQID:,",rfqId)
+const{description,parentResponseId,status}=req.body
+console.log("parentResponseId:,",parentResponseId)
 const{id}=req.user
 
 try {
@@ -574,6 +629,7 @@ try {
       data: null,
     });
   }
+
   
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
@@ -581,13 +637,32 @@ try {
     id: file.filename.split(".")[0], // Extract UUID from the filename
     path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
   })); 
-  console.log("File deatiles in RFQ:",fileDetails)
+  //console.log("File deatiles in RFQ:",fileDetails)
+if(parentResponseId!=undefined){
+  const updateParentRfqStatus= await prisma.rFQResponse.update({
+  where:{id:parentResponseId},
+  data:{
+    status:status
+  }
+})
+console.log("The parent rfq",updateParentRfqStatus)
+if (!updateParentRfqStatus) {
+    return sendResponse({
+      message: "Failed to update the Status of the Parent RFQ",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+}
 
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
       description:description,
       rfqId:rfqId,
+      status:status,
       files:fileDetails,
       parentResponseId:parentResponseId || null
     }
@@ -619,7 +694,14 @@ const getRfqResponse=async(req,res)=>{
       where:{id:id},
       include:{
         file:true,
-        childResponses:true
+        childResponses:true,
+        user:{
+          select:{
+            f_name:true,
+            m_name:true,
+            l_name:true
+          }
+        }
       }
     })
     console.log("Response:",response)
