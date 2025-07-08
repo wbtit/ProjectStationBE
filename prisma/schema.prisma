@@ -413,6 +413,7 @@ model RFQResponse{
   files     Json[]    @default([])
   description  String   @default("")
   status       RFQStatus  @default(RECEIVED)
+  wbtStatus    RFQStatus  @default(SENT) 
   createdAt    DateTime   @default(now())
   userId        String    @db.Uuid
   user          Users     @relation("rfqresponseBy",fields:[userId],references:[id])
@@ -645,12 +646,12 @@ model File{
 // Estimation Management
 model Estimation {
   id               String            @id @default(uuid()) @db.Uuid
-  rfqId            String             @db.Uuid
+  rfqId            String            @db.Uuid
   estimationNumber String            @unique
   fabricatorName   String?
   projectName      String
   estimateDate     DateTime          @default(now())
-  teklaOrSds       String?           // TEKLA/SDS
+  tools            String?           
   status           EstimationStatus  @default(DRAFT)
   createdById      String            @db.Uuid
   fabricatorId     String            @db.Uuid
@@ -660,6 +661,7 @@ model Estimation {
   finalPrice       Float?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+
 
   rfq              RFQ               @relation(fields: [rfqId], references: [id])
   createdBy        Users              @relation("CreatedBy", fields: [createdById], references: [id])
@@ -693,6 +695,7 @@ model EstimationTask {
   reviewedById String?          @db.Uuid
   reviewNotes  String?
   createdAt    DateTime         @default(now())
+  files        Json?             @default("[]")
   updatedAt    DateTime         @updatedAt
 
   estimation   Estimation       @relation(fields: [estimationId], references: [id])
@@ -871,6 +874,7 @@ enum RFQStatus {
   CLOSED 
   APPROVED 
   RE_APPROVAL
+  SENT
 }
 enum SubResStatus{
   APPROVED

@@ -33,10 +33,10 @@ const addRFQ=async(req,res)=>{
 
           let salesPersonId;
            const user= await prisma.users.findUnique({where:{id:id}})
-            console.log(user.id)
-           if(user.role === 'SALES_PERSON' || user.role==='DEPT_MANAGER' || user.role==='OPERATION_EXECUTIVE'){
+            //console.log(user.id)
+           if(user.role === 'SALES_PERSON' || user.role==='DEPT_MANAGER' || user.role==='OPERATION_EXECUTIVE' ||user.is_superuser){
               salesPersonId=user.id
-              console.log(salesPersonId)
+              //console.log(salesPersonId)
            }
           const newrfq= await prisma.rFQ.create({
             data:{
@@ -225,7 +225,7 @@ const addRFQ=async(req,res)=>{
               data: null,
             });
           }
-          console.log("Newly created RFQ:",newrfq)
+          //console.log("Newly created RFQ:",newrfq)
           // Emit real-time notification using socket.io
           sendNotification(recepient_id,{
             message:`New RFQ received:${recepient_id}`,
@@ -307,6 +307,7 @@ const sentRFQByUser = async (req, res) => {
             file:true,
             description:true,
             status:true,
+            wbtStatus:true,
             createdAt:true,
             userId:true,
             rfqId:true,
@@ -371,6 +372,7 @@ const RFQByID = async (req, res) => {
             file:true,
             description:true,
             status:true,
+            wbtStatus:true,
             createdAt:true,
             userId:true,
             rfqId:true,
@@ -425,14 +427,25 @@ const Inbox = async (req, res) => {
             file:true,
             description:true,
             status:true,
+            wbtStatus:true,
             createdAt:true,
             userId:true,
             rfqId:true,
-            parentResponseId:true
+            parentResponseId:true,
+            childResponses:true
           }
         },
         file:true,
-        sender:true
+        sender:{
+          select:{
+            email:true,
+            f_name:true,
+            m_name:true,
+            l_name:true,
+            phone:true,
+            fabricator:true
+          }
+        }
       },
     });
 
@@ -514,7 +527,7 @@ const RFQClosed = async (req, res) => {
 
 const RfqViewFiles = async (req, res) => {
   const { id, fid } = req.params;
-  console.log("I am viewfile route",id)
+  //console.log("I am viewfile route",id)
   try {
     const rFQ = await prisma.rFQ.findUnique({
       where: { id },
@@ -599,7 +612,8 @@ const RfqresponseViewFiles = async (req, res) => {
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
 const{description,parentResponseId,status}=req.body
-console.log("parentResponseId:,",parentResponseId)
+console.log("The response of the rfq",req.body)
+//console.log("parentResponseId:,",parentResponseId)
 const{id}=req.user
 
 try {
@@ -629,7 +643,23 @@ try {
       data: null,
     });
   }
-
+if(parentResponseId!=undefined){
+ const parentResponse= await prisma.rFQ.update({
+  where:{id:parentResponseId},
+  data:{
+    wbtStatus:status
+  }
+ })
+ if(!parentResponse){
+    return sendResponse({
+      message: "Failed to update the Status of the parent RFQ",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+}
   
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
@@ -645,7 +675,7 @@ if(parentResponseId!=undefined){
     status:status
   }
 })
-console.log("The parent rfq",updateParentRfqStatus)
+//console.log("The parent rfq",updateParentRfqStatus)
 if (!updateParentRfqStatus) {
     return sendResponse({
       message: "Failed to update the Status of the Parent RFQ",
@@ -662,9 +692,9 @@ if (!updateParentRfqStatus) {
       userId:id,
       description:description,
       rfqId:rfqId,
-      status:status,
       files:fileDetails,
-      parentResponseId:parentResponseId || null
+      parentResponseId:parentResponseId || null,
+      status:status
     }
   })
   //console.log(addResponse)
@@ -686,9 +716,9 @@ if (!updateParentRfqStatus) {
     })
 }
 }
-const getRfqResponse=async(req,res)=>{
+const getRfqResponseById=async(req,res)=>{
   const{id}=req.params
-  console.log("RFQRESPONSEID",id)
+  //console.log("RFQRESPONSEID",id)
   try {
     const response=await prisma.rFQResponse.findUnique({
       where:{id:id},
@@ -704,7 +734,7 @@ const getRfqResponse=async(req,res)=>{
         }
       }
     })
-    console.log("Response:",response)
+    //console.log("Response:",response)
     return sendResponse({
       message:"Respose is fetched successfully",
       res,
@@ -736,5 +766,5 @@ export {
   RfqresponseViewFiles,
 
   addRfqResponse,
-  getRfqResponse
+  getRfqResponseById
 };

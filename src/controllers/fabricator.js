@@ -209,7 +209,7 @@ const GetAllFabricator = async (req, res) => {
         }
       });
     }
-    console.log(fabricators)
+    //console.log(fabricators)
     return sendResponse({
       message: "Fetched all fabricators",
       res,

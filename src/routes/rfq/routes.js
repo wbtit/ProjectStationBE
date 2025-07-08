@@ -10,7 +10,7 @@ import {
     RFQByID,
     RfqViewFiles,
     addRfqResponse,
-    getRfqResponse,
+    getRfqResponseById,
     RfqresponseViewFiles,
     updateRfq
 } from "../../controllers/rfq.js"
@@ -39,6 +39,6 @@ router.post("/addresponse/:rfqId",
     rfqResponseUploads.any("files"),
     addRfqResponse
   )
-  router.get("/getResponse/:id",Authenticate,getRfqResponse)
+  router.get("/getResponse/:id",Authenticate,getRfqResponseById)
 
 export default router
