@@ -3,6 +3,7 @@ import { sendResponse } from "../utils/responder.js";
 import createEstimationLineItem from "../utils/createEstimationLineItems.js";
 
 
+
 //create the estimation
 const createEstimation=async(req,res)=>{
 const{
@@ -11,20 +12,21 @@ estimationNumber,
 fabricatorName,
 projectName,
 estimateDate,
-teklaOrSds,
+tools,
 fabricatorId,
-assignedById,
 }=req.body
+const{id}=req.user
+
 
 try {
+
     if(
     !rfqId||
     !estimationNumber||
-    !fabricatorName||
-    !projectName||
-    !estimateDate||
     !fabricatorId||
-    !assignedById){
+    !projectName||
+    !estimateDate
+    ){
         return sendResponse({
             message:"Fields are empty",
             res,
@@ -35,14 +37,21 @@ try {
     }
     const createEstimation = await prisma.estimation.create({
         data:{
-          rfqId,
+          rfq:{
+            connect:{id:rfqId}
+          },
+          createdBy:{
+            connect:{id:id}
+          },
           estimationNumber,
           fabricatorName,
           projectName,
           estimateDate,
-          teklaOrSds,
-          fabricatorId,
-          assignedById,  
+          tools,
+          fabricators:{
+            connect:{id:fabricatorId}
+          },
+          assignedById:id,
         }
     })
 
@@ -65,6 +74,8 @@ try {
     })
 }
 }
+
+
 const getallEstimation=async(req,res)=>{
     try {
         const getallEstimation= await prisma.estimation.findMany({
@@ -113,7 +124,8 @@ const getEstimationById=async(req,res)=>{
                  createdBy:true,
                  tasks:true,
                  lineItems:true,
-                 template:true 
+                 template:true ,
+                 fabricators:true
             }
         })
         return sendResponse({
@@ -153,7 +165,7 @@ const updateEstimationData=async(req,res)=>{
                 fabricatorName,   
                 projectName,      
                 estimateDate,     
-                teklaOrSds,       
+                tools,       
                 status,           
                 createdById,      
                 fabricatorId,     

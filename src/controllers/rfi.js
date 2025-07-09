@@ -259,7 +259,7 @@ const sentRFIByUser = async (req, res) => {
         file:true
       },
     });
-    console.log("sentRFI:",sentRFI)
+    //console.log("sentRFI:",sentRFI)
     if (!sentRFI) {
       return sendResponse({
         message: "Failed to get RFIs",
@@ -349,7 +349,7 @@ const Inbox = async (req, res) => {
         file:true
       },
     });
-    console.log("Received RFI:",sentRFI)
+    //console.log("Received RFI:",sentRFI)
     if (!sentRFI) {
       return sendResponse({
         message: "Failed to get RFIs",
