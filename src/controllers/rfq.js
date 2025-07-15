@@ -11,7 +11,9 @@ import { response } from "express";
 
 
 const addRFQ=async(req,res)=>{
-    const {projectName,recepient_id,subject,description,status}=req.body
+    const {projectName,recepient_id,subject,description,status,connectionDesign,
+      miscDesign,customerDesign
+    }=req.body
     const {id}=req.user
     //// console.log("The Rfq data Input",req.body)
     try {
@@ -45,6 +47,9 @@ const addRFQ=async(req,res)=>{
                 createdById:id,
                 salesPersonId:salesPersonId ||null,
                 status:"RECEIVED",
+                connectionDesign,
+                miscDesign,
+                customerDesign,
                 subject,
                 description,
                 files:fileDetails,
@@ -644,7 +649,7 @@ try {
     });
   }
 if(parentResponseId!=undefined){
- const parentResponse= await prisma.rFQ.update({
+ const parentResponse= await prisma.rFQResponse.update({
   where:{id:parentResponseId},
   data:{
     wbtStatus:status

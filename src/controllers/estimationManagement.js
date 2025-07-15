@@ -15,8 +15,9 @@ estimateDate,
 tools,
 fabricatorId,
 }=req.body
-const{id}=req.user
 
+const{id}=req.user
+console.log("==============The creatdeBy Id fo the Estimation:",id)
 
 try {
 
@@ -146,6 +147,8 @@ const getEstimationById=async(req,res)=>{
         })
     }
 }
+
+
 const updateEstimationData=async(req,res)=>{
     const{estimationId}=req.params
     if(!estimationId){

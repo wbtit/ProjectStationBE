@@ -7,13 +7,15 @@ const{estimationId}=req.params
         assignedToId,
         startDate,
         notes,
+        endDate
     }=req.body
     const{id}=req.user
-    if(!estimationId || assignedToId||!startDate){
+    if(!estimationId ||!assignedToId||!startDate||!endDate){
+        console.log(req.body)
         return sendResponse({
             message:"Fields are required",
             res,
-            statusCode:401,
+            statusCode:400,
             success:false,
             data:null
         })
@@ -21,9 +23,15 @@ const{estimationId}=req.params
     try {
     const assignTask= await prisma.estimationTask.create({
         data:{
-            estimationId:estimationId,
-            assignedTo:assignedToId,
+            estimation:{
+               connect:{id:estimationId,} 
+            },
+            assignedTo:{
+                connect:{id:assignedToId,}
+            },
+            
             assignedById:id,
+            endDate:endDate,
             startDate:startDate,
             notes:notes
         }
@@ -48,10 +56,10 @@ const{estimationId}=req.params
 }
 const estimationTaskReview= async(req,res)=>{
     const{estimationTaskId}=req.params
-    const{reviewNotes,status,endDate}=req.body
+    const{reviewNotes,status}=req.body
     const{id}=req.user
     try {
-        if(!estimationTaskId||!status||!endDate||!reviewNotes){
+        if(!estimationTaskId||!status||!reviewNotes){
             return sendResponse({
                 message:"Fields are empty",
                 res,
@@ -65,7 +73,6 @@ const estimationTaskReview= async(req,res)=>{
             data:{
                 reviewNotes:reviewNotes,
                 status:status,
-                endDate:endDate,
                 reviewedById:id
             },include:{
                 estimation:true,
@@ -120,7 +127,42 @@ const getAllEstimationTasks=async(req,res)=>{
     }) 
     }
 }
-
+const getMyTasks=async(req,res)=>{
+    const {id}=req.user
+    try {
+        if(!id){
+        return sendResponse({
+            message:"UserId is required",
+            statusCode:400,
+            success:false,
+            data:null
+        })
+    }
+    const my_tasks= await prisma.estimationTask.findMany({
+        where:{assignedToId:id,
+          status: { notIn: ["COMPLETE"] }  
+        },
+        include:{
+            workinghours:true,
+            estimation:true
+        }
+    })
+    return sendResponse({
+        message:"My tasks Fetched successfully",
+        statusCode:200,
+        success:true,
+        data:my_tasks
+    })
+    } catch (error) {
+    console.log(error.message)
+    return sendResponse({
+        message:error.message,
+        statusCode:500,
+        success:false,
+        data:null
+    })    
+    }
+}
 const getEstimationTaskById=async(req,res)=>{
     const{estimationTaskId}=req.params
     try {
@@ -236,5 +278,6 @@ export{
     getAllEstimationTasks,
     getEstimationTaskById,
     updateTask,
-    deletetask
+    deletetask,
+    getMyTasks
 }

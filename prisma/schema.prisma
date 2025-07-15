@@ -44,6 +44,7 @@ model Users {
   is_est                Boolean         @default(false)
   is_disabled           Boolean         @default(false)
   updatedAt             DateTime        @updatedAt  @default(now())
+
   accepttasks           AcceptTask[]    @relation("acceptTaskUser")
   taskApprovedBy        Assigned_list[] @relation("taskApprovedBy")
   taskAssignedby        Assigned_list[] @relation("taskAssignedby")
@@ -155,8 +156,8 @@ model Project {
   stage                    Stage         @default(RFI)
   tools                    Tools         @default(TEKLA)
   files                    Json          @default("[]")
-  connectionDesign         Boolean       @default(true)
-  miscDesign               Boolean       @default(true)
+  connectionDesign         Boolean       @default(false)
+  miscDesign               Boolean       @default(false)
   customerDesign           Boolean       @default(false)
   startDate                String
   endDate                  String?
@@ -395,6 +396,9 @@ model RFQ {
   status        RFQStatus  @default(RECEIVED)
   subject       String
   description   String
+  connectionDesign         Boolean       @default(false)
+  miscDesign               Boolean       @default(false)
+  customerDesign           Boolean       @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt    @default(now())
   files Json[] @default([])
@@ -650,7 +654,8 @@ model Estimation {
   estimationNumber String            @unique
   fabricatorName   String?
   projectName      String
-  estimateDate     DateTime          @default(now())
+  startDate        DateTime          @default(now())
+  estimateDate     DateTime          
   tools            String?           
   status           EstimationStatus  @default(DRAFT)
   createdById      String            @db.Uuid

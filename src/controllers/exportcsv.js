@@ -7,7 +7,7 @@ const exportcvs=async(req,res)=>{
         users:prisma.users,
         projects:prisma.project,
         tasks:prisma.task,
-        workingHours:prisma.workingHours,
+        workingHours:prisma.workingHours,  
         fabricators:prisma.fabricator,
         department:prisma.department,
         team:prisma.team,
