@@ -150,7 +150,7 @@ const Pause = async (req, res) => {
 
     const startTimetask_idstamp= new Date(workingHourRecord.start).getTime()// convert starttime to time stamp
     const currentTimeStamp= Date.now()
-    const durationInMinutes=Math.floor((currentTimeStamp-startTimestamp)/60000)
+    const durationInMinutes=Math.floor((currentTimeStamp-startTimetask_idstamp)/60000)
 
     // Update the duration in the database
     const updatedWorkingHour = await tx.workingHours.update({
@@ -181,7 +181,7 @@ const Pause = async (req, res) => {
     });
   })
   } catch (error) {
-    // console.log(error.message);
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
