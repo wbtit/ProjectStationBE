@@ -161,13 +161,13 @@ const Uploadfiles = async (req, res) => {
       });
     }
 
-    // Extract file details (uuid, originalName, path)
     const fileDetails = req.files.map((file) => ({
-      filename: file.filename, // UUID + extension
-      originalName: file.originalname, // Original name of the file
-      id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/projecttemp/${file.filename}`, // Relative path
-    }));
+    filename: file.filename,             // UUID.ext
+    originalName: file.originalname,     // Original file name
+    id: file.filename.split(".")[0],     // UUID
+    path: `/public/projecttemp/${file.filename}`, // relative URL
+  }));
+
 
     // Fetch the project
     const project = await prisma.project.findUnique({
