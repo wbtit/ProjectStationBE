@@ -8,18 +8,18 @@ import Task from "./tasks/route.js";
 import Team from "./team/route.js";
 import Employee from "./employee/route.js";
 import RFI from "./rfi/route.js";
-import RFQ from "./rfq/routes.js"
+import RFQ from "./rfq/route.js"
 import { Submittals } from "./submittals/route.js";
 import WorkingHour from "./workinghours/route.js";
 import { ChangeOrderRouter } from "./changeorder/route.js";
 import { WorkBreakDown } from "./workbreakdown/route.js";
 import WBSActivity from "./wbsactivity/route.js";
 import { SubTasksRouter } from "./subtasks/route.js";
-import {chatRouter}  from  "./chatSystem/routes.js"
+import {chatRouter}  from  "./chatSystem/route.js"
 import  {File}       from   "./files/route.js"
-import { dashBoardStats } from "./dashboardNumbers/routes.js";
+import { dashBoardStats } from "./dashboardNumbers/route.js";
 import {estimation} from "./estimation/route.js"
-import { EstimationTask } from "./estimationTask/routes.js";
+import { EstimationTask } from "./estimationTask/route.js";
 import {estimationWH} from './estimationTaskWorkingHours/route.js'
 
 const routes = express.Router();

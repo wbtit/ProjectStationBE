@@ -408,7 +408,7 @@ model RFQ {
   salesPerson   Users?        @relation("SalesPersonRFQ", fields: [salesPersonId], references: [id])
   response      RFQResponse[]  @relation("rfqResponses")
   file          File[]       @relation("rfqFiles")
-  estimations   Estimation[]
+  estimations   Estimation[] 
   @@map("rfq")
 }
 

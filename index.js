@@ -8,6 +8,8 @@ import { app } from "./src/app.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import {initSocket} from "./sockets/socket.js"
+import swaggerUi from 'swagger-ui-express'
+import swaggerSpec from "./swaggerDef.js";
 
 import './corn-jobs/checkAndSendReminders.js'
 dotenv.config();
@@ -56,6 +58,8 @@ app.get("/getall", async (req, res) => {
   }
 });
 
+
+app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use("/api", routes);
  
 const PORT = process.env.PORT || 5154;

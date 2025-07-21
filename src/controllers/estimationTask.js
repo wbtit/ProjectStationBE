@@ -139,8 +139,9 @@ const getMyTasks=async(req,res)=>{
         })
     }
     const my_tasks= await prisma.estimationTask.findMany({
-        where:{assignedToId:id,
-          status: { notIn: ["COMPLETE"] }  
+        where:{
+          assignedToId:id,
+          status: { notIn: ["COMPLETED"] }  
         },
         include:{
             workinghours:true,
@@ -149,6 +150,7 @@ const getMyTasks=async(req,res)=>{
     })
     return sendResponse({
         message:"My tasks Fetched successfully",
+        res,
         statusCode:200,
         success:true,
         data:my_tasks
@@ -157,6 +159,7 @@ const getMyTasks=async(req,res)=>{
     console.log(error.message)
     return sendResponse({
         message:error.message,
+        res,
         statusCode:500,
         success:false,
         data:null
