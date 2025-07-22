@@ -197,7 +197,7 @@ const Resume = async (req, res) => {
   const { work_id, estimationTaskId } = req.body;
   const { id } = req.user;
     console.log("Tatask_idskId and WorkId:",work_id,estimationTaskId)
-  if (!work_id || !task_id) {
+  if (!work_id || !estimationTaskId) {
     console.log("TaskId and WorkId:",work_id,estimationTaskId)
     return sendResponse({
       message: "Invalid work_id or task_id",
@@ -384,7 +384,7 @@ const End = async (req, res) => {
       });
     }
 
-    await tx.task.update({
+    await tx.estimationTask.update({
       where: { id: estimationTaskId },
       data: { status: "UNDER_REVIEW" },
     });
@@ -400,7 +400,7 @@ const End = async (req, res) => {
     })
   });
   } catch (error) {
-    // console.log(error.message);
+    console.log(error.message);
     return sendResponse({
       message: error,
       res,
@@ -411,4 +411,65 @@ const End = async (req, res) => {
   }
 };
 
-export { End, Pause, Resume, Start };
+const getWork = async (req, res) => {
+  const { id } = req.user;
+  const { estimationTaskId } = req.params;
+
+  // console.log(task_id);
+
+  if (!estimationTaskId) {
+    return sendResponse({
+      message: "Invalid task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const work = await prisma.workingHours.findFirst({
+      where: {
+        estimationTask_id: estimationTaskId,
+        user_id: id,
+      },
+    });
+
+    if (!work) {
+      return sendResponse({
+        message: "No work entry found for this user and task",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+    let updatedDuration = work.duration; 
+    // 🔹 Fix: Check if work exists before accessing its properties
+    if ((work.status === "START" || work.status === "RESUME") && work.start) {
+      const startTime = new Date(work.start).getTime();
+      const elapsedMinutes = Math.floor((Date.now() - startTime) / 60000);
+      updatedDuration = work.duration + elapsedMinutes;
+    }
+
+    return sendResponse({
+      message: "Work fetch success",
+      res,
+      statusCode: 200,
+      success: true,
+      data: { ...work, duration: updatedDuration }, // Return updated duration
+    });
+  } catch (error) {
+    console.error("Error fetching work record:", error.message);
+    return sendResponse({
+      message: "Internal Server Error",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+export { End, Pause, Resume, Start,getWork };

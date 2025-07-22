@@ -189,27 +189,63 @@ const DeleteFabricator = async (req, res) => {
 };
 
 const GetAllFabricator = async (req, res) => {
-  const { id } = req.user;
+  const { id } = req.user || {};
+
+  if (!id) {
+    return sendResponse({
+      message: "Unauthorized request. User not found.",
+      res,
+      statusCode: 401,
+      success: false,
+      data: null,
+    });
+  }
 
   try {
     const user = await prisma.users.findUnique({
       where: { id },
-      select: { is_superuser: true }
+      select: {
+        is_superuser: true,
+        is_manager: true,
+        is_staff: true, // still selected if needed elsewhere
+        is_sales: true,
+        is_oe: true,
+        is_pmo: true,
+        is_est: true,
+      },
     });
+
+    if (!user) {
+      return sendResponse({
+        message: "User not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    const hasAllowedRole =
+      user.is_superuser ||
+      user.is_manager ||
+      user.is_sales ||
+      user.is_oe ||
+      user.is_pmo ||
+      user.is_est;
 
     let fabricators;
 
-    if (user?.is_superuser) {
+    if (hasAllowedRole) {
       fabricators = await getFabricators();
     } else {
       fabricators = await prisma.fabricator.findMany({
         where: { createdById: id },
-        include:{
-          userss:true
-        }
+        include: {
+          userss: true,
+        },
       });
     }
-    //console.log(fabricators)
+
     return sendResponse({
       message: "Fetched all fabricators",
       res,
@@ -229,6 +265,7 @@ const GetAllFabricator = async (req, res) => {
     });
   }
 };
+
 
 
 const UpdateFabricator = async (req, res) => {

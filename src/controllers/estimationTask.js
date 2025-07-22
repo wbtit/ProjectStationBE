@@ -184,7 +184,8 @@ const getEstimationTaskById=async(req,res)=>{
                estimation:true,
                assignedTo:true,
                reviewedBy:true,
-               workinghours:true 
+               workinghours:true,
+               comment:true
             }
         })
         return sendResponse({

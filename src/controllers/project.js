@@ -418,7 +418,7 @@ const GetAllProjects = async (req, res) => {
     let projects;
 
     // 🔹 Superuser: Fetch all projects
-    if (is_superuser|| is_hr || is_sales||is_est) {
+    if (is_superuser|| is_hr || is_sales) {
       projects = await prisma.project.findMany({
         include: {
           file:true,
@@ -485,7 +485,7 @@ const GetAllProjects = async (req, res) => {
       });
     }
     // 🔹 Staff: Fetch projects where they have tasks assigned
-    else if (is_staff) {
+    else if (is_staff||is_est) {
       // console.log("Staff access granted.");
       projects = await prisma.project.findMany({
         where: { tasks: { some: { user_id: id } } },
