@@ -207,21 +207,14 @@ const GetTask = async (req, res) => {
       });
     }
 
-    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr} = req.user;
+    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr,is_supermanager} = req.user;
     let tasks;
 
-    if (is_superuser||is_hr) {
+    if (is_superuser||is_hr||is_supermanager) {
       // Fetch all tasks since superuser has full access
       tasks = await prisma.task.findMany({
         include: {
-          project: { 
-            include: 
-            { manager:{select:{
-                f_name:true,
-                m_name:true,
-                l_name:true
-              }}, 
-            department: true } },
+          project: { include: { manager: true, department: true } },
           user: true,
           taskcomment: { include: { user:{
             select:{
@@ -233,7 +226,7 @@ const GetTask = async (req, res) => {
           assignedTask: true,
           taskInAssignedList: true,
           workingHourTask: true,
-        }, 
+        },
       })
     }else if (is_manager && is_staff) {
       // If the user is a manager, fetch projects belonging to their department and include all task details
@@ -242,11 +235,6 @@ const GetTask = async (req, res) => {
           department: { managerId: id }, // ✅ Correct reference to the department manager
         },
         include: {
-          manager:{select:{
-            f_name:true,
-            m_name:true,
-            l_name:true
-          }},
           tasks: {
             include: {
               user: true,
@@ -262,7 +250,6 @@ const GetTask = async (req, res) => {
               assignedTask: true,
               taskInAssignedList: true,
               workingHourTask: true,
-              
             },
           },
         },

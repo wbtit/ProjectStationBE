@@ -43,6 +43,7 @@ model Users {
   is_pmo                Boolean              @default(false)
   is_disabled           Boolean              @default(false)
   is_est                Boolean              @default(false)
+  is_supermanager       Boolean              @default(false)
   updatedAt             DateTime             @default(now()) @updatedAt
   COrespondedby         COResponse[]         @relation("COrespondedby")
   accepttasks           AcceptTask[]         @relation("acceptTaskUser")
@@ -159,6 +160,8 @@ model Project {
   customerDesign         Boolean       @default(false)
   startDate              String
   endDate                String?
+  endDateChangeLog       Json          @default("[]")
+  stageHistory           ProjectStageHistory[]
   approvalDate           String
   estimatedHours         Float         @default(0)
   detailCheckingHours    Float         @default(0)
@@ -184,6 +187,18 @@ model Project {
   wbsActivities          WBSActivity[]
 
   @@map("project")
+}
+
+model ProjectStageHistory {
+  id         String   @id @default(uuid()) @db.Uuid
+  projectID  String   @db.Uuid
+  stage      Stage
+  startDate  DateTime @default(now())
+  endDate    DateTime?
+
+  project    Project  @relation(fields: [projectID], references: [id], onDelete: Cascade)
+
+  @@map("project_stage_history")
 }
 
 model Task {

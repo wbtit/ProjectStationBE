@@ -414,11 +414,11 @@ const GetAllProjects = async (req, res) => {
   try {
     // console.log("User Data:", req.user);
 
-    const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr,is_sales,is_est} = req.user;
+    const { is_manager, is_staff, is_superuser, role, fabricatorId, id ,is_hr,is_sales,is_est,is_supermanager} = req.user;
     let projects;
 
     // 🔹 Superuser: Fetch all projects
-    if (is_superuser|| is_hr || is_sales) {
+    if (is_superuser|| is_hr || is_sales||is_supermanager) {
       projects = await prisma.project.findMany({
         include: {
           file:true,
