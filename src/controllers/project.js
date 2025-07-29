@@ -316,6 +316,7 @@ const UpdateProject = async (req, res) => {
       "duration",
       "startDate",
       "endDate",
+      "endDateChangeLog",
       "status",
       "stage",
       "managerID",
@@ -354,11 +355,31 @@ const UpdateProject = async (req, res) => {
         approvalDate:true,
         endDate:true,
         mailReminder:true,
-        submissionMailReminder:true
+        submissionMailReminder:true,
+        endDateChangeLog:true
       }
     })
 
+    if(req.body.stage && req.body.stage !== previousProjectStage.stage){
+      await prisma.ProjectStageHistory.updateMany({
+        where:{
+          projectID:id,
+          endDate:null
+        },
+        data:{
+          endDate:new Date()
+        }
+      })
 
+      await prisma.ProjectStageHistory.create({
+        data:{
+          projectID:id,
+          stage:updateData.stage,
+          startDate: new Date()
+        }
+      })
+      updateData.stage=req.body.stage
+    }
     //Reset
     if(req.body.approvalDate && new Date(req.body.approvalDate).toDateString()!==new Date(previousProjectStage.approvalDate).toDateString()){
       fieldsToUpdate.approvalDate= new Date(req.body.approvalDate).toISOString()
@@ -376,6 +397,19 @@ const UpdateProject = async (req, res) => {
     }else if (req.body.endDate) {
             // If date is provided but not changed, ensure it's still a Date object
             updateData.endDate = new Date(req.body.endDate).toISOString();
+    }
+
+
+    if(req.body.endDate && req.body.endDate!== previousProjectStage.endDate){
+      const existingLog=previousProjectStage.endDateChangeLog || [];
+
+      const newLogEntry={
+        oldEndDate:previousProjectStage.endDate,
+        newEndDate:updateData.endDate,
+        changetAt: new Date().toISOString()
+      }
+      updateData.endDate=req.body.endDate;
+      updateData.endDateChangeLog=[...existingLog,newLogEntry]
     }
 
     const updatedProject = await prisma.project.update({
@@ -421,6 +455,7 @@ const GetAllProjects = async (req, res) => {
     if (is_superuser|| is_hr || is_sales||is_supermanager) {
       projects = await prisma.project.findMany({
         include: {
+          stageHistory:true,
           file:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
@@ -437,6 +472,7 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { fabricatorID: fabricatorId },
         include: {
+          stageHistory:true,
           fabricator: true,
           tasks:true,
           team:true,
@@ -458,6 +494,7 @@ const GetAllProjects = async (req, res) => {
           department: { manager: { id } }  // ✅ Fixed reference to department manager
         },
         include: {
+          stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
@@ -474,6 +511,7 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { managerID: id },
         include: {
+          stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
@@ -490,6 +528,7 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { tasks: { some: { user_id: id } } },
         include: {
+          stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
@@ -516,6 +555,7 @@ const GetAllProjects = async (req, res) => {
           where: { id: { in: projectIds } },
           include: {
             fabricator: true,
+            stageHistory:true,
             manager: { select: { f_name: true, l_name: true } },
             team: { select: { name: true, members: true } },
             department: {
@@ -577,6 +617,7 @@ const GetProjectByID = async (req, res) => {
             manager: true,
           },
         },
+        stageHistory:true,
         department: true,
         fabricator: true,
         manager: true,
@@ -615,7 +656,7 @@ const GetProjectByID = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
+    console.log("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrror",error.message);
     return sendResponse({
       message: "Something went wrong",
       res,
