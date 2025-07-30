@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true });
 router.post("/client/:fid/addclient", Authenticate, ClientAccess, addClient); // Add Client
 
 router.patch(
-  "/cleint/:cid/updateclient",
+  "/cleint/:cid/updateClient",
   Authenticate,
   ClientAccess,
   updateClient

@@ -383,9 +383,10 @@ model RFI {
 model RFIResponse {
   id               String        @id @default(uuid()) @db.Uuid
   files            Json[]        @default([])
-  responseState    State
+  responseState    State         @default(SENT)
+  wbtStatus        State         @default(RECEIVED)
   reason           String        @default("")
-  respondedAt      String        @default("")
+  respondedAt      DateTime      @default(now())
   createdAt        DateTime      @default(now())
   rfiId            String        @unique @db.Uuid
   userId           String        @db.Uuid
@@ -843,6 +844,10 @@ enum Activity {
 enum State {
   PARTIAL
   COMPLETE
+  OPEN
+  SENT
+  RECEIVED
+  IN_REVIEW
 }
 
 enum RFQStatus {

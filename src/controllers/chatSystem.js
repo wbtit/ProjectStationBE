@@ -430,7 +430,37 @@ const recentchats = async (req, res) => {
     
   }
 }
+const deleteGroup= async(req,res)=>{
+  const {groupId}=req.params
+  try {
+    if(!groupId){
+    return sendResponse({
+      message:"groupId is required",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  const deletedGroup= await prisma.group.delete({where:{id:groupId}})
 
+  return sendResponse({
+    message:"Group deleted Successfully",
+    statusCode:200,
+    res,
+    success:true,
+    data:deletedGroup
+  })
+  } catch (error) {
+    return sendResponse({
+      message:error.message,
+      statusCode:500,
+      res,
+      success:false,
+      data:null
+    })
+  }
+}
  
 export{
   createGroup,
@@ -439,5 +469,6 @@ export{
   privateChatHistory,
   recentchats,
   deleteMembersInGroup,
-  getgroupMembers
+  getgroupMembers,
+  deleteGroup
 }

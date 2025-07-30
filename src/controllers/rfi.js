@@ -505,10 +505,10 @@ const viewRFIResponsefiles = async (req, res) => {
 const addRFIResponse=async(req,res)=>{
   const{rfiId}=req.params
   const{id}=req.user
-  const{responseState,reason,respondedAt,parentResponseId}=req.body
+  const{responseState,reason,parentResponseId,status}=req.body
   
   try {
-    if(!responseState ||!reason){
+    if(!reason){
       return sendResponse({
         message:"Feilds are empty",
         res,
@@ -517,14 +517,66 @@ const addRFIResponse=async(req,res)=>{
         data:null
       })
     }
+    const rfiInReview= await prisma.rFI.update({
+      where:{
+        id:rfiId
+      },
+      data:{
+        status:false
+      }
+    })
+    if (!rfiInReview) {
+    return sendResponse({
+      message: "Failed to update the Status of the RFI to false",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
 
+  if(parentResponseId!=undefined){
+    const parentResponse= await prisma.rFIResponse.update({
+      where:{id:parentResponseId},
+      data:{
+        wbtStatus:status
+      }
+    })
+    if(!parentResponse){
+    return sendResponse({
+      message: "Failed to update the Status of the parent RFQ",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+  }
+  
     const fileDetails = req.files.map((file) => ({
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
       path: `/public/rfiResponsetemp/${file.filename}`, // Relative path
     }));
-
+    if(parentResponseId!=undefined){
+  const updateParentRfqStatus= await prisma.rFIResponse.update({
+  where:{id:parentResponseId},
+  data:{
+    responseState:responseState
+  }
+  
+})
+if (!updateParentRfqStatus) {
+    return sendResponse({
+      message: "Failed to update the Status of the Parent RFI",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+    }
     const addresponse= await prisma.rFIResponse.create({
       data:{
         responseState:responseState,

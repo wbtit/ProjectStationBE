@@ -617,7 +617,7 @@ const RfqresponseViewFiles = async (req, res) => {
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params
 const{description,parentResponseId,status}=req.body
-console.log("The response of the rfq",req.body)
+console.log("The response of the rfq",description,status)
 //console.log("parentResponseId:,",parentResponseId)
 const{id}=req.user
 

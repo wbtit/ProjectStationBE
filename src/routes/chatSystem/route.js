@@ -6,7 +6,8 @@ import { createGroup,
         privateChatHistory,
         recentchats,
         deleteMembersInGroup,
-        getgroupMembers
+        getgroupMembers,
+        deleteGroup
  } from "../../controllers/chatSystem.js"; 
 
  import Authenticate from "../../middlewares/authenticate.js";
@@ -17,6 +18,7 @@ import { createGroup,
  //{base_url}/api/chat/.......
 
  router.post("/createGroup",Authenticate,createGroup)
+ router.delete("/removeGroup/:groupId",Authenticate,deleteGroup)
  router.post("/group/addMember/:groupId",Authenticate,addMemberToGroup)
  router.get("/groupMessages/:groupId",Authenticate,groupChatHistory)
  router.get("/privateChatRoom/:user1/:user2",Authenticate,privateChatHistory)

@@ -25,7 +25,7 @@ import {estimationWH} from './estimationTaskWorkingHours/route.js'
 const routes = express.Router();
 
 routes.use("/auth", Auth);
-routes.use("/client", Client);
+routes.use("/Client", Client);
 routes.use("/department", Department);
 routes.use("/fabricator", Fabricator);
 routes.use("/project", Project);
