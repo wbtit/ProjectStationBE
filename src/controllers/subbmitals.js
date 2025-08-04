@@ -14,7 +14,7 @@ const AddSubmitals = async (req, res) => {
   // console.log(fabricator_id, project_id, recepient_id, subject, description);
 
   try {
-    if (!project_id || !recepient_id || !subject || !description||!Stage) {
+    if (!project_id || !recepient_id || !subject || !description) {
       // console.log("Fields are empty");
       return sendResponse({
         message: "Fields are empty",
@@ -41,7 +41,6 @@ const AddSubmitals = async (req, res) => {
           fabricator_id !== "undefined" ? fabricator_id : fabricatorId,
         files: fileDetails,
         project_id,
-        Stage,
         recepient_id,
         sender_id: id,
         status: true,
@@ -504,14 +503,14 @@ const submitalsResponseViewFiles = async (req, res) => {
 const addSubmittalsResponse=async(req,res)=>{
 const{submittalId}=req.params
 const{id}=req.user
-const{reason,approved,respondedAt,status,description,parentResponseId}=req.body
+const{reason,respondedAt,status,description,parentResponseId}=req.body
 
 // console.log("submittalId:",submittalId)
 // console.log("Req Body:",req.body)
 
 
 try {
-  if(!respondedAt||!status||!description){
+  if(!description){
     return sendResponse({
       message:"Feilds are empty",
       res,
@@ -521,7 +520,40 @@ try {
     })
   }
   
+  const subStatus= await prisma.submittals.update({
+    where:{
+      id:submittalId
+    },data:{
+      status:false
+    }
+  })
+  if (!subStatus) {
+    return sendResponse({
+      message: "Failed to update the Status of the RFI to false",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
 
+  if(parentResponseId!=undefined){
+    const parentResponse= await prisma.submittalsResponse.update({
+      where:{id:parentResponseId},
+      data:{
+        wbtStatus:status
+      }
+    })
+    if(!parentResponse){
+    return sendResponse({
+      message: "Failed to update the Status of the parent RFQ",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+  }
   const fileDetails = req.files.map((file) => ({
     filename: file.filename, // UUID + extension
     originalName: file.originalname, // Original name of the file
@@ -533,8 +565,6 @@ try {
   const addresponse= await prisma.submittalsResponse.create({
     data:{
      reason:reason || "",
-     respondedAt:respondedAt,
-     status:status,
      description:description,
      userId:id,
      files:fileDetails,

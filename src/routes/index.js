@@ -34,7 +34,7 @@ routes.use("/team", Team);
 routes.use("/employee", Employee);
 routes.use("/RFI", RFI);
 routes.use("/RFQ",RFQ)
-routes.use("/submittals", Submittals);
+routes.use("/Submittals", Submittals);
 routes.use("/wh", WorkingHour);
 routes.use("/co", ChangeOrderRouter);
 routes.use("/br", WorkBreakDown);

@@ -119,7 +119,7 @@ const AddChangeOrder = async (req, res) => {
     project,
     recipients,
     remarks,
-    changeOrder,
+    changeOrderNumber,
     description,
   } = req.body;
 
@@ -127,7 +127,7 @@ const AddChangeOrder = async (req, res) => {
     !project ||
     !recipients ||
     !remarks ||
-    !changeOrder ||
+    !changeOrderNumber ||
     !description 
   ) {
     return sendResponse({
@@ -149,7 +149,7 @@ const AddChangeOrder = async (req, res) => {
     
     const changeorder = await prisma.changeOrder.create({
       data: {
-        changeOrder: parseInt(changeOrder),
+        changeOrder: parseInt(changeOrderNumber),
         description: description,
         project: project,
         status:'NOT_REPLIED',

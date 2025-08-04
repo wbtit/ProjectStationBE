@@ -43,7 +43,8 @@ const addRFI = async (req, res) => {
       include: {
         recepients: true,
         project: true,
-        sender : true
+        sender : true,
+        rfiresponse:true
       },
     });
 
@@ -290,13 +291,9 @@ const sentRFIByUser = async (req, res) => {
 const RFIByID = async (req, res) => {
   const { id } = req.params;
 
-  // console.log(id, "This is rfi ID");
-
   try {
     const rfi = await prisma.rFI.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         recepients: {
           include: {
@@ -308,31 +305,46 @@ const RFIByID = async (req, res) => {
             },
           },
         },
-        rfiresponse:true,
-        file:true
+        rfiresponse: true,
+        file: true,
       },
     });
 
-    // console.log(rfi, "This is rfi");
+    if (!rfi) {
+      return sendResponse({
+        message: "RFI not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    const filtered = {
+      ...rfi,
+      rfiresponse: Array.isArray(rfi.rfiresponse)
+        ? rfi.rfiresponse.filter(resp => resp.parentResponseId === null)
+        : [],
+    };
 
     sendResponse({
       message: "RFI fetch success",
       res,
       statusCode: 200,
       success: true,
-      data: rfi,
+      data: filtered,
     });
   } catch (error) {
-    // console.log(error.message);
     sendResponse({
       message: error.message,
       res,
-      statusCode: 200,
+      statusCode: 500,
       success: false,
       data: null,
     });
   }
 };
+
 
 const Inbox = async (req, res) => {
   const { id } = req.user;
@@ -611,6 +623,7 @@ if (!updateParentRfqStatus) {
 
 const getRfiresponse=async(req,res)=>{
   const{id}=req.params
+  //console.log("RFI ID:",id)
   try {
     const response= await prisma.rFIResponse.findUnique({
       where:{id:id},
@@ -663,9 +676,11 @@ const getRfiByProjectId=async(req,res)=>{
         project:true,
         recepients:true,
         sender:true,
-        rfiresponse:true
+        rfiresponse:true,
       }
     })
+    //console.log("RFI fetched by ProjectId",getRFI)
+    
     return sendResponse({
       message:"RFI fetched by ProjectId",
       res,

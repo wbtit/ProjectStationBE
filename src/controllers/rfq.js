@@ -723,7 +723,7 @@ if (!updateParentRfqStatus) {
 }
 const getRfqResponseById=async(req,res)=>{
   const{id}=req.params
-  //console.log("RFQRESPONSEID",id)
+  console.log("RFQRESPONSEID",id)
   try {
     const response=await prisma.rFQResponse.findUnique({
       where:{id:id},
