@@ -356,7 +356,8 @@ const GetTaskByID = async (req, res) => {
       include: {
         project: true,
         taskcomment: true,
-        taskInAssignedList:true
+        taskInAssignedList:true,
+        workingHourTask:true
       },
     });
 

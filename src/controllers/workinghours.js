@@ -128,15 +128,15 @@ const Pause = async (req, res) => {
       });
     }
 
-    if (workingHourRecord.status === "PAUSE") {
-      return sendResponse({
-        message: "Work is already paused",
-        res,
-        statusCode: 400,
-        success: false,
-        data: workingHourRecord,
-      });
-    }
+    // if (workingHourRecord.status === "PAUSE") {
+    //   return sendResponse({
+    //     message: "Work is already paused",
+    //     res,
+    //     statusCode: 400,
+    //     success: false,
+    //     data: workingHourRecord,
+    //   });
+    // }
 
     if (!workingHourRecord.start) {
       return sendResponse({
@@ -285,7 +285,8 @@ const Resume = async (req, res) => {
 };
 
 const End = async (req, res) => {
-  const { work_id, task_id} = req.body;
+  const { work_id, task_id,end} = req.body;
+  console.log("*-*-*-*-*-*-*-*-*-*-*-*",req.body)
   const { id } = req.user;
 
   if (!work_id || !task_id) {
@@ -366,6 +367,7 @@ const End = async (req, res) => {
       data: {
         duration: workingHourRecord.duration + durationInMinutes, // Store the duration in minutes as an integer
         status: "END",
+        end:end
       },
     });
 
@@ -477,5 +479,79 @@ const getWork = async (req, res) => {
   }
 };
 
+const getReWorkDuration = async (req, res) => {
+  const { work_id, task_id } = req.body;
 
-export { End, Pause, Resume, Start, getWork };
+  if (!work_id || !task_id) {
+    return sendResponse({
+      message: "Invalid work_id or task_id",
+      res,
+      statusCode: 400,
+      success: false,
+      data: null,
+    });
+  }
+
+  try {
+    const task = await prisma.task.findUnique({
+      where: { id: task_id }
+    });
+
+    const work = await prisma.workingHours.update({
+      where: { id: work_id },
+      data: {
+        status: "PAUSE"
+      }
+    });
+
+    if (!task || !work || !work.end || !task.reworkStartTime) {
+      return sendResponse({
+        message: "Task or Work record not found or missing dates",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    const start = new Date(task.reworkStartTime);
+    const end = new Date(work.end);
+    console.log("strat: ",start)
+    console.log("end: ",end)
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return sendResponse({
+        message: "Invalid date values",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    const ms = end - start;
+    const minutes = Math.floor(ms / (1000 * 60));
+    console.log("-=-=-=-",minutes)
+
+    return sendResponse({
+      message: "Rework duration fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: { minutes },
+    });
+
+  } catch (error) {
+    console.error("Error fetching work record:", error.message);
+    return sendResponse({
+      message: "Internal Server Error",
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+
+export { End, Pause, Resume, Start, getWork,getReWorkDuration};

@@ -3,9 +3,9 @@ import { sendResponse } from "../utils/responder.js";
 // Check is the user is a sales
 
 const isStaff = (req, res, next) => {
-  const { is_staff } = req?.user;
+  const { is_staff,is_manager } = req?.user;
 
-  if (!is_staff) {
+  if (!is_staff||!is_manager) {
     // If not in sales then return
     // console.log("You are not a staff");
     return sendResponse({

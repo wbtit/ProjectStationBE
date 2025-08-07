@@ -433,21 +433,68 @@ const AddMember = async (req, res) => {
 };
 
 const GetAllTeams = async (req, res) => {
+  const user = req.user;
+  
+  let Teams = [];
+
   try {
-    const Teams = await prisma.team.findMany({
-      include: {
-        manager: true,
-      },
-    }); // Getting all the teams irrespective of any conditions.
+    if (user.is_superuser) {
+
+      Teams = await prisma.team.findMany({
+        include: {
+          manager: true,
+        },
+      })
+     } else if(user.is_manager && user.is_staff) {
+      // Both manager and staff
+      const departments = await prisma.department.findMany({
+        where: { managerId: user.id },
+      });
+
+      const allTeams = await Promise.all(
+        departments.map((d) =>
+          prisma.team.findMany({
+            where: { departmentID: d.id },
+            include: {
+              manager: true,
+            },
+          })
+        )
+      );
+
+      // Flatten the nested arrays
+      Teams = allTeams.flat();
+
+      
+    }else if (user.is_manager ) {
+      // Manager only
+      Teams = await prisma.team.findMany({
+        where: { managerID: user.id },
+        include: {
+          manager: true,
+        },
+      });
+    } else {
+  return sendResponse({
+    message: "You are not allowed to see the Team Data",
+    res,
+    statusCode: 403,
+    success: false,
+    data: null,
+  });
+}
+
 
     return sendResponse({
-      message: "Retrived All Teams",
+      message: "Retrieved All Teams",
       res,
       statusCode: 200,
       success: true,
       data: Teams,
     });
+
   } catch (error) {
+    console.error("Error in GetAllTeams:", error);
     return sendResponse({
       message: "Something went wrong",
       res,
@@ -459,6 +506,7 @@ const GetAllTeams = async (req, res) => {
     await prisma.$disconnect();
   }
 };
+
 
 const UpdateTeam = async (req, res) => {
   const { id } = req.params;

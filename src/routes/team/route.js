@@ -40,7 +40,7 @@ router.patch(
 
 router.patch("/teams/:tid/addmember", Authenticate, BroadAccess, AddMember); // Adding a member to a Team
 
-router.get("/teams", Authenticate, isStaff, GetAllTeams); // To Get All Teams
+router.get("/teams", Authenticate, GetAllTeams); // To Get All Teams
 
 router.patch("/teams/:id", Authenticate, BroadAccess, UpdateTeam); // Update Team Deatails Except Team Members (Team Member Operations Are Done Using Different Routes)
 

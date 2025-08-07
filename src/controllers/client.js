@@ -207,10 +207,13 @@ const deleteClient = async (req, res) => {
     });
   }
   try {
-    const deleteClient = await prisma.users.delete({
+    const deleteClient = await prisma.users.update({
       where: {
         id: cid,
       },
+      data:{
+        is_disabled:true
+      }
     });
     if (!deleteClient) {
       return sendResponse({

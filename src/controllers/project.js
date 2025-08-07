@@ -21,6 +21,7 @@ const AddProject = async (req, res) => {
     fabricator,
     department,
     manager,
+    clientId,
     status,
     team,
     stage,
@@ -50,7 +51,8 @@ const AddProject = async (req, res) => {
     !manager ||
     !start_date ||
     !estimatedHours||
-    !approvalDate //||
+    !approvalDate ||
+    !clientId
     // !modelingHours||
     // !modelCheckingHours||
     // !detailingHours||
@@ -78,6 +80,7 @@ const AddProject = async (req, res) => {
         customerDesign: customer,
         departmentID: department,
         fabricatorID: fabricator,
+        clientId:clientId,
         managerID: manager,
         miscDesign: miscDesign,
         stage: stage || 'IFA',
@@ -87,11 +90,11 @@ const AddProject = async (req, res) => {
         tools: tools,
         endDate: end_date,
         modelingHours,
-      modelCheckingHours,
-      detailingHours,
-      detailCheckingHours,
-      erectionHours,
-      erectionCheckingHours
+        modelCheckingHours,
+        detailingHours,
+        detailCheckingHours,
+        erectionHours,
+        erectionCheckingHours
       },
     });
     const fabricatorData= await prisma.fabricator.findUnique({

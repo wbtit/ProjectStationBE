@@ -63,3 +63,5 @@ export const changeorderUploads=createMulterUploader("public/changeordertemp",ch
 export const changeOrderTableDataMap={};
 export const changeOrderTableUploads=createMulterUploader("public/changeOrderTabletemp",changeOrderTableDataMap)
 
+export const notesDataMap={};
+export const notesUploads=createMulterUploader("public/notesTemp",notesDataMap)

@@ -88,6 +88,7 @@ model Users {
   workingHourUser       WorkingHours[]       @relation("workingHourUser")
   fabricators           Fabricator[]         @relation("FabricatorUsers")
   taggedInMessages      Message[]            @relation("TaggedUsers")
+  POC                   Project[]            @relation("POC")                    
 
   @@map("users")
 }
@@ -148,6 +149,7 @@ model Project {
   name                   String        @unique
   description            String
   fabricatorID           String        @db.Uuid
+  clientId               String?        @db.Uuid
   departmentID           String        @db.Uuid
   teamID                 String?       @db.Uuid
   managerID              String        @db.Uuid
@@ -179,15 +181,31 @@ model Project {
   department             Department    @relation("projectDepartment", fields: [departmentID], references: [id], onDelete: Cascade)
   fabricator             Fabricator    @relation("projectFabricator", fields: [fabricatorID], references: [id], onDelete: Cascade)
   manager                Users         @relation("projectManager", fields: [managerID], references: [id], onDelete: Cascade)
+  pointOfContact         Users?         @relation("POC",fields:[clientId],references:[id])
   team                   Team?         @relation("projectTeam", fields: [teamID], references: [id], onDelete: Cascade)
   rfi                    RFI[]         @relation("ProjectRFI")
   subTasks               SubTasks[]    @relation("subTasksproject")
   submittals             Submittals[]  @relation("ProjectSubmittals")
   tasks                  Task[]        @relation("projectTask")
   wbsActivities          WBSActivity[]
+  notes                  Notes[]        @relation("projectNotes")
 
   @@map("project")
 }
+
+model Notes{
+  id                     String         @id @default(uuid()) @db.Uuid
+  content                String   
+  stage                  Stage         @default(RFI)            
+  files                  Json           @default("[]")
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  projectId              String         @db.Uuid
+  project                Project        @relation("projectNotes",fields:[projectId],references:[id])
+  @@map("notes")
+}
+
 
 model ProjectStageHistory {
   id         String   @id @default(uuid()) @db.Uuid
@@ -208,6 +226,7 @@ model Task {
   status             String
   priority           Int
   created_on         DateTime        @default(now())
+  reworkStartTime    DateTime?
   due_date           String
   duration           String
   project_id         String          @db.Uuid
@@ -794,6 +813,8 @@ enum UserRole {
   PROJECT_MANAGER_OFFICER
   DEPUTY_MANAGER
   OPERATION_EXECUTIVE
+  CLIENT_ADMIN
+  CLIENT_MANAGER
 }
 
 enum Status {
@@ -818,6 +839,7 @@ enum Stage {
   REV
   CO
   COMPLETED
+  REWORK
 }
 
 enum Tools {
