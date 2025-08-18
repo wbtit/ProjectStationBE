@@ -678,7 +678,7 @@ model Estimation {
   finalPrice       Float?
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
-  rfqId            String               @db.Uuid
+  rfqId            String?               @db.Uuid
   createdById      String               @db.Uuid
   id               String               @id @default(uuid()) @db.Uuid
   fabricatorId     String               @db.Uuid
@@ -689,7 +689,7 @@ model Estimation {
   template         EstimationTemplate?
   createdBy        Users                @relation("CreatedBy", fields: [createdById], references: [id])
   fabricators      Fabricator           @relation("estimationUnderFabricator", fields: [fabricatorId], references: [id])
-  rfq              RFQ                  @relation(fields: [rfqId], references: [id])
+  rfq              RFQ?                  @relation(fields: [rfqId], references: [id])
 
   @@map("estimations")
 }

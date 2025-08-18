@@ -22,7 +22,6 @@ console.log("==============The creatdeBy Id fo the Estimation:",id)
 try {
 
     if(
-    !rfqId||
     !estimationNumber||
     !fabricatorId||
     !projectName||
@@ -37,24 +36,27 @@ try {
         })
     }
     const createEstimation = await prisma.estimation.create({
-        data:{
-          rfq:{
-            connect:{id:rfqId}
-          },
-          createdBy:{
-            connect:{id:id}
-          },
-          estimationNumber,
-          fabricatorName,
-          projectName,
-          estimateDate,
-          tools,
-          fabricators:{
-            connect:{id:fabricatorId}
-          },
-          assignedById:id,
-        }
-    })
+  data: {
+    ...(rfqId && {
+      rfq: {
+        connect: { id: rfqId },
+      },
+    }),
+    createdBy: {
+      connect: { id },
+    },
+    estimationNumber,
+    fabricatorName,
+    projectName,
+    estimateDate,
+    tools,
+    fabricators: {
+      connect: { id: fabricatorId },
+    },
+    assignedById: id,
+  },
+});
+
 
     await createEstimationLineItem(createEstimation.id)
     return sendResponse({
