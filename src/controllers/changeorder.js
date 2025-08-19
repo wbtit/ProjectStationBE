@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendNotification } from "../utils/notify.js";
+import { getNextCONumber } from "../utils/generateCoNumber.js";
 
 
 const changeOrderReceived=async(req,res)=>{
@@ -114,59 +115,57 @@ const changeOrderSent=async(req,res)=>{
         })
     }
 }
-const AddChangeOrder = async (req, res) => {
-  const {
-    project,
-    recipients,
-    remarks,
-    changeOrderNumber,
-    description,
-  } = req.body;
 
-  if (
-    !project ||
-    !recipients ||
-    !remarks ||
-    !changeOrderNumber ||
-    !description 
-  ) {
-    return sendResponse({
-      message: "Fields are empty",
-      res,
-      statusCode: 400,
-      success: false,
-      data: null,
-    });
-  }
 
+
+// Create Change Order function
+const createCO = async (req, res) => {
   try {
-    const fileDetails = req.files.map((file) => ({
-      filename: file.filename, // UUID + extension
-      originalName: file.originalname, // Original name of the file
-      id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/changeordertemp/${file.filename}`, // Relative path
-    }));
-    
+    const { project, recipients, remarks, description } = req.body;
+
+    if (!project || !recipients || !remarks || !description) {
+      return sendResponse({
+        message: "Fields are empty",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Handle file uploads safely
+    const fileDetails = req.files
+      ? req.files.map((file) => ({
+          filename: file.filename, // UUID + extension
+          originalName: file.originalname, // Original name of the file
+          id: file.filename.split(".")[0], // Extract UUID from the filename
+          path: `/public/changeordertemp/${file.filename}`, // Relative path
+        }))
+      : [];
+
+    // Generate unique CO number
+    const coNum = await getNextCONumber();
+
+    // Insert into DB
     const changeorder = await prisma.changeOrder.create({
       data: {
-        changeOrder: parseInt(changeOrderNumber),
-        description: description,
-        project: project,
-        status:'NOT_REPLIED',
-        recipients: recipients,
-        remarks: remarks,
+        changeOrder: coNum,
+        description,
+        project,
+        status: "NOT_REPLIED",
+        recipients,
+        remarks,
         sender: req.user.id,
-        files:fileDetails
-        
+        files: fileDetails,
       },
     });
-    //console.log("ChangeOrder from DB:",changeorder)
-    
-    //RLT 
-    sendNotification(recipients,{
-      message:`New CO received: ${remarks}`,
-      coId:changeorder.id
-    })
+
+    // Notify recipients
+    sendNotification(recipients, {
+      message: `New CO received: ${remarks}`,
+      coId: changeorder.id,
+    });
+
     return sendResponse({
       message: "Change Order Submitted",
       res,
@@ -175,7 +174,33 @@ const AddChangeOrder = async (req, res) => {
       data: changeorder,
     });
   } catch (error) {
-    // console.log(error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+// Add Change Order (with permissions)
+const AddChangeOrder = async (req, res) => {
+  try {
+    const { isAproovedByAdmin, is_superuser } = req.user;
+
+    if (is_superuser || isAproovedByAdmin) {
+      return createCO(req, res);
+    }
+
+    return sendResponse({
+      message: "Admin Approval is required",
+      res,
+      statusCode: 200,
+      success: false,
+      data: null,
+    });
+  } catch (error) {
     return sendResponse({
       message: error.message,
       res,
@@ -291,6 +316,7 @@ const AddChangeOrdertable = async (req, res) => {
       elements: co.elements,
       QtyNo: co.QtyNo,
       hours: co.hours,
+      remarks:co.remarks??"",//optional field
       cost: co.cost,
       CoId: coId  // from params
     }));

@@ -496,7 +496,7 @@ model ChangeOrder {
   project     String             @db.Uuid
   recipients  String             @db.Uuid
   remarks     String             @default("")
-  changeOrder Int                @default(1)
+  changeOrder String             @default("")
   description String             @default("")
   sender      String             @db.Uuid
   sentOn      DateTime           @default(now())
@@ -504,6 +504,7 @@ model ChangeOrder {
   status      COSTATUS           @default(NOT_REPLIED)
   reason      String             @default("")
   coResponse  COResponse?        @relation("coResponse")
+  isAproovedByAdmin   Boolean?   @default(false)
   Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
   Recipients  Users              @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
   senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
@@ -519,6 +520,7 @@ model ChangeOrdertable {
   referenceDoc String      @default("")
   elements     String      @default("")
   QtyNo        Int         @default(0)
+  remarks      String?      @default("")
   hours        Float       @default(0.0)
   cost         Float       @default(0.0)
   CoId         String      @db.Uuid
