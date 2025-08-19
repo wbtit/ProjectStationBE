@@ -535,15 +535,133 @@ const getChangeOrderByProjectId=async(req,res)=>{
     })
   }
 }
+
+
+const updateChangeOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      project,
+      recipients,
+      remarks,
+      changeOrder,
+      description,
+      sender,
+      files,
+      status,
+      reason,
+      isAproovedByAdmin
+    } = req.body;
+
+    // Update ChangeOrder
+    const updatedChangeOrder = await prisma.changeOrder.update({
+      where: { id },
+      data: {
+        project,
+        recipients,
+        remarks,
+        changeOrder,
+        description,
+        sender,
+        files,
+        status,
+        reason,
+        isAproovedByAdmin
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "ChangeOrder updated successfully",
+      data: updatedChangeOrder
+    });
+
+  } catch (error) {
+    console.error("Update ChangeOrder Error:", error);
+
+    if (error.code === "P2025") {
+      // Record not found
+      return res.status(404).json({
+        success: false,
+        message: "ChangeOrder not found"
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update ChangeOrder",
+      error: error.message
+    });
+  }
+};
+
+ const updateChangeOrderTable = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      description,
+      referenceDoc,
+      elements,
+      QtyNo,
+      remarks,
+      hours,
+      cost,
+      CoId
+    } = req.body;
+
+    // Update ChangeOrdertable record
+    const updatedChangeOrderTable = await prisma.changeOrdertable.update({
+      where: { id },
+      data: {
+        description,
+        referenceDoc,
+        elements,
+        QtyNo,
+        remarks,
+        hours,
+        cost,
+        CoId
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "ChangeOrdertable updated successfully",
+      data: updatedChangeOrderTable
+    });
+
+  } catch (error) {
+    console.error("Update ChangeOrdertable Error:", error);
+
+    if (error.code === "P2025") {
+      // Record not found
+      return res.status(404).json({
+        success: false,
+        message: "ChangeOrdertable not found"
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update ChangeOrdertable",
+      error: error.message
+    });
+  }
+};
+
+
 export { 
   AddChangeOrder ,
   changeOrderReceived,
   changeOrderSent,
+  updateChangeOrder,
 
   addCoResponse,
   getResponse,
 
   AddChangeOrdertable,
+  updateChangeOrderTable,
+  
   getRowCotable,
   viewCOfiles,
   changeStatus,
