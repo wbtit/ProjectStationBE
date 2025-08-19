@@ -1,3 +1,5 @@
+import prisma from "../lib/prisma.js";
+
 // Utility to get next CO number
 const getNextCONumber = async () => {
   const lastCO = await prisma.changeOrder.findFirst({

@@ -28,7 +28,7 @@ router.delete(
   deleteClient
 ); //dele client by ID
 
-router.get("/client/getallclients", Authenticate, ClientAccess, getAllClients); //get Clients
+router.get("/client/getallclients", Authenticate, getAllClients); //get Clients
 
 router.get("/client/:cid", Authenticate, ClientAccess, GetClientBYID); // Get clinet by IDj
 

@@ -19,7 +19,8 @@ const changeOrderReceived=async(req,res)=>{
         }
         const receives= await prisma.changeOrder.findMany({
             where:{
-                recipients:id
+                recipients:id,
+                isAproovedByAdmin:true
             },
               select:{
                 id:true,
@@ -119,7 +120,7 @@ const changeOrderSent=async(req,res)=>{
 
 
 // Create Change Order function
-const createCO = async (req, res) => {
+const createCO = async (req, res,approval) => {
   try {
     const { project, recipients, remarks, description } = req.body;
 
@@ -155,6 +156,7 @@ const createCO = async (req, res) => {
         status: "NOT_REPLIED",
         recipients,
         remarks,
+        isAproovedByAdmin:approval,
         sender: req.user.id,
         files: fileDetails,
       },
@@ -174,6 +176,7 @@ const createCO = async (req, res) => {
       data: changeorder,
     });
   } catch (error) {
+    //console.log(error.message)
     return sendResponse({
       message: error.message,
       res,
@@ -189,8 +192,10 @@ const AddChangeOrder = async (req, res) => {
   try {
     const { isAproovedByAdmin, is_superuser } = req.user;
 
-    if (is_superuser || isAproovedByAdmin) {
-      return createCO(req, res);
+    if (is_superuser &&! isAproovedByAdmin) {
+      return createCO(req, res,true);
+    }else{
+      return createCO(req,res,false)
     }
 
     return sendResponse({
@@ -201,6 +206,7 @@ const AddChangeOrder = async (req, res) => {
       data: null,
     });
   } catch (error) {
+    console.log(error.mes)
     return sendResponse({
       message: error.message,
       res,
@@ -489,6 +495,7 @@ const changeStatus=async(req,res)=>{
 
 const getChangeOrderByProjectId=async(req,res)=>{
   const{projectId}=req.params
+  console.log("-=-=-=-=---",projectId)
   try {
     if(!projectId){
       return sendResponse({
@@ -510,7 +517,7 @@ const getChangeOrderByProjectId=async(req,res)=>{
       }
     })
     return sendResponse({
-      message:"RFI fetched by ProjectId",
+      message:"CO fetched by ProjectId",
       res,
       statusCode:200,
       success:true,

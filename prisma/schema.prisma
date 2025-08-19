@@ -503,6 +503,7 @@ model ChangeOrder {
   files       Json               @default("[]")
   status      COSTATUS           @default(NOT_REPLIED)
   reason      String             @default("")
+  createdAt   DateTime           @default(now())
   coResponse  COResponse?        @relation("coResponse")
   isAproovedByAdmin   Boolean?   @default(false)
   Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
@@ -510,6 +511,7 @@ model ChangeOrder {
   senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)
   CoRefersTo  ChangeOrdertable[] @relation("CoRefersTo")
   file        File[]             @relation("changeorderFiles")
+
 
   @@map("changeorder")
 }
