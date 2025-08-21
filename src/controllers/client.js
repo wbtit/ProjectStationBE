@@ -77,7 +77,7 @@ const addClient = async (req, res) => {
     state = fab.headquaters.state;
     country = fab.headquaters.country;
     zip_code = fab.headquaters.zip_code;
-  } else {
+  } else {  
     fab.branches.map((branch) => {
       if (branch.id === address) {
         city = branch.city;

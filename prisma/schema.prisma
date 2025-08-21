@@ -62,6 +62,7 @@ model Users {
   createdDepartments    Department[]         @relation("Creator")
   managedDepartments    Department[]         @relation("Manager")
   assignedEstimations   EstimationTask[]     @relation("AssignedEstimator")
+  AssignedByEstimations EstimationTask[]     @relation("AssignedBy")
   reviewedEstimations   EstimationTask[]     @relation("ReviewedBy")
   createdEstimations    Estimation[]         @relation("CreatedBy")
   createdFabricators    Fabricator[]         @relation("FabricatorCreatedBy")
@@ -706,7 +707,7 @@ model Estimation {
 }
 
 model EstimationTask {
-  assignedById String
+  assignedById String         @db.Uuid
   status       TaskStatus     @default(ASSIGNED)
   startDate    DateTime?
   endDate      DateTime?
@@ -719,7 +720,10 @@ model EstimationTask {
   reviewedById String?        @db.Uuid
   id           String         @id @default(uuid()) @db.Uuid
   files        Json?          @default("[]")
+
+
   assignedTo   Users          @relation("AssignedEstimator", fields: [assignedToId], references: [id])
+  assignedBy   Users          @relation("AssignedBy",fields: [assignedById],references: [id])
   estimation   Estimation     @relation(fields: [estimationId], references: [id])
   reviewedBy   Users?         @relation("ReviewedBy", fields: [reviewedById], references: [id])
   workinghours WorkingHours[] @relation("workingHourEstimationTask")

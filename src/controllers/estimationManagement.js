@@ -125,7 +125,24 @@ const getEstimationById=async(req,res)=>{
             include:{
                  rfq:true,
                  createdBy:true,
-                 tasks:true,
+                 tasks:{
+                    include:{
+                        assignedTo:{
+                            select:{
+                                f_name:true,
+                                m_name:true,
+                                l_name:true
+                            }
+                        },
+                        assignedBy:{
+                            select:{
+                            f_name:true,
+                            m_name:true,
+                            l_name:true  
+                            }
+                        }
+                    }
+                 },
                  lineItems:true,
                  template:true ,
                  fabricators:true
