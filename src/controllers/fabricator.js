@@ -619,11 +619,13 @@ const ViewFile = async (req, res) => {
 
 export {
   AddBranch,
+
   AddFabricator,
   DeleteFabricator,
   GetAllFabricator,
   UpdateFabricator,
   GetFabricatorByID,
+  
   DeleteBranch,
   Uploadfiles,
   DownloadFile,

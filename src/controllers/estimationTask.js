@@ -29,8 +29,9 @@ const{estimationId}=req.params
             assignedTo:{
                 connect:{id:assignedToId,}
             },
-            
-            assignedById:id,
+            assignedBy:{
+                connect:{id:req.user.id}
+            },
             endDate:endDate,
             startDate:startDate,
             notes:notes
@@ -129,6 +130,7 @@ const getAllEstimationTasks=async(req,res)=>{
 }
 const getMyTasks=async(req,res)=>{
     const {id}=req.user
+    //console.log("-=-=-=-",id)
     try {
         if(!id){
         return sendResponse({
@@ -148,6 +150,7 @@ const getMyTasks=async(req,res)=>{
             estimation:true
         }
     })
+    //console.log("=-=-=--=-=---=-=-",my_tasks)
     return sendResponse({
         message:"My tasks Fetched successfully",
         res,
