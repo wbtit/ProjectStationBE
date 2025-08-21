@@ -517,19 +517,26 @@ model ChangeOrder {
 }
 
 model ChangeOrdertable {
-  id           String      @id @default(uuid()) @db.Uuid
-  description  String      @default("")
-  referenceDoc String      @default("")
-  elements     String      @default("")
-  QtyNo        Int         @default(0)
-  remarks      String?      @default("")
-  hours        Float       @default(0.0)
-  cost         Float       @default(0.0)
-  CoId         String      @db.Uuid
-  CoRefersTo   ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
+  id             String      @id @default(uuid()) @db.Uuid
+  description    String      @default("")
+  referenceDoc   String      @default("")
+  elements       String      @default("")
+  QtyNo          Int         @default(0)
+  remarks        String?     @default("")
+  hours          Float       @default(0.0)
+
+  cost           Float       @default(0.0)
+  costUpdatedBy  String      @default("") // userId or role of the person who updated
+  costUpdatedAt  DateTime?   // timestamp of last cost update
+
+  CoId           String      @db.Uuid
+  CoRefersTo     ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   @@map("changeordertable")
 }
+
 
 model COResponse {
   id               String       @id @default(uuid()) @db.Uuid

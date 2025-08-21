@@ -302,8 +302,10 @@ const getResponse=async(req,res)=>{
 const AddChangeOrdertable = async (req, res) => {
   const { coId } = req.params;
   const changeOrderItems = Object.values(req.body);
+  const currentUser = req.user; // assuming middleware sets this
+  const userId = currentUser?.id || "UNKNOWN";
 
-  console.log("ChangeOrderTable data:", changeOrderItems);
+  //console.log("ChangeOrderTable data:", changeOrderItems);
 
   try {
     if (!Array.isArray(changeOrderItems) || changeOrderItems.length === 0) {
@@ -322,11 +324,15 @@ const AddChangeOrdertable = async (req, res) => {
       elements: co.elements,
       QtyNo: co.QtyNo,
       hours: co.hours,
-      remarks:co.remarks??"",//optional field
+      remarks: co.remarks ?? "", 
       cost: co.cost,
+      costUpdatedBy: userId,   
+      costUpdatedAt: new Date(),
       CoId: coId  // from params
     }));
-    console.log("ChangeOrderTable data:", dataToInsert);
+
+    //console.log("ChangeOrderTable data:", dataToInsert);
+
     const created = await prisma.changeOrdertable.createMany({
       data: dataToInsert,
       skipDuplicates: true // optional: avoids inserting duplicates
@@ -353,62 +359,76 @@ const AddChangeOrdertable = async (req, res) => {
 };
 
 
-const getRowCotable=async(req,res)=>{
-  const{CoId}=req.params
-  console.log("The CoID:",CoId)
+
+const getRowCotable = async (req, res) => {
+  const { CoId } = req.params;
+  const currentUser = req.user; // from auth middleware
+  const userId=currentUser.id
+
+
+  console.log("The CoID:", CoId);
+
   try {
-    if(!CoId){
+    if (!CoId) {
       return sendResponse({
-        message:"Feilds are empty",
+        message: "Fields are empty",
         res,
-        statusCode:400,
-        success:false,
-        data:null
-      }) 
+        statusCode: 400,
+        success: false,
+        data: null
+      });
     }
-   
-    const coRow= await prisma.changeOrdertable.findMany({
-      where:{CoId:CoId}
-    })
-    const CO= await prisma.changeOrder.findUnique({
-      where:{
-        id:CoId
-      },
-      include:{
-        senders:{
-          select:{
-            f_name:true,
-            m_name:true,
-            l_name:true
-          }
+
+    // fetch rows
+    let coRow = await prisma.changeOrdertable.findMany({
+      where: { CoId }
+    });
+
+    // apply visibility rule for PMs
+    if (currentUser.is_manager && !currentUser.is_staff) {
+      coRow = coRow.map(row => {
+        if (row.costUpdatedBy !==userId) {
+          return { ...row, cost: null };
+        }
+        return row;
+      });
+    }
+
+    // fetch parent CO with related info
+    const CO = await prisma.changeOrder.findUnique({
+      where: { id: CoId },
+      include: {
+        senders: {
+          select: { f_name: true, m_name: true, l_name: true }
         },
-        Project:{
-          select:{
-            name:true
-          }
+        Project: {
+          select: { name: true }
         }
       }
-    })
-    const response={coRow,CO}
-    console.log(coRow)
+    });
+
+    const response = { coRow, CO };
+
     return sendResponse({
-      message:"Response created",
+      message: "Response created",
       res,
-      statusCode:200,
-      success:true,
-      data:response
-    })
+      statusCode: 200,
+      success: true,
+      data: response
+    });
+
   } catch (error) {
-    console.log(error.message)
+    console.error(error.message);
     return sendResponse({
-      message:"failed to fetch the CoRow",
+      message: "Failed to fetch the CoRow",
       res,
-      statusCode:500,
-      success:false,
-      data:''
-    })
+      statusCode: 500,
+      success: false,
+      data: ''
+    });
   }
-}
+};
+
 
 const viewCOfiles = async (req, res) => {
   const { id, fid } = req.params;
@@ -495,7 +515,7 @@ const changeStatus=async(req,res)=>{
 
 const getChangeOrderByProjectId=async(req,res)=>{
   const{projectId}=req.params
-  console.log("-=-=-=-=---",projectId)
+  //console.log("-=-=-=-=---",projectId)
   try {
     if(!projectId){
       return sendResponse({
@@ -595,7 +615,7 @@ const updateChangeOrder = async (req, res) => {
   }
 };
 
- const updateChangeOrderTable = async (req, res) => {
+const updateChangeOrderTable = async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -609,6 +629,9 @@ const updateChangeOrder = async (req, res) => {
       CoId
     } = req.body;
 
+    const currentUser = req.user; // middleware should inject
+    const userId = currentUser.id
+
     // Update ChangeOrdertable record
     const updatedChangeOrderTable = await prisma.changeOrdertable.update({
       where: { id },
@@ -620,7 +643,11 @@ const updateChangeOrder = async (req, res) => {
         remarks,
         hours,
         cost,
-        CoId
+        CoId,
+        ...(cost !== undefined && {
+          costUpdatedBy: userId,        
+          costUpdatedAt: new Date() 
+        })
       }
     });
 

@@ -530,7 +530,7 @@ const getReWorkDuration = async (req, res) => {
 
     const ms = end - start;
     const minutes = Math.floor(ms / (1000 * 60));
-    console.log("-=-=-=-",minutes)
+    //console.log("-=-=-=-",minutes)
 
     return sendResponse({
       message: "Rework duration fetched successfully",
