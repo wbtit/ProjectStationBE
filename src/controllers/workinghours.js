@@ -551,7 +551,45 @@ const getReWorkDuration = async (req, res) => {
     });
   }
 };
+const updateWorkingHours = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      status,
+      start,
+      end,
+      duration,
+      task_id,
+      estimationTask_id,
+    } = req.body;
+
+    // Update working hour
+    const updatedWorkingHour = await prisma.workingHours.update({
+      where: { id },
+      data: {
+        status,
+        start: start ? new Date(start) : undefined,
+        end: end ? new Date(end) : undefined,
+        duration,
+        task_id,
+        estimationTask_id,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: updatedWorkingHour,
+    });
+  } catch (error) {
+    console.error("Error updating working hour:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update working hour",
+      error: error.message,
+    });
+  }
+};
 
 
 
-export { End, Pause, Resume, Start, getWork,getReWorkDuration};
+export { End, Pause, Resume, Start, getWork,getReWorkDuration,updateWorkingHours};

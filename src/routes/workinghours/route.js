@@ -7,6 +7,7 @@ import {
   Resume,
   getWork,
   getReWorkDuration,
+  updateWorkingHours
   
 } from "../../controllers/workinghours.js";
 
@@ -17,6 +18,7 @@ router.patch("/wh/pause", Authenticate, Pause);
 router.patch("/wh/resume", Authenticate, Resume);
 router.patch("/wh/end", Authenticate, End);
 router.get("/wh/:task_id", Authenticate, getWork);
+router.patch("/working-hours/:id",Authenticate,updateWorkingHours)
 
 
 router.patch("/rework",Authenticate,getReWorkDuration)
