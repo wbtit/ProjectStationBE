@@ -439,42 +439,36 @@ const GetAllTeams = async (req, res) => {
 
   try {
     if (user.is_superuser) {
+  // Admin can see all
+  Teams = await prisma.team.findMany({
+    include: { manager: true },
+  });
 
-      Teams = await prisma.team.findMany({
-        include: {
-          manager: true,
-        },
+} else if (user.is_manager && user.is_staff) {
+  // Department Manager
+  const departments = await prisma.department.findMany({
+    where: { managerId: user.id },
+  });
+
+  const allTeams = await Promise.all(
+    departments.map((d) =>
+      prisma.team.findMany({
+        where: { departmentID: d.id },
+        include: { manager: true },
       })
-     } else if(user.is_manager && user.is_staff) {
-      // Both manager and staff
-      const departments = await prisma.department.findMany({
-        where: { managerId: user.id },
-      });
+    )
+  );
 
-      const allTeams = await Promise.all(
-        departments.map((d) =>
-          prisma.team.findMany({
-            where: { departmentID: d.id },
-            include: {
-              manager: true,
-            },
-          })
-        )
-      );
+  Teams = allTeams.flat();
 
-      // Flatten the nested arrays
-      Teams = allTeams.flat();
+} else if (user.is_manager && !user.is_staff) {
+  // Project Manager
+  Teams = await prisma.team.findMany({
+    where: { managerID: user.id },
+    include: { manager: true },
+  });
 
-      
-    }else if (user.is_manager ) {
-      // Manager only
-      Teams = await prisma.team.findMany({
-        where: { managerID: user.id },
-        include: {
-          manager: true,
-        },
-      });
-    } else {
+} else {
   return sendResponse({
     message: "You are not allowed to see the Team Data",
     res,
@@ -483,6 +477,7 @@ const GetAllTeams = async (req, res) => {
     data: null,
   });
 }
+
 
 
     return sendResponse({
