@@ -447,7 +447,7 @@ const GetAllTeams = async (req, res) => {
 } else if (user.is_manager && user.is_staff) {
   // Department Manager
   const departments = await prisma.department.findMany({
-    where: { managerId: user.id },
+    where: { managerId: req.user.id },
   });
 
   const allTeams = await Promise.all(
