@@ -245,7 +245,7 @@ const deleteClient = async (req, res) => {
 };
 
 const getAllClients = async (req, res) => {
-  console.log("hello")
+  //console.log("hello")
   try {
     const clients = await prisma.users.findMany({
       where: {

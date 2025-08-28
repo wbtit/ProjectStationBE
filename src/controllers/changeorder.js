@@ -190,21 +190,13 @@ const createCO = async (req, res,approval) => {
 // Add Change Order (with permissions)
 const AddChangeOrder = async (req, res) => {
   try {
-    const { isAproovedByAdmin, is_superuser } = req.user;
+    const {  is_superuser,is_manager,is_staff } = req.user
 
-    if (is_superuser &&! isAproovedByAdmin) {
+    if (is_superuser ||(is_manager&& is_staff)) {
       return createCO(req, res,true);
     }else{
       return createCO(req,res,false)
     }
-
-    return sendResponse({
-      message: "Admin Approval is required",
-      res,
-      statusCode: 200,
-      success: false,
-      data: null,
-    });
   } catch (error) {
     console.log(error.mes)
     return sendResponse({
@@ -219,7 +211,7 @@ const AddChangeOrder = async (req, res) => {
 
 const addCoResponse = async (req, res) => {
   const { coId } = req.params;
-  const { id: userId } = req.user; // id from auth middleware
+  const { id: userId } = req.user; // from auth middleware
   const { status, description, parentResponseId } = req.body;
 
   try {
@@ -233,6 +225,16 @@ const addCoResponse = async (req, res) => {
         data: null,
       });
     }
+
+    // Handle uploaded files
+    const fileDetails = req.files
+      ? req.files.map((file) => ({
+          filename: file.filename,
+          originalName: file.originalname,
+          id: file.filename.split(".")[0],
+          path: `/public/changeOrderResponsetemp/${file.filename}`,
+        }))
+      : [];
 
     // Check if user exists
     const user = await prisma.users.findUnique({ where: { id: userId } });
@@ -258,20 +260,35 @@ const addCoResponse = async (req, res) => {
       });
     }
 
+    // If parentResponseId is provided, validate it
+    let parentConnect = undefined;
+    if (parentResponseId) {
+      const parentExists = await prisma.cOResponse.findUnique({
+        where: { id: parentResponseId },
+      });
+
+      if (!parentExists) {
+        return sendResponse({
+          message: "Parent COResponse not found",
+          res,
+          statusCode: 404,
+          success: false,
+          data: null,
+        });
+      }
+
+      parentConnect = { connect: { id: parentResponseId } };
+    }
+
     // Create COResponse
     const coResponse = await prisma.cOResponse.create({
       data: {
-        Status: status, // must match enum value in your schema
+        Status: status,
         description,
-        parentResponse: parentResponseId
-  ? { connect: { id: parentResponseId } }
-  : undefined,
-        user: {
-          connect: { id: userId },
-        },
-        COresponse: {
-          connect: { id: coId },
-        },
+        files: fileDetails,
+        parentResponse: parentConnect,
+        user: { connect: { id: userId } },
+        COresponse: { connect: { id: coId } },
       },
     });
 
@@ -294,6 +311,7 @@ const addCoResponse = async (req, res) => {
     });
   }
 };
+
 
 const getResponse=async(req,res)=>{
   const{id}=req.params

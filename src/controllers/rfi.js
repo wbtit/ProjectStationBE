@@ -5,13 +5,10 @@ import path from "path"
 import fs from "fs"
 import mime from "mime"
 import { sendNotification } from "../utils/notify.js";
-const addRFI = async (req, res) => {
-  const { id, fabricatorId } = req.user;
-  // console.log("==", req.body);
-  const { fabricator_id, project_id, recipient_id, subject, description } =
-    req.body;
 
-  try {
+
+const createRFI=async(req,res,approval)=>{
+    try {
     if (!project_id || !recipient_id || !subject || !description) {
       return sendResponse({
         message: "Fields are empty",
@@ -243,7 +240,94 @@ const addRFI = async (req, res) => {
       data: null,
     });
   }
+}
+
+
+const addRFI = async (req, res) => {
+ try {
+   const {  is_superuser,is_manager,is_staff } = req.user
+   
+       if (is_superuser ||(is_manager&& is_staff)) {
+         return createRFI(req, res,true);
+       }else{
+         return createRFI(req,res,false)
+       }
+     } catch (error) {
+       console.log(error.mes)
+       return sendResponse({
+         message: error.message,
+         res,
+         statusCode: 500,
+         success: false,
+         data: null,
+       });
+     }
+   
+
+
 };
+// Update RFI Handler
+const updateRFI = async (req, res) => {
+  const { id } = req.params; // RFI ID
+  const {
+    subject,
+    description,
+    status,
+    isAproovedByAdmin,
+    files,
+  } = req.body;
+
+  try {
+    // 1. Check if RFI exists
+    const existing = await prisma.rFI.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return sendResponse({
+        message: "RFI not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    // 2. Update only provided fields
+    const updatedRFI = await prisma.rFI.update({
+      where: { id },
+      data: {
+        subject: subject ?? existing.subject,
+        description: description ?? existing.description,
+        status: typeof status === "boolean" ? status : existing.status,
+        isAproovedByAdmin:
+          typeof isAproovedByAdmin === "boolean"
+            ? isAproovedByAdmin
+            : existing.isAproovedByAdmin,
+        files: files ?? existing.files,
+      },
+    });
+
+    // 3. Send success response
+    return sendResponse({
+      message: "RFI updated successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: updatedRFI,
+    });
+  } catch (error) {
+    console.error("Error updating RFI:", error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
 
 const sentRFIByUser = async (req, res) => {
   const { id } = req.user;
@@ -702,6 +786,7 @@ const getRfiByProjectId=async(req,res)=>{
 }
 export { 
   addRFI, 
+  updateRFI,
   sentRFIByUser, 
   Inbox, 
   RFIseen, 

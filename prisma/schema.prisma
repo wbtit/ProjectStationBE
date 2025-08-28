@@ -349,6 +349,7 @@ model Submittals {
   subject            String
   description        String
   files              Json              @default("[]")
+  isAproovedByAdmin   Boolean?   @default(false)
   file               File[]              @relation("submittalsFiles")
   fabricator         Fabricator          @relation("FabricatorSubmittals", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project            Project             @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
@@ -391,6 +392,7 @@ model RFI {
   subject       String
   description   String
   files         Json       @default("[]")
+  isAproovedByAdmin   Boolean?   @default(false)
   file          File[]       @relation("rfiFiles")
   fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
@@ -544,9 +546,10 @@ model COResponse {
   id               String       @id @default(uuid()) @db.Uuid
   Status           COSTATUS     @default(NOT_REPLIED)
   description      String       @default("")
-  CoId             String?       @unique @db.Uuid
+  CoId             String?      @unique @db.Uuid
   userId           String       @db.Uuid
   parentResponseId String?      @db.Uuid
+  files       Json               @default("[]")
   COresponse       ChangeOrder?  @relation("coResponse", fields: [CoId], references: [id])
   parentResponse   COResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
   childResponses   COResponse[] @relation("ParentChildResponse")
