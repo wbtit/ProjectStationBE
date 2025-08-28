@@ -345,6 +345,7 @@ model Submittals {
   recepient_id       String              @db.Uuid
   sender_id          String              @db.Uuid
   status             Boolean             @default(false)
+  stage              Stage               @default(IFA)
   subject            String
   description        String
   files              Json              @default("[]")
@@ -541,12 +542,12 @@ model ChangeOrdertable {
 
 model COResponse {
   id               String       @id @default(uuid()) @db.Uuid
-  approved         Boolean      @default(true)
+  Status           COSTATUS     @default(NOT_REPLIED)
   description      String       @default("")
-  CoId             String       @unique @db.Uuid
+  CoId             String?       @unique @db.Uuid
   userId           String       @db.Uuid
   parentResponseId String?      @db.Uuid
-  COresponse       ChangeOrder  @relation("coResponse", fields: [CoId], references: [id])
+  COresponse       ChangeOrder?  @relation("coResponse", fields: [CoId], references: [id])
   parentResponse   COResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
   childResponses   COResponse[] @relation("ParentChildResponse")
   user             Users        @relation("COrespondedby", fields: [userId], references: [id])
@@ -855,6 +856,7 @@ enum Stage {
   CO
   COMPLETED
   REWORK
+  KICKOFF
 }
 
 enum Tools {

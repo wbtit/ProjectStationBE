@@ -217,42 +217,74 @@ const AddChangeOrder = async (req, res) => {
   }
 };
 
-const  addCoResponse=async(req,res)=>{
+const addCoResponse = async (req, res) => {
+  const { coId } = req.params;
+  const { id: userId } = req.user; // id from auth middleware
+  const { status, description, parentResponseId } = req.body;
 
-  const {coId}=req.params
-  const {id}=req.user
-  const {approved,description,parentResponseId}=req.body
-  
   try {
-    if(!coId || !approved ||!description){
+    // Validate required fields
+    if (!coId || !status || !description) {
       return sendResponse({
-        message:"feilds are required",
+        message: "Fields are required",
         res,
         statusCode: 400,
         success: false,
-        data: null,  
-      })
+        data: null,
+      });
     }
-    const coResponse= await prisma.coResponse.create({
-      data:{
-        approved:approved,
-        description:description,
-        userId:id,
-        coId:coId,
-        parentResponseId:parentResponseId||null
-      }
-    })
+
+    // Check if user exists
+    const user = await prisma.users.findUnique({ where: { id: userId } });
+    if (!user) {
+      return sendResponse({
+        message: "User not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Check if ChangeOrder exists
+    const changeOrder = await prisma.changeOrder.findUnique({ where: { id: coId } });
+    if (!changeOrder) {
+      return sendResponse({
+        message: "Change Order not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    // Create COResponse
+    const coResponse = await prisma.cOResponse.create({
+      data: {
+        Status: status, // must match enum value in your schema
+        description,
+        parentResponse: parentResponseId
+  ? { connect: { id: parentResponseId } }
+  : undefined,
+        user: {
+          connect: { id: userId },
+        },
+        COresponse: {
+          connect: { id: coId },
+        },
+      },
+    });
 
     return sendResponse({
-      message:"Coresponse created successfully",
+      message: "COResponse created successfully",
       res,
-      statusCode:200,
-      success:true,
-      data:coResponse
-    })
+      statusCode: 200,
+      success: true,
+      data: coResponse,
+    });
 
   } catch (error) {
-    console.log(error.message)
+    console.error("Error creating COResponse:", error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -261,7 +293,8 @@ const  addCoResponse=async(req,res)=>{
       data: null,
     });
   }
-}
+};
+
 const getResponse=async(req,res)=>{
   const{id}=req.params
   try {

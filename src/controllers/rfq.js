@@ -767,7 +767,9 @@ export {
   Inbox,
   RFQClosed,
   RFQByID,
+
   RfqViewFiles,
+  
   RfqresponseViewFiles,
 
   addRfqResponse,
