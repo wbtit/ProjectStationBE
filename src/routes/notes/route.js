@@ -13,7 +13,7 @@ import {
 
 const router= Router();
 
-router.post("/addNote",notesUploads.array("files"),Authenticate,createNote)
+router.post("/addNote/:projectId",notesUploads.array("files"),Authenticate,createNote)
 router.get("/All",Authenticate,getAllNotes)
 router.get("/:id",Authenticate,getNoteById)
 router.patch("/update/:id",Authenticate,updateNote)

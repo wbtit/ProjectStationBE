@@ -47,6 +47,6 @@ routes.use("/stats",dashBoardStats)
 routes.use("/Estimation",estimation)
 routes.use("/EstimationTask",EstimationTask)
 routes.use("/EWH",estimationWH)
-routes.use("Note",Notes)
+routes.use("/Note",Notes)
 
 export { routes };

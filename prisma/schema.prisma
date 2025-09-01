@@ -197,8 +197,8 @@ model Project {
 model Notes{
   id                     String         @id @default(uuid()) @db.Uuid
   content                String   
-  stage                  Stage         @default(RFI)            
-  files                  Json           @default("[]")
+  stage                  Stage?        @default(RFI)            
+  files                  Json?           @default("[]")
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @updatedAt
 

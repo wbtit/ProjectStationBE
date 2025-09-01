@@ -425,7 +425,8 @@ const GetFabricatorByID = async (req, res) => {
       where: {
         id,
       },include:{
-        file:true
+        file:true,
+        project:true
       }
     });
 

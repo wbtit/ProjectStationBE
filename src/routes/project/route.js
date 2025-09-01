@@ -15,7 +15,8 @@ import {
   DownloadFile,
   ViewFile,
   getProjectsByUser,
-  deleteProjectById
+  deleteProjectById,
+  getTaskStatusCountsByStage
 } from "../../controllers/project.js";
 import { uploads } from "../../config/multer.js";
 import { isStaffAndClient } from "../../middlewares/isstaffandclient.js";
@@ -34,6 +35,8 @@ router.post(
 ); // Upload Files To Project+
 
 router.get("/projects/project-files", Authenticate, isStaff, GetAllfiles);
+
+router.get("/:projectId/tasks-by-stage",Authenticate,getTaskStatusCountsByStage)
 
 router.patch("/projects/:id", Authenticate, BroadAccess, UpdateProject); // Update Projects
 

@@ -909,6 +909,71 @@ const deleteProjectById=async(req,res)=>{
     })
   }
 }
+const getTaskStatusCountsByStage = async (req, res) => {
+  const { projectId } = req.params;
+
+  try {
+    // Step 1: Group tasks by Stage and Status
+    const grouped = await prisma.task.groupBy({
+      by: ['Stage', 'status'],
+      where: {
+        project_id: projectId,
+        status: {
+          in: ['COMPLETE', 'ASSIGNED'],
+        },
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    // Step 2: Prepare result map with all stages initialized
+    const result = {};
+
+    // Initialize all stages
+    const Stage={
+      RFI,
+      IFA,
+      BFA,
+      BFAM,
+      RIFA,
+      RBFA,
+      IFC,
+      BFC,
+      RIFC,
+      REV,
+      CO,
+      COMPLETED,
+      REWORK,
+      KICKOFF,
+    }
+
+    for (const stage of Object.values(Stage)) {
+      result[stage] = { COMPLETE: 0, ASSIGNED: 0 };
+    }
+
+    // Fill counts based on grouped results
+    for (const entry of grouped) {
+      const { Stage: stage, status, _count } = entry;
+      if (status === 'COMPLETE' || status === 'ASSIGNED') {
+        result[stage][status] = _count._all;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error) {
+    console.error('Error fetching task counts by stage and status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 
 export {
   AddProject,
@@ -921,5 +986,6 @@ export {
   DownloadFile,
   ViewFile,
   getProjectsByUser,
-  deleteProjectById
+  deleteProjectById,
+  getTaskStatusCountsByStage
 };
