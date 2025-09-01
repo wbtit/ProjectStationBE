@@ -364,7 +364,7 @@ const UpdateProject = async (req, res) => {
     })
 
     if(req.body.stage && req.body.stage !== previousProjectStage.stage){
-      await prisma.ProjectStageHistory.updateMany({
+      await prisma.projectStageHistory.updateMany({
         where:{
           projectID:id,
           endDate:null
@@ -374,7 +374,7 @@ const UpdateProject = async (req, res) => {
         }
       })
 
-      await prisma.ProjectStageHistory.create({
+      await prisma.projectStageHistory.create({
         data:{
           projectID:id,
           stage:updateData.stage,
