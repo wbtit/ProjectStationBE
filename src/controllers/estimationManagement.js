@@ -12,6 +12,7 @@ estimationNumber,
 fabricatorName,
 projectName,
 estimateDate,
+description,
 tools,
 fabricatorId,
 }=req.body
@@ -35,6 +36,14 @@ try {
             data:null
         })
     }
+    const fileDetails = req.files
+      ? req.files.map((file) => ({
+          filename: file.filename, // UUID + extension
+          originalName: file.originalname, // Original name of the file
+          id: file.filename.split(".")[0], // Extract UUID from the filename
+          path: `/public/estimationtemp/${file.filename}`, // Relative path
+        }))
+      : [];
     const createEstimation = await prisma.estimation.create({
   data: {
     ...(rfqId && {
@@ -49,6 +58,8 @@ try {
     fabricatorName,
     projectName,
     estimateDate,
+    description,
+    files:fileDetails,
     tools,
     fabricators: {
       connect: { id: fabricatorId },
@@ -341,6 +352,49 @@ const setFinalPrice=async(req,res)=>{
       })  
     }
 }
+
+const estimationsViewFiles = async (req, res) => {
+  const { id, fid } = req.params;
+  //console.log("I am viewfile route",id)
+  try {
+    const est = await prisma.estimation.findUnique({
+      where: { id },
+    });
+
+    if (!est) {
+      return res.status(404).json({ message: "Estimation not found" });
+    }
+
+    const fileObject = est.files.find((file) => file.id === fid);
+
+    if (!fileObject) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, fileObject.path);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    const mimeType = mime.getType(filePath);
+    res.setHeader("Content-Type", mimeType || "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error("View File Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong while viewing the file" });
+  }
+};
+
 export {
     createEstimation,
     getallEstimation,
@@ -348,5 +402,6 @@ export {
     updateEstimationData,
     deleteEstimationData,
     updateStatus,
-    setFinalPrice
+    setFinalPrice,
+    estimationsViewFiles
 }

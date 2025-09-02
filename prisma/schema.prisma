@@ -426,6 +426,7 @@ model RFIResponse {
 model RFQ {
   id               String        @id @default(uuid()) @db.Uuid
   projectName      String
+  projectNumber    String?       @unique
   sender_id        String        @db.Uuid
   subject          String
   description      String
@@ -433,6 +434,8 @@ model RFQ {
   recepient_id     String        @db.Uuid
   status           RFQStatus     @default(RECEIVED)
   createdAt        DateTime      @default(now())
+  estimationDate   DateTime?
+  tools            String?
   createdById      String?
   updatedAt        DateTime      @default(now()) @updatedAt
   salesPersonId    String?       @db.Uuid
@@ -686,12 +689,14 @@ model Estimation {
   estimationNumber String               @unique
   fabricatorName   String?
   projectName      String
+  description      String?
   estimateDate     DateTime
   status           EstimationStatus     @default(DRAFT)
   assignedById     String?
   finalHours       Float?
   finalWeeks       Float?
   finalPrice       Float?
+  files            Json?                 @default("[]")
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
   rfqId            String?               @db.Uuid

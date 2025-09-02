@@ -65,3 +65,6 @@ export const changeOrderResponseUploads=createMulterUploader("public/changeOrder
 
 export const notesDataMap={};
 export const notesUploads=createMulterUploader("public/notesTemp",notesDataMap)
+
+export const estimationDataMap={};
+export const estimationUploads=createMulterUploader("public/estimationtemp",estimationDataMap)
