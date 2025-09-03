@@ -699,7 +699,7 @@ model Estimation {
   files            Json?                 @default("[]")
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
-  rfqId            String?               @db.Uuid
+  rfqId            String?              @db.Uuid
   createdById      String               @db.Uuid
   id               String               @id @default(uuid()) @db.Uuid
   fabricatorId     String               @db.Uuid

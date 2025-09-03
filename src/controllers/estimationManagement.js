@@ -18,7 +18,7 @@ fabricatorId,
 }=req.body
 
 const{id}=req.user
-console.log("==============The creatdeBy Id fo the Estimation:",id)
+console.log("==============The body fo the Estimation:",req.body)
 
 try {
 
@@ -46,11 +46,13 @@ try {
       : [];
     const createEstimation = await prisma.estimation.create({
   data: {
-    ...(rfqId && {
-      rfq: {
-        connect: { id: rfqId },
-      },
-    }),
+    ...(rfqId && rfqId !== "undefined"
+      ? {
+          rfq: {
+            connect: { id: rfqId },
+          },
+        }
+      : {}),
     createdBy: {
       connect: { id },
     },

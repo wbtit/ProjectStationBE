@@ -4,7 +4,7 @@ import prisma from "../lib/prisma.js"                      // Assuming this path
 
 async function cloneWBSAndSubtasks(projectId, stage) {
     try {
-        console.log(`Attempting to clone WBS and subtasks data for project ${projectId} at stage ${stage}...`);
+        // console.log(`Attempting to clone WBS and subtasks data for project ${projectId} at stage ${stage}...`);
 
         // Fetch existing WBS Activities for this project and stage to avoid duplicates
         // Corrected: prisma.WBSActivity -> prisma.wBSActivity (camelCase)
@@ -41,12 +41,12 @@ async function cloneWBSAndSubtasks(projectId, stage) {
                 });
                 wbsActivityIdMap.set(templateWBSActivity.id, newWBSActivity.id);
                 // Corrected console log variable: newStage -> stage
-                console.log(`Created WBSActivity: ${newWBSActivity.name} (ID: ${newWBSActivity.id}) for stage ${stage}`);
+                // console.log(`Created WBSActivity: ${newWBSActivity.name} (ID: ${newWBSActivity.id}) for stage ${stage}`);
             } else {
                 const existingId = existingWBSActivitiesIdMap.get(templateWBSActivity.templateKey);
                 wbsActivityIdMap.set(templateWBSActivity.id, existingId);
                 // Corrected console log variable: newStage -> stage
-                console.log(`WBSActivity "${templateWBSActivity.name}" (templateKey: ${templateWBSActivity.templateKey}) already exists for project ${projectId} at stage ${stage}. Skipping creation.`);
+                // console.log(`WBSActivity "${templateWBSActivity.name}" (templateKey: ${templateWBSActivity.templateKey}) already exists for project ${projectId} at stage ${stage}. Skipping creation.`);
             }
         }
 
@@ -67,8 +67,8 @@ async function cloneWBSAndSubtasks(projectId, stage) {
         // Corrected: wbsactivityID -> wbsActivityId (camelCase)
         const existingSubTaskspairs = new Set(existingSubtasks.map(st => `${st.wbsactivityID}-${st.parentTemplateKey}`));
          // --- DEBUGGING LOGS START HERE ---
-        console.log(`--- Debugging SubTask Creation for Project: ${projectId}, Stage: ${stage} ---`);
-        console.log(`Existing SubTask Pairs in DB for this stage:`, Array.from(existingSubTaskspairs));
+        // console.log(`--- Debugging SubTask Creation for Project: ${projectId}, Stage: ${stage} ---`);
+        // console.log(`Existing SubTask Pairs in DB for this stage:`, Array.from(existingSubTaskspairs));
         // --- DEBUGGING LOGS END HERE ---
 
         for (const templateSubTask of newSubTasks) {
@@ -77,14 +77,14 @@ async function cloneWBSAndSubtasks(projectId, stage) {
             if (newOrExistingWBSActivityId) {
                 const subTaskUniqueKey = `${newOrExistingWBSActivityId}-${templateSubTask.parentTemplateKey}`;
                  // --- DEBUGGING LOGS START HERE ---
-                console.log(`Processing template subtask: "${templateSubTask.description}"`);
-                console.log(`  Resolved Parent WBSActivity DB ID: ${newOrExistingWBSActivityId}`);
-                console.log(`  Template Parent Key: ${templateSubTask.parentTemplateKey}`);
-                console.log(`  Generated Unique Key for check: "${subTaskUniqueKey}"`);
+                // console.log(`Processing template subtask: "${templateSubTask.description}"`);
+                // console.log(`  Resolved Parent WBSActivity DB ID: ${newOrExistingWBSActivityId}`);
+                // console.log(`  Template Parent Key: ${templateSubTask.parentTemplateKey}`);
+                // console.log(`  Generated Unique Key for check: "${subTaskUniqueKey}"`);
                 // --- DEBUGGING LOGS END HERE ---
                 if (!existingSubTaskspairs.has(subTaskUniqueKey)) {
                       // --- DEBUGGING LOGS START HERE ---
-                    console.log(`  Key "${subTaskUniqueKey}" NOT found in existing set. Attempting to create.`);
+                    // console.log(`  Key "${subTaskUniqueKey}" NOT found in existing set. Attempting to create.`);
                     // --- DEBUGGING LOGS END HERE ---
                     // Corrected: prisma.SubTasks -> prisma.subTask (camelCase and singular)
                     // Corrected: wbsactivityID -> wbsActivityId (use the mapped DB ID)
@@ -101,12 +101,12 @@ async function cloneWBSAndSubtasks(projectId, stage) {
                         }
                     });
                     // Corrected console log: more descriptive
-                    console.log(`Created SubTask: "${templateSubTask.description}" for stage ${stage}`);
+                    // console.log(`Created SubTask: "${templateSubTask.description}" for stage ${stage}`);
                 } else {
                       // --- DEBUGGING LOGS START HERE ---
-                    console.log(`  Key "${subTaskUniqueKey}" FOUND in existing set. Skipping creation.`);
+                    // console.log(`  Key "${subTaskUniqueKey}" FOUND in existing set. Skipping creation.`);
                     // --- DEBUGGING LOGS END HERE ---
-                    console.log(`SubTask "${templateSubTask.description}" (parentTemplateKey: ${templateSubTask.parentTemplateKey}) already exists for WBSActivity ${newOrExistingWBSActivityId} at stage ${stage}. Skipping creation.`);
+                    // console.log(`SubTask "${templateSubTask.description}" (parentTemplateKey: ${templateSubTask.parentTemplateKey}) already exists for WBSActivity ${newOrExistingWBSActivityId} at stage ${stage}. Skipping creation.`);
                 }
             } else {
                 // Corrected console log variable: newStage -> stage
@@ -118,9 +118,9 @@ async function cloneWBSAndSubtasks(projectId, stage) {
         }
 
         // Corrected console log variable: newStage -> stage
-        console.log(`Finished processing WBSActivities and SubTasks for Project ${projectId} at stage ${stage}.`);
+        // console.log(`Finished processing WBSActivities and SubTasks for Project ${projectId} at stage ${stage}.`);
     } catch (error) {
-        console.error(`Error cloning WBS activities and subtasks:`, error);
+        // console.error(`Error cloning WBS activities and subtasks:`, error);
         throw new Error('Failed to clone WBS activities and subtasks.');
     }
 }
