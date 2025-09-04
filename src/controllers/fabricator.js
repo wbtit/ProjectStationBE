@@ -226,7 +226,7 @@ const GetAllFabricator = async (req, res) => {
     }
 
     const hasAllowedRole =
-      user.is_superuser ||
+      // user.is_superuser ||
       user.is_manager ||
       user.is_sales ||
       user.is_oe ||
@@ -234,9 +234,11 @@ const GetAllFabricator = async (req, res) => {
       user.is_est;
 
     let fabricators;
-
-    if (hasAllowedRole) {
-      fabricators = await getFabricators();
+    if(user.is_superuser){
+      fabricators= await prisma.fabricator.findMany();
+    }
+    else if (hasAllowedRole) {
+      fabricators = await getFabricators(id);
     } else {
       fabricators = await prisma.fabricator.findMany({
         where: { createdById: id },
@@ -425,7 +427,8 @@ const GetFabricatorByID = async (req, res) => {
       where: {
         id,
       },include:{
-        file:true
+        file:true,
+        project:true
       }
     });
 

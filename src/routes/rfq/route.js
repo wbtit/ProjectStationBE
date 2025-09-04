@@ -31,6 +31,7 @@ router.get("/rfq/sent",Authenticate,sentRFQByUser)
 router.get("/rfq/inbox",Authenticate,Inbox),
 //route updated
 router.patch("/rfq/close/:id/",Authenticate,RFQClosed)
+
 router.get("/rfq/:id",Authenticate,RFQByID)
 
 

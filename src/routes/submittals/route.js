@@ -11,7 +11,8 @@ import {
   getSubmittalresponse,
   submitalsResponseViewFiles,
   getSubmittal,
-  getSubmittalsByProjectId
+  getSubmittalsByProjectId,
+  updateSubmittal
 } from "../../controllers/subbmitals.js";
 
 const router = Router();
@@ -35,6 +36,7 @@ router.get("/:projectId",Authenticate,getSubmittalsByProjectId)
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
 
 router.put("/submittalsStatus/:id", Authenticate, SubmittalsSeen);
+router.put("/update/:id",Authenticate,updateSubmittal);
 
 router.post("/addresponse/:submittalId",
   Authenticate,

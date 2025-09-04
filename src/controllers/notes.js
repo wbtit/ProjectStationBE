@@ -5,7 +5,8 @@ import { sendResponse } from "../utils/responder.js";
 // CREATE a note
 const createNote = async (req, res) => {
   try {
-    const { content, stage,projectId } = req.body;
+    const{projectId}=req.params;
+    const { content, stage } = req.body;
 
     if(!content||!stage||!projectId){
         return sendResponse({

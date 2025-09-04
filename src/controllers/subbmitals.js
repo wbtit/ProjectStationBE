@@ -6,14 +6,9 @@ import mime from "mime"
 import fs from "fs"
 import { sendNotification } from "../utils/notify.js";
 
-const AddSubmitals = async (req, res) => {
-  const { id, fabricatorId } = req?.user;
-  const { fabricator_id, project_id, recepient_id, subject, description,Stage} =
-    req.body;
-
-  // console.log(fabricator_id, project_id, recepient_id, subject, description);
-
-  try {
+//Create Change Order function
+const createSubmittal=async(req,res,approval)=>{
+try {
     if (!project_id || !recepient_id || !subject || !description) {
       // console.log("Fields are empty");
       return sendResponse({
@@ -43,6 +38,7 @@ const AddSubmitals = async (req, res) => {
         project_id,
         recepient_id,
         sender_id: id,
+        isAproovedByAdmin:approval,
         status: true,
       },
       include: {
@@ -236,7 +232,113 @@ const AddSubmitals = async (req, res) => {
       data: null,
     });
   }
+}
+
+
+
+
+const AddSubmitals = async (req, res) => {
+try {
+  const {  is_superuser,is_manager,is_staff } = req.user
+  
+      if (is_superuser ||(is_manager&& is_staff)) {
+        return createSubmittal(req, res,true);
+      }else{
+        return createSubmittal(req,res,false)
+      }
+    } catch (error) {
+      console.log(error.mes)
+      return sendResponse({
+        message: error.message,
+        res,
+        statusCode: 500,
+        success: false,
+        data: null,
+      });
+    }
+  
 };
+
+// updateSubmittal.ts
+const updateSubmittal = async (req, res) => {
+  const { id } = req.params; // submittal ID
+  const {
+    fabricator_id,
+    project_id,
+    recepient_id,
+    sender_id,
+    status,
+    stage,
+    subject,
+    description,
+    isAproovedByAdmin,
+  } = req.body;
+
+  try {
+    // check if submittal exists
+    const existing = await prisma.submittals.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return sendResponse({
+        message: "Submittal not found",
+        res,
+        statusCode: 404,
+        success: false,
+        data: null,
+      });
+    }
+
+    // update file details if files are uploaded
+    const fileDetails = req.files
+      ? req.files.map((file) => ({
+          filename: file.filename,
+          originalName: file.originalname,
+          id: file.filename.split(".")[0],
+          path: `/public/submittals/${file.filename}`,
+        }))
+      : existing.files; // keep existing files if none uploaded
+
+    // update the submittal
+    const updated = await prisma.submittals.update({
+      where: { id },
+      data: {
+        fabricator_id: fabricator_id ?? existing.fabricator_id,
+        project_id: project_id ?? existing.project_id,
+        recepient_id: recepient_id ?? existing.recepient_id,
+        sender_id: sender_id ?? existing.sender_id,
+        status: typeof status === "boolean" ? status : existing.status,
+        stage: stage ?? existing.stage,
+        subject: subject ?? existing.subject,
+        description: description ?? existing.description,
+        isAproovedByAdmin:
+          typeof isAproovedByAdmin === "boolean"
+            ? isAproovedByAdmin
+            : existing.isAproovedByAdmin,
+        files: fileDetails,
+      },
+    });
+
+    return sendResponse({
+      message: "Submittal updated successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: updated,
+    });
+  } catch (error) {
+    console.error("Error updating submittal:", error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
 
 const getSubmittal = async (req, res) => {
   const { submittalId } = req.params;
@@ -674,6 +776,7 @@ const getSubmittalsByProjectId=async(req,res)=>{
 }
 export { 
   AddSubmitals,
+  updateSubmittal,
   RecievedSubmittals,
   SentSubmittals, 
   SubmittalsSeen,

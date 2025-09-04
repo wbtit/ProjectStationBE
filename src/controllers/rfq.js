@@ -5,17 +5,17 @@ import fs from "fs"
 import mime from "mime"
 import path from "path"
 import { sendNotification } from "../utils/notify.js";
-import { response } from "express";
+
 
 
 
 
 const addRFQ=async(req,res)=>{
-    const {projectName,recepient_id,subject,description,status,connectionDesign,
+    const {projectName,projectNumber,recepient_id,estimationDate,tools,subject,description,status,connectionDesign,
       miscDesign,customerDesign
     }=req.body
     const {id}=req.user
-    //// console.log("The Rfq data Input",req.body)
+    //console.log("The Rfq data Input",req.body)
     try {
         if ( !recepient_id||!subject || !description) {
             return sendResponse({
@@ -43,15 +43,18 @@ const addRFQ=async(req,res)=>{
           const newrfq= await prisma.rFQ.create({
             data:{
                 projectName,
+                projectNumber,
                 sender_id:id,
                 createdById:id,
                 salesPersonId:salesPersonId ||null,
                 status:"RECEIVED",
                 connectionDesign,
+                tools,
                 miscDesign,
                 customerDesign,
                 subject,
                 description,
+                estimationDate,
                 files:fileDetails,
                 recepient_id:recepient_id
             },
@@ -767,7 +770,9 @@ export {
   Inbox,
   RFQClosed,
   RFQByID,
+
   RfqViewFiles,
+  
   RfqresponseViewFiles,
 
   addRfqResponse,

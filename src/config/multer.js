@@ -60,8 +60,11 @@ export const fabricatorsUploads=createMulterUploader("public/fabricatortemp",fab
 export const changeOrderDataMap = {};
 export const changeorderUploads=createMulterUploader("public/changeordertemp",changeOrderDataMap)
 
-export const changeOrderTableDataMap={};
-export const changeOrderTableUploads=createMulterUploader("public/changeOrderTabletemp",changeOrderTableDataMap)
+export const changeOrderResponse={};
+export const changeOrderResponseUploads=createMulterUploader("public/changeOrderTabletemp",changeOrderResponse)
 
 export const notesDataMap={};
 export const notesUploads=createMulterUploader("public/notesTemp",notesDataMap)
+
+export const estimationDataMap={};
+export const estimationUploads=createMulterUploader("public/estimationtemp",estimationDataMap)

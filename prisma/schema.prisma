@@ -197,8 +197,8 @@ model Project {
 model Notes{
   id                     String         @id @default(uuid()) @db.Uuid
   content                String   
-  stage                  Stage         @default(RFI)            
-  files                  Json           @default("[]")
+  stage                  Stage?        @default(RFI)            
+  files                  Json?           @default("[]")
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @updatedAt
 
@@ -345,9 +345,11 @@ model Submittals {
   recepient_id       String              @db.Uuid
   sender_id          String              @db.Uuid
   status             Boolean             @default(false)
+  stage              Stage               @default(IFA)
   subject            String
   description        String
   files              Json              @default("[]")
+  isAproovedByAdmin   Boolean?   @default(false)
   file               File[]              @relation("submittalsFiles")
   fabricator         Fabricator          @relation("FabricatorSubmittals", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project            Project             @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
@@ -390,6 +392,7 @@ model RFI {
   subject       String
   description   String
   files         Json       @default("[]")
+  isAproovedByAdmin   Boolean?   @default(false)
   file          File[]       @relation("rfiFiles")
   fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
@@ -423,6 +426,7 @@ model RFIResponse {
 model RFQ {
   id               String        @id @default(uuid()) @db.Uuid
   projectName      String
+  projectNumber    String?       @unique
   sender_id        String        @db.Uuid
   subject          String
   description      String
@@ -430,6 +434,8 @@ model RFQ {
   recepient_id     String        @db.Uuid
   status           RFQStatus     @default(RECEIVED)
   createdAt        DateTime      @default(now())
+  estimationDate   DateTime?
+  tools            String?
   createdById      String?
   updatedAt        DateTime      @default(now()) @updatedAt
   salesPersonId    String?       @db.Uuid
@@ -541,12 +547,13 @@ model ChangeOrdertable {
 
 model COResponse {
   id               String       @id @default(uuid()) @db.Uuid
-  approved         Boolean      @default(true)
+  Status           COSTATUS     @default(NOT_REPLIED)
   description      String       @default("")
-  CoId             String       @unique @db.Uuid
+  CoId             String?      @unique @db.Uuid
   userId           String       @db.Uuid
   parentResponseId String?      @db.Uuid
-  COresponse       ChangeOrder  @relation("coResponse", fields: [CoId], references: [id])
+  files       Json               @default("[]")
+  COresponse       ChangeOrder?  @relation("coResponse", fields: [CoId], references: [id])
   parentResponse   COResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
   childResponses   COResponse[] @relation("ParentChildResponse")
   user             Users        @relation("COrespondedby", fields: [userId], references: [id])
@@ -682,15 +689,17 @@ model Estimation {
   estimationNumber String               @unique
   fabricatorName   String?
   projectName      String
+  description      String?
   estimateDate     DateTime
   status           EstimationStatus     @default(DRAFT)
   assignedById     String?
   finalHours       Float?
   finalWeeks       Float?
   finalPrice       Float?
+  files            Json?                 @default("[]")
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
-  rfqId            String?               @db.Uuid
+  rfqId            String?              @db.Uuid
   createdById      String               @db.Uuid
   id               String               @id @default(uuid()) @db.Uuid
   fabricatorId     String               @db.Uuid
@@ -855,6 +864,7 @@ enum Stage {
   CO
   COMPLETED
   REWORK
+  KICKOFF
 }
 
 enum Tools {

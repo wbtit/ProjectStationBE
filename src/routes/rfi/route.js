@@ -12,7 +12,8 @@ import {
   viewRFIResponsefiles,
   addRFIResponse,
   getRfiresponse,
-  getRfiByProjectId 
+  getRfiByProjectId ,
+  updateRFI
 } from "../../controllers/rfi.js";
 
 const router = Router();
@@ -33,6 +34,7 @@ router.get("/:projectId",Authenticate,getRfiByProjectId)
 
 router.get("/rfi/inbox", Authenticate, Inbox);
 router.patch("/rfi/:id/update", Authenticate, RFIseen);
+router.put("/update/:id",Authenticate,updateRFI)
 router.get("/rfi/:id", Authenticate, RFIByID);
 
 router.post("/rfi/addResponse/:rfiId",
