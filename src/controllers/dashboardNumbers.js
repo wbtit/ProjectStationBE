@@ -7,15 +7,22 @@ const dashBoardNumbers = async (req, res) => {
     let taskFilter = {};
 
     if(req.user.is_superuser){
+
       //console.log("I am admin")
        projectFilter = {};
       taskFilter = {};
 
     }
     // If Project Manager, restrict to their projects only
-    if (req.user.is_manager && !req.user.is_staff) {
+    else if (req.user.is_manager && !req.user.is_staff) {
       projectFilter = { managerID: req.user.id };
       taskFilter = { project: { managerID: req.user.id } }; // filter tasks by project manager
+    }
+    // Dept manager
+    else if(req.user.is_manager && req.user.is_staff){
+const departments = await prisma.department.findMany({ where: { managerId: req.user.id }, select: { id: true }, }); 
+const deptIds = departments.map(d => d.id); projectFilter = { departmentID: { in: deptIds } }; 
+taskFilter = { project: { departmentID: { in: deptIds } } };
     }
 
     const [projectStats, totalProject, taskStats, totalNumberOfTasks, employeeCount] = await Promise.all([
