@@ -11,11 +11,14 @@ import { sendNotification } from "../utils/notify.js";
 
 
 const addRFQ=async(req,res)=>{
-    const {projectName,projectNumber,recepient_id,estimationDate,tools,subject,description,sender_id,connectionDesign,fabricatorId,
-      miscDesign,customerDesign
+    const {projectName,projectNumber,recepient_id,estimationDate,tools,bidPrice,subject,description,sender_id,connectionDesign,fabricatorId,
+      miscDesign,customerDesign,detailingMain,
+    detailingMisc
     }=req.body
     const {id}=req.user
-    //console.log("The Rfq data Input",req.body)
+    //console.log(req.user)
+    console.log("The Rfq data Input",req.body)
+
     try {
         if ( !recepient_id||!subject || !description) {
             return sendResponse({
@@ -45,15 +48,18 @@ const addRFQ=async(req,res)=>{
             data:{
                 projectName,
                 projectNumber,
-                fabricatorId,
+                fabricatorId:fabricatorId?fabricatorId:req.user.fabricatorId,
                 sender_id:sender_id?sender_id:id,
+                bidPrice:bidPrice,
                 createdById:id,
                 salesPersonId:salesPersonId ||null,
                 status:"RECEIVED",
-                connectionDesign,
+                connectionDesign:(connectionDesign==="true"),
+                detailingMain:(detailingMain==="true"),
+                detailingMisc:(detailingMisc=== "true"),
                 tools,
-                miscDesign,
-                customerDesign,
+                miscDesign:(miscDesign==="true"),
+                customerDesign:(customerDesign==="true"),
                 subject,
                 description,
                 estimationDate,

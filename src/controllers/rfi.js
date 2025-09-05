@@ -8,6 +8,8 @@ import { sendNotification } from "../utils/notify.js";
 
 
 const createRFI=async(req,res,approval)=>{
+  const{project_id,recipient_id,subject, description,fabricator_id}=req.body
+  const{id}=req.user
     try {
     if (!project_id || !recipient_id || !subject || !description) {
       return sendResponse({
@@ -28,7 +30,7 @@ const createRFI=async(req,res,approval)=>{
     const newrfi = await prisma.rFI.create({
       data: {
         fabricator_id:
-          fabricator_id !== "undefined" ? fabricator_id : fabricatorId,
+          fabricator_id,
         project_id,
         recepient_id: recipient_id,
         sender_id: id,

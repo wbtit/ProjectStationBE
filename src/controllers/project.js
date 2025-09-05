@@ -8,8 +8,7 @@ import path from "path";
 import fs from "fs";
 // import client from "../redis/index.js";
 import mime from "mime";
-import { fetchTeamDetails } from "../models/getTeamMemberDetails.js";
-import { SubTasks } from "../../data/data.js";
+import { fetchTeamDetails } from "../models/getTeamMemberDetails.js"
 import { sendNotification } from "../utils/notify.js";
 import cloneWBSAndSubtasks from "../utils/cloneWBSAndSubTasks.js";
 
@@ -38,7 +37,11 @@ const AddProject = async (req, res) => {
     detailingHours,
     detailCheckingHours,
     erectionHours,
-    erectionCheckingHours
+    erectionCheckingHours,
+    detailingMain,
+    detailingMisc,
+    rfqId,
+    projectNumber
   } = req.body;
 
   // console.log(req.body);
@@ -75,6 +78,10 @@ const AddProject = async (req, res) => {
         name: name,
         approvalDate: approvalDate,
         connectionDesign: connectionDesign,
+        detailingMain,
+        detailingMisc,
+        projectNumber,
+        rfqId,
         customerDesign: customer,
         departmentID: department,
         fabricatorID: fabricator,
@@ -126,7 +133,7 @@ const AddProject = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.log(error.message);
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -331,7 +338,9 @@ const UpdateProject = async (req, res) => {
       "erectionHours",
       "erectionCheckingHours",
       "mailReminder",
-      "submissionMailReminder"
+      "submissionMailReminder",
+      "detailingMain",
+      "detailingMisc"
     ];
 
     fieldsToUpdate.forEach((field) => {

@@ -89,9 +89,44 @@ model Users {
   workingHourUser       WorkingHours[]       @relation("workingHourUser")
   fabricators           Fabricator[]         @relation("FabricatorUsers")
   taggedInMessages      Message[]            @relation("TaggedUsers")
-  POC                   Project[]            @relation("POC")                    
-
+  POC                   Project[]            @relation("POC")
+  meetingsCreated Meeting[]          @relation("MeetingCreatedBy") 
+  meetingAttendees MeetingAttendee[] @relation("MeetingAttendeeUser")
   @@map("users")
+}
+
+model Meeting {
+  id          String            @id @default(uuid()) @db.Uuid
+  title       String
+  agenda      String
+  description String?
+  link        String
+  startTime   DateTime
+  endTime     DateTime?
+  files       Json         @default("[]")
+  status      MeetingStatus            @default(SCHEDULED) // optional
+
+  // relation to who created the meeting
+  createdById String            @db.Uuid
+  createdBy   Users             @relation("MeetingCreatedBy", fields: [createdById], references: [id])
+
+  participants MeetingAttendee[]
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model MeetingAttendee {
+  id        String   @id @default(uuid())
+  meetingId String   @db.Uuid
+  userId    String?  @db.Uuid // nullable in case external emails are invited
+  email     String
+  rsvp      RSVPStatus  
+  joined    Boolean     @default(false) // true if they actually attended
+  role      MeetingRole @default(ATTENDEE) // role in the meeting
+
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      Users?   @relation("MeetingAttendeeUser", fields: [userId], references: [id])
 }
 
 model Fabricator {
@@ -150,6 +185,8 @@ model Project {
   id                     String        @id @default(uuid()) @db.Uuid
   name                   String        @unique
   description            String
+  rfqId                  String?         @unique @db.Uuid 
+  projectNumber          String?       @unique  
   fabricatorID           String        @db.Uuid
   clientId               String?        @db.Uuid
   departmentID           String        @db.Uuid
@@ -191,9 +228,9 @@ model Project {
   subTasks               SubTasks[]    @relation("subTasksproject")
   submittals             Submittals[]  @relation("ProjectSubmittals")
   tasks                  Task[]        @relation("projectTask")
-  wbsActivities          WBSActivity[]
+  wbsActivities          WBSActivity[]  
   notes                  Notes[]        @relation("projectNotes")
-
+  rfq                    RFQ?          @relation("ProjectRFQ", fields: [rfqId], references: [id], onDelete: Cascade)
   @@map("project")
 }
 
@@ -440,12 +477,15 @@ model RFQ {
   createdAt        DateTime      @default(now())
   estimationDate   DateTime?
   tools            String?
+  bidPrice         String?
   createdById      String?
   updatedAt        DateTime      @default(now()) @updatedAt
   salesPersonId    String?       @db.Uuid
   connectionDesign Boolean       @default(false)
   customerDesign   Boolean       @default(false)
   miscDesign       Boolean       @default(false)
+  detailingMain    Boolean       @default(false)
+  detailingMisc    Boolean       @default(false)
   estimations      Estimation[]
   fabricators      Fabricator?    @relation("FabricatorRFQ", fields: [fabricatorId], references: [id])
   file             File[]        @relation("rfqFiles")
@@ -453,6 +493,7 @@ model RFQ {
   salesPerson      Users?        @relation("SalesPersonRFQ", fields: [salesPersonId], references: [id])
   sender           Users?         @relation("senderRFQ", fields: [sender_id], references: [id])
   response         RFQResponse[] @relation("rfqResponses")
+  project          Project?      @relation("ProjectRFQ")
 
   @@map("rfq")
 }
@@ -932,3 +973,26 @@ enum COSTATUS {
   REJECT
   NOT_REPLIED
 }
+// Meeting status values
+enum MeetingStatus {
+  SCHEDULED   // Meeting is planned but not started
+  ONGOING     // Meeting is currently happening
+  COMPLETED   // Meeting has ended
+  CANCELLED   // Meeting was cancelled
+  RESCHEDULED // Meeting moved to another time
+}
+
+// RSVP values for attendees
+enum RSVPStatus {
+  ACCEPTED   // User accepted invitation
+  DECLINED   // User declined
+  MAYBE      // User marked as tentative
+  PENDING    // User has not responded yet
+}
+enum MeetingRole {
+  HOST        // Creator or main organizer of the meeting
+  PRESENTER   // Allowed to present/share content
+  ATTENDEE    // Regular participant
+  OBSERVER    // Can join but not actively participate
+}
+

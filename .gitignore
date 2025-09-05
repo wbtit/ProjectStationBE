@@ -90,6 +90,9 @@ out
 
 public/
 
+src/controllers/meeting.js
+src/controllers/rsvp_attendence.js
+
 # Nuxt.js build / generate output
 .nuxt
 dist

@@ -8,6 +8,8 @@ import { sendNotification } from "../utils/notify.js";
 
 //Create Change Order function
 const createSubmittal=async(req,res,approval)=>{
+  const{id}=req.user
+  const{description,subject,fabricator_id,project_id,recepient_id}=req.body
 try {
     if (!project_id || !recepient_id || !subject || !description) {
       // console.log("Fields are empty");
@@ -33,7 +35,7 @@ try {
         description,
         subject,
         fabricator_id:
-          fabricator_id !== "undefined" ? fabricator_id : fabricatorId,
+          fabricator_id,
         files: fileDetails,
         project_id,
         recepient_id,
