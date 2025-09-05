@@ -50,9 +50,7 @@ const AddProject = async (req, res) => {
     !department ||
     !manager ||
     !start_date ||
-    !estimatedHours||
-    !approvalDate ||
-    !clientId
+    !approvalDate 
     // !modelingHours||
     // !modelCheckingHours||
     // !detailingHours||
@@ -73,14 +71,14 @@ const AddProject = async (req, res) => {
     const project = await prisma.project.create({
       data: {
         description: description,
-        estimatedHours: parseInt(estimatedHours),
+        estimatedHours: parseInt(estimatedHours)||"",
         name: name,
         approvalDate: approvalDate,
         connectionDesign: connectionDesign,
         customerDesign: customer,
         departmentID: department,
         fabricatorID: fabricator,
-        clientId:clientId,
+        clientId:clientId||null,
         managerID: manager,
         miscDesign: miscDesign,
         stage: stage || 'IFA',
