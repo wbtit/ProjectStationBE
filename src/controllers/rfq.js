@@ -11,7 +11,7 @@ import { sendNotification } from "../utils/notify.js";
 
 
 const addRFQ=async(req,res)=>{
-    const {projectName,projectNumber,recepient_id,estimationDate,tools,subject,description,status,connectionDesign,
+    const {projectName,projectNumber,recepient_id,estimationDate,tools,subject,description,sender_id,connectionDesign,fabricatorId,
       miscDesign,customerDesign
     }=req.body
     const {id}=req.user
@@ -34,8 +34,9 @@ const addRFQ=async(req,res)=>{
           }));
 
           let salesPersonId;
+            //console.log("logged in user id-=-=--=--=-=",id)
            const user= await prisma.users.findUnique({where:{id:id}})
-            //console.log(user.id)
+            //console.log(user)
            if(user.role === 'SALES_PERSON' || user.role==='DEPT_MANAGER' || user.role==='OPERATION_EXECUTIVE' ||user.is_superuser){
               salesPersonId=user.id
               //console.log(salesPersonId)
@@ -44,7 +45,8 @@ const addRFQ=async(req,res)=>{
             data:{
                 projectName,
                 projectNumber,
-                sender_id:id,
+                fabricatorId,
+                sender_id:sender_id?sender_id:id,
                 createdById:id,
                 salesPersonId:salesPersonId ||null,
                 status:"RECEIVED",
@@ -308,6 +310,7 @@ const sentRFQByUser = async (req, res) => {
       },
       include: {
         recepients: true,
+        fabricators:true,
         response:{
           orderBy: { createdAt: 'asc' },
            select:{
@@ -319,7 +322,7 @@ const sentRFQByUser = async (req, res) => {
             createdAt:true,
             userId:true,
             rfqId:true,
-            parentResponseId:true
+            parentResponseId:true,
           }
         },
         file:true
@@ -373,6 +376,7 @@ const RFQByID = async (req, res) => {
       },
       include: {
         recepients:true,
+        fabricators:true,
         response:{
           orderBy: { createdAt: 'asc' },
            select:{
@@ -420,14 +424,50 @@ const RFQByID = async (req, res) => {
 };
 
 const Inbox = async (req, res) => {
-  const { id } = req.user;
+  const { id,is_superuser } = req.user;
   try {
-    const sentRFQ = await prisma.rFQ.findMany({
+    let sentRFQ
+    if(is_superuser){
+      sentRFQ = await prisma.rFQ.findMany({
+        include: {
+        recepients: true,
+        fabricators:true,
+        response:{
+          orderBy: { createdAt: 'asc' },
+          select:{
+            id:true,
+            file:true,
+            description:true,
+            status:true,
+            wbtStatus:true,
+            createdAt:true,
+            userId:true,
+            rfqId:true,
+            parentResponseId:true,
+            childResponses:true
+          }
+        },
+        file:true,
+        sender:{
+          select:{
+            email:true,
+            f_name:true,
+            m_name:true,
+            l_name:true,
+            phone:true,
+            fabricator:true
+          }
+        }
+      },
+      });
+    }else{
+      sentRFQ = await prisma.rFQ.findMany({
       where: {
         recepient_id: id,
       },
       include: {
         recepients: true,
+        fabricators:true,
         response:{
           orderBy: { createdAt: 'asc' },
           select:{
@@ -456,7 +496,8 @@ const Inbox = async (req, res) => {
         }
       },
     });
-
+    }
+    
     if (!sentRFQ) {
       return sendResponse({
         message: "Failed to get RFQs",

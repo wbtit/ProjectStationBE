@@ -115,6 +115,7 @@ model Fabricator {
   submittals  Submittals[] @relation("FabricatorSubmittals")
   userss      Users[]      @relation("UsersFabricator")
   users       Users[]      @relation("FabricatorUsers")
+  RFQ         RFQ[]       @relation("FabricatorRFQ")
 
   @@map("fabricators")
 }
@@ -156,17 +157,19 @@ model Project {
   managerID              String        @db.Uuid
   status                 Status        @default(ACTIVE)
   stage                  Stage         @default(RFI)
-  tools                  Tools         @default(TEKLA)
+  tools                  Tools         @default(NO_PREFERENCE)
   files                  Json          @default("[]")
   connectionDesign       Boolean       @default(false)
   miscDesign             Boolean       @default(false)
   customerDesign         Boolean       @default(false)
+  detailingMain          Boolean       @default(false)
+  detailingMisc          Boolean       @default(false)
   startDate              String
   endDate                String?
   endDateChangeLog       Json          @default("[]")
   stageHistory           ProjectStageHistory[]
   approvalDate           String
-  estimatedHours         Float         @default(0)
+  estimatedHours         Float?        @default(0)
   detailCheckingHours    Float         @default(0)
   detailingHours         Float         @default(0)
   executionCheckingHours Float         @default(0)
@@ -427,7 +430,8 @@ model RFQ {
   id               String        @id @default(uuid()) @db.Uuid
   projectName      String
   projectNumber    String?       @unique
-  sender_id        String        @db.Uuid
+  sender_id        String?        @db.Uuid
+  fabricatorId     String?        @db.Uuid
   subject          String
   description      String
   files            Json        @default("[]")
@@ -443,10 +447,11 @@ model RFQ {
   customerDesign   Boolean       @default(false)
   miscDesign       Boolean       @default(false)
   estimations      Estimation[]
+  fabricators      Fabricator?    @relation("FabricatorRFQ", fields: [fabricatorId], references: [id])
   file             File[]        @relation("rfqFiles")
   recepients       Users         @relation("UsersRFQ", fields: [recepient_id], references: [id])
   salesPerson      Users?        @relation("SalesPersonRFQ", fields: [salesPersonId], references: [id])
-  sender           Users         @relation("senderRFQ", fields: [sender_id], references: [id])
+  sender           Users?         @relation("senderRFQ", fields: [sender_id], references: [id])
   response         RFQResponse[] @relation("rfqResponses")
 
   @@map("rfq")
@@ -870,7 +875,8 @@ enum Stage {
 enum Tools {
   TEKLA
   SDS2
-  PEMB
+  BOTH
+  NO_PREFERENCE
 }
 
 enum Activity {
