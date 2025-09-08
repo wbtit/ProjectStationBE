@@ -22,6 +22,7 @@ import {
 //---------------
   meetingSummary,
   attendanceHistory,
+  meetingStats
 } from "../../controllers/meeting/index.js";
 
 const router = express.Router();

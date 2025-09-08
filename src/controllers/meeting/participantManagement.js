@@ -17,6 +17,15 @@ const addParticipants=async(req,res)=>{
         role: "ATTENDEE"
   }
 });
+    if (userId) {
+      sendNotification(
+        userId,
+        {
+          subject: "New Meeting Participant",
+          text: `📅 You have been added as a participant to the meeting: ${meeting.title}`
+        }
+      );
+    }
     return sendResponse({
         message:"Participant added successfully",
         statusCode:201,
@@ -48,6 +57,15 @@ const updateParticipant=async(req,res)=>{
     role: role
   }
 });
+    if (updatedData.userId) {
+        sendNotification(
+          updatedData.userId,
+          {
+            subject: "Meeting Participant Updated",
+            text: `📅 Your participation status has been updated for the meeting: ${meeting.title}`
+          }
+        );
+    }
     return sendResponse({
         message:"Participant updated successfully",
         statusCode:200,
@@ -73,6 +91,15 @@ const removeParticipant=async(req,res)=>{
         await prisma.meetingAttendee.delete({
             where: { id: attendeeId }
         });
+        if(attendeeId){
+            sendNotification(
+                attendeeId,
+                {
+                    subject: "Meeting Participant Removed",
+                    text: `📅 You have been removed as a participant from the meeting: ${meeting.title}`
+                }
+            );
+        }
         return sendResponse({
             message: "Participant removed successfully",
             statusCode: 200,

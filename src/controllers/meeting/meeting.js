@@ -35,6 +35,17 @@ const meeting = await prisma.meeting.create({
   },
   include: { participants: true }
 });
+ meeting.participants.forEach(participant => {
+  if (participant.userId) {
+    sendNotification(
+      participant.userId,
+      {
+        subject: "New Meeting Created",
+        text: `📅 A new meeting "${meeting.title}" has been scheduled.\n\n🕒 Start: ${meeting.startTime}\n🔗 Link: ${meeting.link}`
+      }
+    );
+  }
+});
  return sendResponse({
     message:"Meeting created successfully",
     statusCode:200,
@@ -135,6 +146,20 @@ const updateMeeting =async(req,res)=>{
             startTime,
             endTime,
             status
+          },
+          include:{
+            participants:true
+          }
+        });
+        meeting.participants.forEach(participant => {
+          if (participant.userId) {
+            sendNotification(
+              participant.userId,
+              {
+                subject: "Meeting Updated",
+                text: `📅 The meeting "${meeting.title}" has been updated.\n\n🕒 Start: ${meeting.startTime}\n🔗 Link: ${meeting.link}`
+              }
+            );
           }
         });
         return sendResponse({
@@ -161,9 +186,22 @@ const cancelMeeting=async(req,res)=>{
         // DELETE /api/meetings/:id
         await prisma.meeting.update({
           where: { id: id },
-          data: { status: "CANCELLED" }
+          data: { status: "CANCELLED" },
+          include:{
+            participants:true
+          }
         });
-
+        meeting.participants.forEach(participant => {
+          if (participant.userId) {
+            sendNotification(
+              participant.userId,
+              {
+                subject: "Meeting Cancelled",
+                text: `📅 The meeting "${meeting.title}" has been cancelled.`
+              }
+            );
+          }
+        });
     } catch (error) {
               console.log(error.message)
     return sendResponse({

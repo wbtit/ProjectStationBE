@@ -12,7 +12,21 @@ const updateMeetingStatus=async(req,res)=>{
         // PATCH /api/meetings/:id/status
     const updatedMeeting = await prisma.meeting.update({
       where: { id: meetingId },
-      data: { status: status }
+      data: { status: status },
+      include:{
+        participants: true
+      }
+    });
+    updateMeetingStatus.participants.forEach(participant => {
+      if (participant.userId) {
+        sendNotification(
+          participant.userId,
+          {
+            subject: "Meeting Status Updated",
+            text: `📅 The meeting "${updatedMeeting.title}" has been ${status.toLowerCase()}.`
+          }
+        );
+      }
     });
     return sendResponse({
         message:"Meeting status updated successfully",

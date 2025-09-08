@@ -1,7 +1,6 @@
 import prisma from "../../lib/prisma.js";
 import { sendResponse } from "../../utils/responder.js";
 import { sendEmail } from "../../../service/gmailservice/index.js";
-import { sendNotification } from "../../utils/notify.js";
 
 const meetingSummary = async (req, res) => {
     const { id } = req.params
