@@ -105,6 +105,8 @@ model Meeting {
   endTime     DateTime?
   files       Json         @default("[]")
   status      MeetingStatus            @default(SCHEDULED) // optional
+  reminderSent Boolean @default(false)
+
 
   // relation to who created the meeting
   createdById String            @db.Uuid

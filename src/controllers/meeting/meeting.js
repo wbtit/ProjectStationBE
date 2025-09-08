@@ -3,65 +3,84 @@ import { sendResponse } from "../../utils/responder.js";
 import { sendEmail } from "../../../service/gmailservice/index.js";
 import { sendNotification } from "../../utils/notify.js";
 
-const createMeeting=async(req,res)=>{
-const {title,agenda,description,link,startTime,endTime,status,participants}= req.body
-try {
-    if(!title||!agenda||!link||!startTime||!participants){
-    return sendResponse({
-        message:"fields are empty",
-        statusCode:400,
-        success:false,
-        data:null
-    })
-}
-    // POST /api/meetings
-const meeting = await prisma.meeting.create({
-  data: {
-    title,
-    agenda,
-    description,
-    link,
-    startTime,
-    endTime,
-    createdById: req.user.id,
-    participants: {
-      create: participants.map(p => ({
-        userId: p.userId ?? null,
-        email: p.email,
-        rsvp: "PENDING",
-        role: "ATTENDEE"
-      }))
+const createMeeting = async (req, res) => {
+  const { title, agenda, description, link, startTime, endTime, status, participants } = req.body;
+
+  try {
+    if (!title || !agenda || !link || !startTime || !participants) {
+      return sendResponse({
+        message: "fields are empty",
+        statusCode: 400,
+        success: false,
+        data: null
+      });
     }
-  },
-  include: { participants: true }
-});
- meeting.participants.forEach(participant => {
-  if (participant.userId) {
-    sendNotification(
-      participant.userId,
-      {
-        subject: "New Meeting Created",
-        text: `📅 A new meeting "${meeting.title}" has been scheduled.\n\n🕒 Start: ${meeting.startTime}\n🔗 Link: ${meeting.link}`
+
+    // 📌 Create meeting in DB
+    const meeting = await prisma.meeting.create({
+      data: {
+        title,
+        agenda,
+        description,
+        link,
+        startTime,
+        endTime,
+        createdById: req.user.id,
+        participants: {
+          create: participants.map(p => ({
+            userId: p.userId ?? null,
+            email: p.email,
+            rsvp: "PENDING",
+            role: "ATTENDEE"
+          }))
+        }
+      },
+      include: { participants: true }
+    });
+
+    // 📢 Send in-app notifications
+    meeting.participants.forEach(participant => {
+      if (participant.userId) {
+        sendNotification(participant.userId, {
+          subject: "New Meeting Created",
+          text: `📅 A new meeting "${meeting.title}" has been scheduled.\n\n🕒 Start: ${meeting.startTime}\n🔗 Link: ${meeting.link}`
+        });
       }
-    );
-  }
-});
- return sendResponse({
-    message:"Meeting created successfully",
-    statusCode:200,
-    success:true,
-    data:meeting
- })
-} catch (error) {
-    console.log(error.message)
+    });
+
+    // 📧 Send email to all participants
+    await sendEmail({
+      to: meeting.participants.map(p => p.email).join(","), // <-- safer
+      subject: `📅 Meeting Scheduled: ${meeting.title}`,
+      text: `You have been invited to the meeting "${meeting.title}".\n\nAgenda: ${meeting.agenda}\n\n🕒 Start: ${meeting.startTime}\n🔗 Link: ${meeting.link}`,
+      html: `
+        <h2>📅 New Meeting Scheduled</h2>
+        <p><strong>Title:</strong> ${meeting.title}</p>
+        <p><strong>Agenda:</strong> ${meeting.agenda}</p>
+        <p><strong>Description:</strong> ${meeting.description ?? "N/A"}</p>
+        <p><strong>Start:</strong> ${new Date(meeting.startTime).toLocaleString()}</p>
+        <p><strong>End:</strong> ${new Date(meeting.endTime).toLocaleString()}</p>
+        <p><a href="${meeting.link}">🔗 Join Meeting</a></p>
+      `
+    });
+
     return sendResponse({
-        message:error.message,
-        statusCode:500,
-        success:false,
-        data:null
-    })
-}
-}
+      message: "Meeting created successfully",
+      statusCode: 200,
+      success: true,
+      data: meeting
+    });
+  } catch (error) {
+    console.log(error.message);
+    return sendResponse({
+      message: error.message,
+      statusCode: 500,
+      success: false,
+      data: null
+    });
+  }
+};
+
 
 const getMeetingForUser=async(req,res)=>{
    try {
