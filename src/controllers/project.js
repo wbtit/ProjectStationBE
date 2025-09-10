@@ -466,7 +466,6 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         include: {
           stageHistory:true,
-          submittals:{include:{mileStone:true}},
           rfi:true,
           file:true,
           fabricator: true,
@@ -484,6 +483,9 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { fabricatorID: fabricatorId },
         include: {
+          submittals:{
+            mileStoneBelongsTo:true
+          },
           stageHistory:true,
           fabricator: true,
           tasks:true,
