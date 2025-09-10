@@ -414,7 +414,6 @@ model MileStone{
   project_id         String              @db.Uuid
   approvalDate      DateTime?
   status             Status             @default(ACTIVE)
-  stage              Stage               @default(IFA)
   subject            String
   description        String
   //relations
