@@ -80,8 +80,8 @@ const AddProject = async (req, res) => {
         connectionDesign: connectionDesign,
         detailingMain,
         detailingMisc,
-        projectNumber,
-        rfqId,
+        projectNumber: projectNumber ||null,
+        rfqId: rfqId || null,
         customerDesign: customer,
         departmentID: department,
         fabricatorID: fabricator,
@@ -466,6 +466,8 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         include: {
           stageHistory:true,
+          submittals:{include:{mileStone:true}},
+          rfi:true,
           file:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
