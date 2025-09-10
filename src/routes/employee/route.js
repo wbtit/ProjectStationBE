@@ -14,13 +14,13 @@ import { userStats } from "../../controllers/employeestats.js";
 
 const router = Router();
 
-router.post("/employee", Authenticate, isStaff, AddEmployee); // Adding employee
+router.post("/employee", Authenticate, AddEmployee); // Adding employee
 
 router.get("/employee", Authenticate, getAllEmployees); // Get all employee
 
-router.get("/employee/:eid", Authenticate, isStaff, GetEmployeeBYID); // Get employee by id
+router.get("/employee/:eid", Authenticate, GetEmployeeBYID); // Get employee by id
 
-router.patch("/employee/:id", Authenticate, isStaff, UpdateEmployee) // Editing employee details
+router.patch("/employee/:id", Authenticate, UpdateEmployee) // Editing employee details
 
 router.get("/stats/:id",Authenticate,userStats)
 
