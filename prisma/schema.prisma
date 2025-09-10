@@ -105,6 +105,8 @@ model Meeting {
   endTime     DateTime?
   files       Json         @default("[]")
   status      MeetingStatus            @default(SCHEDULED) // optional
+  reminderSent Boolean @default(false)
+
 
   // relation to who created the meeting
   createdById String            @db.Uuid
@@ -151,6 +153,7 @@ model Fabricator {
   userss      Users[]      @relation("UsersFabricator")
   users       Users[]      @relation("FabricatorUsers")
   RFQ         RFQ[]       @relation("FabricatorRFQ")
+  mileStone   MileStone[] @relation("FabricatorMileStone")
 
   @@map("fabricators")
 }
@@ -229,6 +232,7 @@ model Project {
   submittals             Submittals[]  @relation("ProjectSubmittals")
   tasks                  Task[]        @relation("projectTask")
   wbsActivities          WBSActivity[]  
+  mileStones             MileStone[]   @relation("ProjectMileStone")
   notes                  Notes[]        @relation("projectNotes")
   rfq                    RFQ?          @relation("ProjectRFQ", fields: [rfqId], references: [id], onDelete: Cascade)
   @@map("project")
@@ -272,8 +276,10 @@ model Task {
   duration           String
   project_id         String          @db.Uuid
   user_id            String          @db.Uuid
+  mileStone_id        String?         @db.Uuid
   start_date         String
   Stage              Stage           @default(IFA)
+  mileStone          MileStone?        @relation("mileStoneTasks", fields: [mileStone_id], references: [id], onDelete: Cascade)
   taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
   assignedTask       Assignes[]      @relation("assignedTask")
   taskcomment        Comment[]       @relation("taskcomment")
@@ -380,6 +386,7 @@ model Comment {
 model Submittals {
   id                 String              @id @default(uuid()) @db.Uuid
   fabricator_id      String              @db.Uuid
+  mileStoneId      String?               @db.Uuid 
   date               DateTime            @default(now())
   project_id         String              @db.Uuid
   recepient_id       String              @db.Uuid
@@ -389,7 +396,8 @@ model Submittals {
   subject            String
   description        String
   files              Json              @default("[]")
-  isAproovedByAdmin   Boolean?   @default(false)
+  isAproovedByAdmin  Boolean?   @default(false)
+  mileStoneBelongsTo MileStone?          @relation("mileStoneSubmittals", fields: [mileStoneId], references: [id], onDelete: Cascade)
   file               File[]              @relation("submittalsFiles")
   fabricator         Fabricator          @relation("FabricatorSubmittals", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project            Project             @relation("ProjectSubmittals", fields: [project_id], references: [id], onDelete: Cascade)
@@ -399,7 +407,22 @@ model Submittals {
 
   @@map("submittals")
 }
-
+model MileStone{
+  id                 String              @id @default(uuid()) @db.Uuid
+  fabricator_id      String              @db.Uuid
+  date               DateTime            @default(now())
+  project_id         String              @db.Uuid
+  approvalDate      DateTime?
+  status             Status             @default(ACTIVE)
+  stage              Stage               @default(IFA)
+  subject            String
+  description        String
+  //relations
+  fabricator         Fabricator          @relation("FabricatorMileStone", fields: [fabricator_id], references: [id], onDelete: Cascade)
+  project            Project             @relation("ProjectMileStone", fields: [project_id], references: [id], onDelete: Cascade)
+  mileStoneSubmittals Submittals[]       @relation("mileStoneSubmittals")
+  Tasks             Task[]              @relation("mileStoneTasks") 
+}
 model SubmittalsResponse {
   id               String               @id @default(uuid()) @db.Uuid
   files            Json               @default("[]")

@@ -22,9 +22,10 @@ const AddTask = async (req, res) => {
       status,
       Stage,
       start_date,
+      mileStone_id
   } = req.body;
 
-  if (!description || !name || !due_date || !duration || priority === undefined || !project || !user ||!Stage|| !status || !start_date) {
+  if (!description || !name || !due_date || !duration || priority === undefined || !project || !user ||!Stage|| !status || !start_date||!mileStone_id) {
       return sendResponse({
           message: "Fields are empty!!",
           res,
@@ -43,6 +44,7 @@ const AddTask = async (req, res) => {
               duration,
               name,
               priority,
+              mileStone_id,
               start_date,
               Stage:Stage,
               status,
