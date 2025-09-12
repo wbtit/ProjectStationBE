@@ -484,7 +484,9 @@ const GetAllProjects = async (req, res) => {
         where: { fabricatorID: fabricatorId },
         include: {
           submittals:{
-            mileStoneBelongsTo:true
+            include:{
+              mileStoneBelongsTo:true
+            }
           },
           stageHistory:true,
           fabricator: true,
