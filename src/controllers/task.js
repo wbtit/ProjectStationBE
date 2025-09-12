@@ -20,6 +20,7 @@ const AddTask = async (req, res) => {
       project,
       user,
       status,
+      changeOrderNumber,
       Stage,
       start_date,
       mileStone_id
@@ -46,6 +47,7 @@ const AddTask = async (req, res) => {
               priority,
               mileStone_id:mileStone_id || null,
               start_date,
+              changeOrderNumber:changeOrderNumber || 0,
               Stage:Stage,
               status,
               project_id: project,

@@ -279,6 +279,7 @@ model Task {
   mileStone_id        String?         @db.Uuid
   start_date         String
   Stage              Stage           @default(IFA)
+  changeOrderNumber  Int?            @default(0)
   mileStone          MileStone?        @relation("mileStoneTasks", fields: [mileStone_id], references: [id], onDelete: Cascade)
   taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
   assignedTask       Assignes[]      @relation("assignedTask")
@@ -576,6 +577,7 @@ model ChangeOrder {
   sender      String             @db.Uuid
   sentOn      DateTime           @default(now())
   files       Json               @default("[]")
+  stage       Stage              @default(IFA)
   status      COSTATUS           @default(NOT_REPLIED)
   reason      String             @default("")
   createdAt   DateTime           @default(now())

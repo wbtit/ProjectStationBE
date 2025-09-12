@@ -122,9 +122,9 @@ const changeOrderSent=async(req,res)=>{
 // Create Change Order function
 const createCO = async (req, res,approval) => {
   try {
-    const { project, recipients, remarks, description } = req.body;
+    const { project, recipients, remarks, description, Stage } = req.body;
 
-    if (!project || !recipients || !remarks || !description) {
+    if (!project || !recipients || !remarks || !description || !Stage) {
       return sendResponse({
         message: "Fields are empty",
         res,
@@ -154,6 +154,7 @@ const createCO = async (req, res,approval) => {
         description,
         project,
         status: "NOT_REPLIED",
+        stage: Stage || "IFA",
         recipients,
         remarks,
         isAproovedByAdmin:approval,
@@ -621,6 +622,7 @@ const updateChangeOrder = async (req, res) => {
       files,
       status,
       reason,
+      stage,
       isAproovedByAdmin
     } = req.body;
 
@@ -635,6 +637,7 @@ const updateChangeOrder = async (req, res) => {
         description,
         sender,
         files,
+        stage,
         status,
         reason,
         isAproovedByAdmin
