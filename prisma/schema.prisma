@@ -93,6 +93,7 @@ model Users {
   POC                   Project[]            @relation("POC")
   meetingsCreated Meeting[]          @relation("MeetingCreatedBy") 
   meetingAttendees MeetingAttendee[] @relation("MeetingAttendeeUser")
+  notes             Notes[]           @relation("NotesCreatedBy")
   @@map("users")
 }
 
@@ -246,7 +247,9 @@ model Notes{
   files                  Json?           @default("[]")
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @updatedAt
+  createdById            String?         @db.Uuid
 
+  createdBy              Users?          @relation("NotesCreatedBy",fields: [createdById],references: [id])
   projectId              String         @db.Uuid
   project                Project        @relation("projectNotes",fields:[projectId],references:[id])
   @@map("notes")
@@ -852,7 +855,7 @@ model EstimationTemplate {
 
 model EstimatorEfficiency {
   estimatorId               String
-  month                     Int
+  month                     Int 
   year                      Int
   totalEstimationsAssigned  Int      @default(0)
   totalEstimationsCompleted Int      @default(0)

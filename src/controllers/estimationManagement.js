@@ -44,6 +44,9 @@ try {
           path: `/public/estimationtemp/${file.filename}`, // Relative path
         }))
       : [];
+
+
+      
     const createEstimation = await prisma.estimation.create({
   data: {
     ...(rfqId && rfqId !== "undefined"

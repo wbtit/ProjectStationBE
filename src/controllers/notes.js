@@ -7,6 +7,7 @@ const createNote = async (req, res) => {
   try {
     const{projectId}=req.params;
     const { content, stage } = req.body;
+    const{id}=req.user
 
     if(!content||!stage||!projectId){
         return sendResponse({
@@ -28,7 +29,8 @@ const createNote = async (req, res) => {
         content,
         stage,
         projectId,
-        files:fileDetails
+        files:fileDetails,
+        createdById:id
       },
     });
 
@@ -58,6 +60,10 @@ const getAllNotes = async (req, res) => {
 
     const notes = await prisma.notes.findMany({
       where: projectId ? { projectId } : {},
+      include:{
+        createdBy:true,
+        project:true
+      },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -87,6 +93,10 @@ const getNoteById = async (req, res) => {
 
     const note = await prisma.notes.findUnique({
       where: { id },
+      include:{
+        createdBy:true,
+        project:true
+      }
     });
 
     if (!note) {
@@ -129,7 +139,10 @@ const updateNote = async (req, res) => {
       data: {
         content,
         stage,
-      },
+      },include:{
+        createdBy:true,
+        project:true
+      }
     });
 
     return sendResponse({
@@ -194,7 +207,10 @@ const getNotesByProjectId= async(req,res)=>{
         })
     }
     const notes = await prisma.notes.findMany({
-        where:{projectId:projectId}
+        where:{projectId:projectId},include:{
+        createdBy:true,
+        project:true
+      }
     })
     return sendResponse({
         message:"Notes fetched successfully",
