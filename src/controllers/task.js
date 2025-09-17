@@ -211,10 +211,10 @@ const GetTask = async (req, res) => {
       });
     }
 
-    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr,is_supermanager} = req.user;
+    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr,is_supermanager,is_systemadmin} = req.user;
     let tasks;
 
-    if (is_superuser||is_hr||is_supermanager) {
+    if (is_superuser||is_hr||is_supermanager||is_systemadmin) {
       // Fetch all tasks since superuser has full access
       tasks = await prisma.task.findMany({
         include: {
