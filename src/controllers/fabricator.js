@@ -235,7 +235,11 @@ const GetAllFabricator = async (req, res) => {
 
     let fabricators;
     if(user.is_superuser){
-      fabricators= await prisma.fabricator.findMany();
+      fabricators= await prisma.fabricator.findMany({
+        include:{
+          project:true
+        }
+      });
     }
     else if (hasAllowedRole) {
       fabricators = await getFabricators(id);
@@ -244,6 +248,7 @@ const GetAllFabricator = async (req, res) => {
         where: { createdById: id },
         include: {
           userss: true,
+          project:true
         },
       });
     }

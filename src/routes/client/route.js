@@ -22,7 +22,7 @@ router.patch(
 ); // Update Client By ID
 
 router.delete(
-  "/cleint/:cid/deletClient",
+  "/client/:cid/deleteClient",
   Authenticate,
   ClientAccess,
   deleteClient

@@ -8,7 +8,8 @@ export const getFabricators = async (createdById) => {
         createdById:createdById
       },
       include:{
-       userss:true 
+       userss:true,
+       project:true
       }
     });
     return users;

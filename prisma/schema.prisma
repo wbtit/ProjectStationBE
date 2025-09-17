@@ -37,6 +37,7 @@ model Users {
   is_firstLogin         Boolean              @default(true)
   fabricatorId          String?              @db.Uuid
   department            String?              @db.Uuid
+  is_systemadmin        Boolean              @default(false)
   is_deptmanager        Boolean              @default(false)
   is_hr                 Boolean              @default(false)
   is_oe                 Boolean              @default(false)
@@ -899,6 +900,7 @@ enum UserRole {
   CLIENT
   VENDOR
   ADMIN
+  SYSTEM_ADMIN
   SALES_PERSON
   DEPT_MANAGER
   ESTIMATION_HEAD

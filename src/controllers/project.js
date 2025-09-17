@@ -462,7 +462,7 @@ const GetAllProjects = async (req, res) => {
     let projects;
 
     // 🔹 Superuser: Fetch all projects
-    if (is_superuser|| is_hr || is_sales||is_supermanager) {
+    if (is_superuser|| is_hr ||is_supermanager) {
       projects = await prisma.project.findMany({
         include: {
           stageHistory:true,
@@ -476,7 +476,16 @@ const GetAllProjects = async (req, res) => {
           },
         },
       });
-    }
+     }//else if (is_sales){
+    //   const fabs = await prisma.fabricator.findMany({
+    //     where:{createdById:req.user.id},
+    //     include:{
+    //       project:true
+    //     }
+    //   })
+    //   projects=fabs.map(f=>f.project)
+    //   console.log("The projects for the sales",projects)
+    // }
     // 🔹 Client: Fetch only their fabricator's projects
     else if (role === "CLIENT") {
       // console.log("Client access granted.");
