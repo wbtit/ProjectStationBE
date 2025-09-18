@@ -210,6 +210,7 @@ model Project {
   startDate              String
   endDate                String?
   endDateChangeLog       Json          @default("[]")
+  approvalDateChangeLog  Json          @default("[]")
   stageHistory           ProjectStageHistory[]
   approvalDate           String
   estimatedHours         Float?        @default(0)
@@ -420,6 +421,7 @@ model MileStone{
   project_id         String              @db.Uuid
   approvalDate      DateTime?
   status             Status             @default(ACTIVE)
+  stage              Stage              @default(IFA)
   subject            String
   description        String
   //relations
