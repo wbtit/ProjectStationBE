@@ -44,6 +44,7 @@ model Users {
   is_pmo                Boolean              @default(false)
   is_disabled           Boolean              @default(false)
   is_est                Boolean              @default(false)
+  is_estHead            Boolean              @default(false)
   is_supermanager       Boolean              @default(false)
   updatedAt             DateTime             @default(now()) @updatedAt
   COrespondedby         COResponse[]         @relation("COrespondedby")
