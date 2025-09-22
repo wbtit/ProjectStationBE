@@ -30,7 +30,7 @@ router.patch("/setPrice/:estimationId",Authenticate,setFinalPrice)
 router.get("/:id/:fid",Authenticate,estimationsViewFiles)
 
 router.patch(
-  "/estimation-line-items/:lineItemId",
+  "/estimationLineItems/:lineItemId",
   Authenticate,
   updateEstimationLineItem
 );

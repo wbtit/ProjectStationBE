@@ -782,7 +782,7 @@ model Estimation {
   fabricatorId     String               @db.Uuid
   tools            String?
   startDate        DateTime             @default(now())
-  lineItems        EstimationLineItem[]
+  lineItemGroups   EstimationLineItemGroup[]  // multiple groups of line items
   tasks            EstimationTask[]
   template         EstimationTemplate?
   createdBy        Users                @relation("CreatedBy", fields: [createdById], references: [id])
@@ -818,20 +818,28 @@ model EstimationTask {
   @@map("estimation_tasks")
 }
 
+model EstimationLineItemGroup {
+  id           String                @id @default(uuid()) @db.Uuid
+  name         String                // e.g., "Structural", "Electrical", "Phase 1"
+  description  String?
+  estimationId String                @db.Uuid
+  estimation   Estimation            @relation(fields: [estimationId], references: [id], onDelete: Cascade)
+
+  lineItems    EstimationLineItem[]  // each group can have many line items
+}
+
 model EstimationLineItem {
+  id           String                     @id @default(uuid()) @db.Uuid
   scopeOfWork  String
   remarks      String
   quantity     Float?
   hoursPerQty  Float?
   totalHours   Float?
   weeks        Float?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  id           String     @id @default(uuid()) @db.Uuid
-  estimationId String     @db.Uuid
-  estimation   Estimation @relation(fields: [estimationId], references: [id], onDelete: Cascade)
-
-  @@map("estimation_line_items")
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  groupId      String                     @db.Uuid
+  group        EstimationLineItemGroup    @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model EstimationTemplate {

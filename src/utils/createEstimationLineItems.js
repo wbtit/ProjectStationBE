@@ -1,8 +1,8 @@
 import lineItems from "../../data/estimationLineItems.js";
 import prisma from "../lib/prisma.js";
 
-async function createEstimationLineItem(estimationId) {
-    if (!estimationId) {
+async function createEstimationLineItem(groupId) {
+    if (!groupId) {
         console.error('❌ estimationId is not provided');
         return;
     }
@@ -10,7 +10,7 @@ async function createEstimationLineItem(estimationId) {
     try {
         const lineItemsToInsert = lineItems.map(item => ({
             ...item,
-            estimationId:estimationId
+            groupId:groupId
         }));
 
         const createItems = await prisma.estimationLineItem.createMany({

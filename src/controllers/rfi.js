@@ -38,6 +38,7 @@ const createRFI=async(req,res,approval)=>{
         subject,
         description,
         files: fileDetails,
+        
       },
       include: {
         recepients: true,

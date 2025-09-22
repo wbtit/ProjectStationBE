@@ -6,7 +6,7 @@ const dashBoardNumbers = async (req, res) => {
     let projectFilter = {};
     let taskFilter = {};
 
-    if(req.user.is_superuser){
+    if(req.user.is_superuser || req.user.is_supermanager){
 
       console.log("I am admin")
        projectFilter = {};

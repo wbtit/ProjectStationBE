@@ -212,8 +212,10 @@ const GetAllFabricator = async (req, res) => {
         is_oe: true,
         is_pmo: true,
         is_est: true,
+        is_supermanager:true
       },
     });
+    // console.log("-=--=-=-=-=-=-=-",user)
 
     if (!user) {
       return sendResponse({
@@ -234,7 +236,7 @@ const GetAllFabricator = async (req, res) => {
       user.is_est;
 
     let fabricators;
-    if(user.is_superuser){
+    if(user.is_superuser|| user.is_supermanager){
       fabricators= await prisma.fabricator.findMany({
         include:{
           project:true
