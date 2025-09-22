@@ -9,7 +9,8 @@ import {
     deleteEstimationData,
     updateStatus,
     setFinalPrice,
-    estimationsViewFiles
+    estimationsViewFiles,
+    updateEstimationLineItem
     }  from '../../controllers/estimationManagement.js'
 
     import { estimationUploads } from '../../config/multer.js'
@@ -27,5 +28,11 @@ router.patch("/updateStatus/:estimationId/:status",Authenticate,updateStatus)
 router.patch("/setPrice/:estimationId",Authenticate,setFinalPrice)
 
 router.get("/:id/:fid",Authenticate,estimationsViewFiles)
+
+router.patch(
+  "/estimation-line-items/:lineItemId",
+  Authenticate,
+  updateEstimationLineItem
+);
 
 export  {router as estimation};

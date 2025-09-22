@@ -400,6 +400,61 @@ const estimationsViewFiles = async (req, res) => {
   }
 };
 
+const updateEstimationLineItem = async (req, res) => {
+    const { lineItemId } = req.params;
+
+    if (!lineItemId) {
+        return sendResponse({
+            message: "Line item ID is required",
+            res,
+            statusCode: 400,
+            success: false,
+            data: null,
+        });
+    }
+
+    const {
+        scopeOfWork,
+        remarks,
+        quantity,
+        hoursPerQty,
+        totalHours,
+        weeks,
+    } = req.body;
+
+    try {
+        const updatedLineItem = await prisma.estimationLineItem.update({
+            where: { id: lineItemId },
+            data: {
+                scopeOfWork,
+                remarks,
+                quantity,
+                hoursPerQty,
+                totalHours,
+                weeks,
+            },
+        });
+
+        return sendResponse({
+            message: "Estimation line item updated successfully",
+            res,
+            statusCode: 200,
+            success: true,
+            data: updatedLineItem,
+        });
+
+    } catch (error) {
+        console.error(error.message);
+        return sendResponse({
+            message: error.message || "Failed to update line item",
+            res,
+            statusCode: 500,
+            success: false,
+            data: null,
+        });
+    }
+};
+
 export {
     createEstimation,
     getallEstimation,
@@ -408,5 +463,6 @@ export {
     deleteEstimationData,
     updateStatus,
     setFinalPrice,
-    estimationsViewFiles
+    estimationsViewFiles,
+    updateEstimationLineItem
 }

@@ -512,7 +512,11 @@ const GetAllProjects = async (req, res) => {
           },
           stageHistory:true,
           fabricator: true,
-          tasks:true,
+          tasks:{
+            include:{
+              mileStone:{select:{description:true,subject:true,stage:true,status:true}}
+            }
+          },
           team:true,
           changeOrder:true,
           manager: { select: { f_name: true, l_name: true } },
