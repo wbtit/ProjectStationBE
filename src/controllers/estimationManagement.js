@@ -100,8 +100,8 @@ const getallEstimation=async(req,res)=>{
              rfq:true,
              createdBy:true,
              tasks:true,
-             lineItems:true,
-             template:true 
+             template:true,
+             lineItemGroups:true
             }
         })
         return sendResponse({
@@ -157,9 +157,9 @@ const getEstimationById=async(req,res)=>{
                         }
                     }
                  },
-                 lineItems:true,
                  template:true ,
-                 fabricators:true
+                 fabricators:true,
+                 lineItemGroups:true
             }
         })
         return sendResponse({
@@ -213,8 +213,8 @@ const updateEstimationData=async(req,res)=>{
                  rfq:true,
                  createdBy:true,
                  tasks:true,
-                 lineItems:true,
-                 template:true 
+                 template:true,
+                  lineItemGroups:true
             }
         })
         return sendResponse({
@@ -289,8 +289,8 @@ const updateStatus=async(req,res)=>{
                  rfq:true,
                  createdBy:true,
                  tasks:true,
-                 lineItems:true,
-                 template:true 
+                 template:true,
+                lineItemGroups:true 
             }
     })
     return sendResponse({
@@ -333,8 +333,8 @@ const setFinalPrice=async(req,res)=>{
                 rfq:true,
                 createdBy:true,
                 tasks:true,
-                lineItems:true,
-                template:true  
+                template:true,
+                lineItemGroups:true  
             }
         })
         return sendResponse({
