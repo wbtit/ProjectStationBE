@@ -482,6 +482,10 @@ const GetAllProjects = async (req, res) => {
           rfi:true,
           file:true,
           fabricator: true,
+          tasks:{
+            include:{
+              mileStone:{select:{description:true,subject:true,stage:true,status:true}}
+            }},
           manager: { select: { f_name: true, l_name: true } },
           team: { select: { name: true, members: true } },
           department: {
@@ -536,6 +540,7 @@ const GetAllProjects = async (req, res) => {
           department: { manager: { id } }  // ✅ Fixed reference to department manager
         },
         include: {
+          tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
           stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
@@ -543,7 +548,9 @@ const GetAllProjects = async (req, res) => {
           department: {
             select: { name: true, manager: { select: { f_name: true, l_name: true } } },
           },
-          file:true
+          
+          file:true,
+          
         },
       });
     }
@@ -553,6 +560,7 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { managerID: id },
         include: {
+           tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
           stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
@@ -570,6 +578,7 @@ const GetAllProjects = async (req, res) => {
       projects = await prisma.project.findMany({
         where: { tasks: { some: { user_id: id } } },
         include: {
+          tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
           stageHistory:true,
           fabricator: true,
           manager: { select: { f_name: true, l_name: true } },
@@ -596,6 +605,7 @@ const GetAllProjects = async (req, res) => {
         projects = await prisma.project.findMany({
           where: { id: { in: projectIds } },
           include: {
+             tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
             fabricator: true,
             stageHistory:true,
             manager: { select: { f_name: true, l_name: true } },
