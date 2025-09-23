@@ -396,9 +396,7 @@ const GetTaskByID = async (req, res) => {
 
 const UpdateTaskByID = async (req, res) => {
   const { id } = req?.params;
-  let { user, user_id, ...updateData } = req.body; // Extract `user` and `user_id`
-
-  //// console.log(req.body);
+  let { user, user_id, milestone_id, ...updateData } = req.body; // Extract milestone_id
 
   try {
     if (!isValidUUID(id)) {
@@ -414,11 +412,18 @@ const UpdateTaskByID = async (req, res) => {
     // Prepare update payload
     const updatePayload = { ...updateData };
 
-    // Handle user relation update correctly
-    const userToUpdate = user || user_id; // Use whichever is available
+    // Handle user relation update
+    const userToUpdate = user || user_id;
     if (userToUpdate) {
       updatePayload.user = {
-        connect: { id: userToUpdate }, // ✅ Correct relation update
+        connect: { id: userToUpdate },
+      };
+    }
+
+    // Handle milestone relation update
+    if (milestone_id) {
+      updatePayload.mileStone = {
+        connect: { id: milestone_id },
       };
     }
 
@@ -446,6 +451,7 @@ const UpdateTaskByID = async (req, res) => {
       data: task,
     });
   } catch (error) {
+    console.log(error.message);
     return sendResponse({
       message: error.message,
       res,
@@ -457,6 +463,7 @@ const UpdateTaskByID = async (req, res) => {
     await prisma.$disconnect();
   }
 };
+
 
 const calender = async (req, res) => {
   const { id: user_id, date } = req?.params;
