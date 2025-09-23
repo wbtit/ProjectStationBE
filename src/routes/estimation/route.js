@@ -10,7 +10,8 @@ import {
     updateStatus,
     setFinalPrice,
     estimationsViewFiles,
-    updateEstimationLineItem
+    updateEstimationLineItem,
+    createLineItem
     }  from '../../controllers/estimationManagement.js'
 
     import { estimationUploads } from '../../config/multer.js'
@@ -34,5 +35,10 @@ router.patch(
   Authenticate,
   updateEstimationLineItem
 );
+
+router.post("/estimationLineItems/create/:groupId",
+  Authenticate,
+  createLineItem
+)
 
 export  {router as estimation};

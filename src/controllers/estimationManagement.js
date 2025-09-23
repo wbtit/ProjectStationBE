@@ -453,6 +453,63 @@ const updateEstimationLineItem = async (req, res) => {
     }
 };
 
+const createLineItem = async (req, res) => {
+  const {
+    scopeOfWork,
+    remarks,
+    quantity,
+    hoursPerQty,
+    totalHours,
+    weeks
+  } = req.body;
+const {groupId}=req.params
+  try {
+    // ✅ Required field validation
+    if (!scopeOfWork || !groupId) {
+      return sendResponse({
+        message: "Fields are empty",
+        res,
+        statusCode: 401,
+        success: false,
+        data: null,
+      });
+    }
+
+    // ✅ Create Line Item
+    const lineItem = await prisma.estimationLineItem.create({
+      data: {
+        scopeOfWork,
+        remarks,
+        quantity: quantity ? parseFloat(quantity) : null,
+        hoursPerQty: hoursPerQty ? parseFloat(hoursPerQty) : null,
+        totalHours: totalHours ? parseFloat(totalHours) : null,
+        weeks: weeks ? parseFloat(weeks) : null,
+        group: {
+          connect: { id: groupId },
+        },
+      },
+    });
+
+    return sendResponse({
+      message: "Estimation line item created successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: lineItem,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
 export {
     createEstimation,
     getallEstimation,
@@ -462,5 +519,7 @@ export {
     updateStatus,
     setFinalPrice,
     estimationsViewFiles,
-    updateEstimationLineItem
+
+    updateEstimationLineItem,
+    createLineItem
 }
