@@ -669,11 +669,12 @@ const GetProjectByID = async (req, res) => {
             manager: true,
           },
         },
+        
         stageHistory:true,
         department: true,
         fabricator: true,
         manager: true,
-        tasks: true,
+        tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
         accepttasks: true,
         file:true,
         changeOrder:true,
