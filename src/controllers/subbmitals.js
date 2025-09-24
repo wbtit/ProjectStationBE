@@ -566,7 +566,7 @@ const submitalsResponseViewFiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
-    const submittals = await prisma.submittalsdResponse.findUnique({
+    const submittals = await prisma.submittalsResponse.findUnique({
       where: { id },
     });
 
@@ -786,7 +786,7 @@ export {
 
   addSubmittalsResponse,
   getSubmittalresponse,
-
+  
   submitalsResponseViewFiles,
   getSubmittal,
   getSubmittalsByProjectId
