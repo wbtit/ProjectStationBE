@@ -582,43 +582,53 @@ const RFQClosed = async (req, res) => {
 
 const RfqViewFiles = async (req, res) => {
   const { id, fid } = req.params;
-  //console.log("I am viewfile route",id)
+
   try {
     const rFQ = await prisma.rFQ.findUnique({
-      where: { id },
+      where: { id:id },
     });
 
     if (!rFQ) {
-      return res.status(404).json({ message: "rFQ not found" });
+      return res.status(404).json({ message: "RFQ not found" });
     }
 
     const fileObject = rFQ.files.find((file) => file.id === fid);
-
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
-
+     // Remove leading slash to avoid absolute path misinterpretation
+        const safePath = fileObject.path.replace(/^\/+/, '');
+        const filePath = path.join(__dirname, safePath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || "application/octet-stream";
 
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
+    if (fileExt === '.zip') {
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
+
+    fs.createReadStream(filePath).pipe(res);
   } catch (error) {
-    console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    console.error("View RFQ File Error:", error);
+    return res.status(500).json({
+      message: "Something went wrong while viewing the RFQ file",
+      error: error.message,
+    });
   }
 };
 
@@ -626,43 +636,55 @@ const RfqresponseViewFiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
-    const rFQ = await prisma.rFQResponse.findUnique({
-      where: { id },
+    const rFQResponse = await prisma.rFQResponse.findUnique({
+      where: { id:id },
     });
 
-    if (!rFQ) {
-      return res.status(404).json({ message: "rFQResponse not found" });
+    if (!rFQResponse) {
+      return res.status(404).json({ message: "RFQ Response not found" });
     }
 
-    const fileObject = rFQ.files.find((file) => file.id === fid);
-
+    const fileObject = rFQResponse.files.find((file) => file.id === fid);
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
+     // Remove leading slash to avoid absolute path misinterpretation
+        const safePath = fileObject.path.replace(/^\/+/, '');
+        const filePath = path.join(__dirname, safePath);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || "application/octet-stream";
 
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
+    if (fileExt === '.zip') {
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
+
+    fs.createReadStream(filePath).pipe(res);
   } catch (error) {
-    console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    console.error("View RFQ Response File Error:", error);
+    return res.status(500).json({
+      message: "Something went wrong while viewing the RFQ response file",
+      error: error.message,
+    });
   }
 };
+
 
 const addRfqResponse=async(req,res)=>{
 const{rfqId}=req.params

@@ -588,7 +588,7 @@ const ViewFile = async (req, res) => {
 
   try {
     const project = await prisma.fabricator.findUnique({
-      where: { id },
+      where: { id:id}, // Parse if ID is numeric
     });
 
     if (!project) {
@@ -602,20 +602,31 @@ const ViewFile = async (req, res) => {
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
-
-    // console.log(filePath);
-
+     // Remove leading slash to avoid absolute path misinterpretation
+        const safePath = fileObject.path.replace(/^\/+/, '');
+        const filePath = path.join(__dirname, safePath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+
+    if (fileExt === '.zip') {
+      // Force download for zip files
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      // Inline viewing for other files
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
@@ -626,6 +637,7 @@ const ViewFile = async (req, res) => {
       .json({ message: "Something went wrong while viewing the file" });
   }
 };
+
 
 export {
   AddBranch,

@@ -521,40 +521,54 @@ const viewRFIfiles = async (req, res) => {
 
   try {
     const rfi = await prisma.rFI.findUnique({
-      where: { id },
+      where: { id:id }, // Adjust if `id` is not numeric
     });
 
     if (!rfi) {
-      return res.status(404).json({ message: "rfi not found" });
+      return res.status(404).json({ message: "RFI not found" });
     }
 
     const fileObject = rfi.files.find((file) => file.id === fid);
-
+    console.log("file object",fileObject)
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
-
+      // Remove leading slash to avoid absolute path misinterpretation
+    const safePath = fileObject.path.replace(/^\/+/, '');
+    const filePath = path.join(__dirname, safePath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+
+    // Handle zip files by forcing download
+    if (fileExt === '.zip') {
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      // For other file types, allow inline viewing
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (error) {
     console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    return res.status(500).json({
+      message: "Something went wrong while viewing the file",
+      error: error.message,
+    });
   }
 };
 
@@ -563,40 +577,54 @@ const viewRFIResponsefiles = async (req, res) => {
 
   try {
     const rfiResponse = await prisma.rFIResponse.findUnique({
-      where: { id },
+      where: { id: id }, // Adjust based on your schema
+     
     });
 
-    if (!rfi) {
-      return res.status(404).json({ message: "rfiresponse not found" });
+    if (!rfiResponse) {
+      return res.status(404).json({ message: "RFI Response not found" });
     }
 
-    const fileObject = rfi.files.find((file) => file.id === fid);
+    const fileObject = rfiResponse.files.find((file) => file.id === fid);
 
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
+     // Remove leading slash to avoid absolute path misinterpretation
+    const safePath = fileObject.path.replace(/^\/+/, '');
+    const filePath = path.join(__dirname, safePath);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+
+    if (fileExt === '.zip') {
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (error) {
     console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    return res.status(500).json({
+      message: "Something went wrong while viewing the file",
+      error: error.message,
+    });
   }
 };
 

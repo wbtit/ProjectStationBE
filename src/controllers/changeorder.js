@@ -2,6 +2,9 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendNotification } from "../utils/notify.js";
 import { getNextCONumber } from "../utils/generateCoNumber.js";
+import path from "path"
+import fs from "fs"
+import mime from "mime"
 
 
 const changeOrderReceived=async(req,res)=>{
@@ -123,6 +126,7 @@ const changeOrderSent=async(req,res)=>{
 const createCO = async (req, res,approval) => {
   try {
     const { project, recipients, remarks, description, Stage } = req.body;
+    console.log("changeOrder body:",req.body)
 
     if (!project || !recipients || !remarks || !description || !Stage) {
       return sendResponse({
@@ -486,41 +490,62 @@ const viewCOfiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
+    // Fetch Change Order and its files
     const CO = await prisma.changeOrder.findUnique({
-      where: { id },
+      where: { id:id }, // Use parseInt if ID is numeric
+   
     });
 
     if (!CO) {
-      return res.status(404).json({ message: "CO not found" });
+      return res.status(404).json({ message: "Change Order not found" });
     }
 
+    // Find the file by its UUID
     const fileObject = CO.files.find((file) => file.id === fid);
 
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
+    // Build the file path
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
-
+     // Remove leading slash to avoid absolute path misinterpretation
+        const safePath = fileObject.path.replace(/^\/+/, '');
+        const filePath = path.join(__dirname, safePath);
+    // Check if file exists
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    // Get file extension and MIME type
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || 'application/octet-stream';
 
+    // Handle .zip files: force download
+    if (fileExt === '.zip') {
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      // Inline view for other types
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
+
+    // Stream file
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (error) {
-    console.error("View File Error:", error);
+    console.error('View CO File Error:', error);
     return res
+
       .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+      .json({ message: 'Something went wrong while viewing the file' });
   }
 };
 const changeStatus=async(req,res)=>{
@@ -744,7 +769,9 @@ export {
   updateChangeOrderTable,
   
   getRowCotable,
+
   viewCOfiles,
+
   changeStatus,
   getChangeOrderByProjectId
 };

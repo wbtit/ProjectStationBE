@@ -847,7 +847,8 @@ const ViewFile = async (req, res) => {
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id },
+      where: { id:id}, // Use parseInt if 'id' is numeric
+     
     });
 
     if (!project) {
@@ -861,26 +862,40 @@ const ViewFile = async (req, res) => {
     }
 
     const __dirname = path.resolve();
-    const filePath = path.join(__dirname, fileObject.path);
+     // Remove leading slash to avoid absolute path misinterpretation
+        const safePath = fileObject.path.replace(/^\/+/, '');
+        const filePath = path.join(__dirname, safePath);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const mimeType = mime.getType(filePath);
-    res.setHeader("Content-Type", mimeType || "application/octet-stream");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${fileObject.originalName}"`
-    );
+    const fileExt = path.extname(filePath).toLowerCase();
+    const mimeType = mime.getType(filePath) || "application/octet-stream";
+
+    // Special handling for .zip files
+    if (fileExt === '.zip') {
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileObject.originalName}"`
+      );
+    } else {
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${fileObject.originalName}"`
+      );
+    }
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (error) {
     console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    return res.status(500).json({
+      message: "Something went wrong while viewing the file",
+      error: error.message,
+    });
   }
 };
 

@@ -24,8 +24,8 @@ router.post(
   AddSubmitals
 );
 
-router.get("/submittals/:id/:fid",Authenticate,submitalsViewFiles)
-router.get("/submittalsResponse/:id/:fid",Authenticate,submitalsResponseViewFiles)
+router.get("/submittals/:id/:fid",submitalsViewFiles)
+router.get("/submittalsResponse/:id/:fid",submitalsResponseViewFiles)
 
 router.get("/getSubmittals/:submittalId",Authenticate,getSubmittal)
 
