@@ -33,7 +33,7 @@ const addRFQ=async(req,res)=>{
             filename: file.filename, // UUID + extension
             originalName: file.originalname, // Original name of the file
             id: file.filename.split(".")[0], // Extract UUID from the filename
-            path: `/public/rfqtemp/${file.filename}`, // Relative path
+            path: `public/rfqtemp/${file.filename}`, // Relative path
           }));
 
           let salesPersonId;
@@ -597,16 +597,15 @@ const RfqViewFiles = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname = path.resolve();
-     // Remove leading slash to avoid absolute path misinterpretation
-        const safePath = fileObject.path.replace(/^\/+/, '');
-        const filePath = path.join(__dirname, safePath);
-    if (!fs.existsSync(filePath)) {
+        // 3. Construct safe absolute path
+      const projectRoot = process.cwd();
+      const safePath = path.join(projectRoot, fileObject.path);
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || "application/octet-stream";
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || "application/octet-stream";
 
     if (fileExt === '.zip') {
       res.setHeader("Content-Type", "application/zip");
@@ -621,12 +620,18 @@ const RfqViewFiles = async (req, res) => {
         `inline; filename="${fileObject.originalName}"`
       );
     }
+// 6. Stream file to client
+    const fileStream = fs.createReadStream(safePath);
+    fileStream.pipe(res);
 
-    fs.createReadStream(filePath).pipe(res);
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).json({ message: "Error reading file" });
+    });
   } catch (error) {
-    console.error("View RFQ File Error:", error);
+    console.error("View File Error:", error); 
     return res.status(500).json({
-      message: "Something went wrong while viewing the RFQ file",
+      message: "Something went wrong while viewing the file",
       error: error.message,
     });
   }
@@ -649,17 +654,16 @@ const RfqresponseViewFiles = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname = path.resolve();
-     // Remove leading slash to avoid absolute path misinterpretation
-        const safePath = fileObject.path.replace(/^\/+/, '');
-        const filePath = path.join(__dirname, safePath);
+    // 3. Construct safe absolute path
+   const projectRoot = process.cwd();
+   const safePath = path.join(projectRoot, fileObject.path);
 
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || "application/octet-stream";
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || "application/octet-stream";
 
     if (fileExt === '.zip') {
       res.setHeader("Content-Type", "application/zip");
@@ -675,11 +679,18 @@ const RfqresponseViewFiles = async (req, res) => {
       );
     }
 
-    fs.createReadStream(filePath).pipe(res);
+// 6. Stream file to client
+    const fileStream = fs.createReadStream(safePath);
+    fileStream.pipe(res);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).json({ message: "Error reading file" });
+    });
   } catch (error) {
-    console.error("View RFQ Response File Error:", error);
+    console.error("View File Error:", error); 
     return res.status(500).json({
-      message: "Something went wrong while viewing the RFQ response file",
+      message: "Something went wrong while viewing the file",
       error: error.message,
     });
   }
@@ -742,7 +753,7 @@ if(parentResponseId!=undefined){
     filename: file.filename, // UUID + extension
     originalName: file.originalname, // Original name of the file
     id: file.filename.split(".")[0], // Extract UUID from the filename
-    path: `/public/rfqResponsetemp/${file.filename}`, // Relative path
+    path: `public/rfqResponsetemp/${file.filename}`, // Relative path
   })); 
   //console.log("File deatiles in RFQ:",fileDetails)
 if(parentResponseId!=undefined){

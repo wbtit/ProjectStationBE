@@ -353,7 +353,7 @@ const Uploadfiles = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/fabricatortemp/${file.filename}`, // Relative path
+      path: `public/fabricatortemp/${file.filename}`, // Relative path
     }));
 
     // Fetch the project
@@ -601,16 +601,15 @@ const ViewFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname = path.resolve();
-     // Remove leading slash to avoid absolute path misinterpretation
-        const safePath = fileObject.path.replace(/^\/+/, '');
-        const filePath = path.join(__dirname, safePath);
+    // 3. Construct safe absolute path
+   const projectRoot = process.cwd();
+   const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || 'application/octet-stream';
 
     if (fileExt === '.zip') {
       // Force download for zip files
@@ -628,13 +627,20 @@ const ViewFile = async (req, res) => {
       );
     }
 
-    const fileStream = fs.createReadStream(filePath);
+    // 6. Stream file to client
+    const fileStream = fs.createReadStream(safePath);
     fileStream.pipe(res);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).json({ message: "Error reading file" });
+    });
   } catch (error) {
-    console.error("View File Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong while viewing the file" });
+    console.error("View File Error:", error); 
+    return res.status(500).json({
+      message: "Something went wrong while viewing the file",
+      error: error.message,
+    });
   }
 };
 

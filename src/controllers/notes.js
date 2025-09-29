@@ -22,7 +22,7 @@ const createNote = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `/public/notesTemp/${file.filename}`, // Relative path
+      path: `public/notesTemp/${file.filename}`, // Relative path
     }));
     const note = await prisma.notes.create({
       data: {
@@ -230,6 +230,8 @@ const getNotesByProjectId= async(req,res)=>{
       })  
     }
 }
+
+
 export{
   createNote,
   getAllNotes,

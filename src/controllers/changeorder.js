@@ -144,7 +144,7 @@ const createCO = async (req, res,approval) => {
           filename: file.filename, // UUID + extension
           originalName: file.originalname, // Original name of the file
           id: file.filename.split(".")[0], // Extract UUID from the filename
-          path: `/public/changeordertemp/${file.filename}`, // Relative path
+          path: `public/changeordertemp/${file.filename}`, // Relative path
         }))
       : [];
 
@@ -237,7 +237,7 @@ const addCoResponse = async (req, res) => {
           filename: file.filename,
           originalName: file.originalname,
           id: file.filename.split(".")[0],
-          path: `/public/changeOrderResponsetemp/${file.filename}`,
+          path: `public/changeOrderResponsetemp/${file.filename}`,
         }))
       : [];
 
@@ -507,19 +507,17 @@ const viewCOfiles = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    // Build the file path
-    const __dirname = path.resolve();
-     // Remove leading slash to avoid absolute path misinterpretation
-        const safePath = fileObject.path.replace(/^\/+/, '');
-        const filePath = path.join(__dirname, safePath);
+    // 3. Construct safe absolute path
+   const projectRoot = process.cwd();
+   const safePath = path.join(projectRoot, fileObject.path);
     // Check if file exists
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
     // Get file extension and MIME type
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || 'application/octet-stream';
 
     // Handle .zip files: force download
     if (fileExt === '.zip') {
@@ -536,18 +534,24 @@ const viewCOfiles = async (req, res) => {
         `inline; filename="${fileObject.originalName}"`
       );
     }
+        // 6. Stream file to client
+        const fileStream = fs.createReadStream(safePath);
+        fileStream.pipe(res);
+    
+        fileStream.on("error", (err) => {
+          console.error("File stream error:", err);
+          res.status(500).json({ message: "Error reading file" });
+        });
+      } catch (error) {
+        console.error("View File Error:", error); 
+        return res.status(500).json({
+          message: "Something went wrong while viewing the file",
+          error: error.message,
+        });
+      }
+    };
 
-    // Stream file
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-  } catch (error) {
-    console.error('View CO File Error:', error);
-    return res
 
-      .status(500)
-      .json({ message: 'Something went wrong while viewing the file' });
-  }
-};
 const changeStatus=async(req,res)=>{
   const {coId}=req.params
   const{status,reason}=req.body

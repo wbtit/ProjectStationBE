@@ -173,7 +173,7 @@ const Uploadfiles = async (req, res) => {
     filename: file.filename,             // UUID.ext
     originalName: file.originalname,     // Original file name
     id: file.filename.split(".")[0],     // UUID
-    path: `/public/projecttemp/${file.filename}`, // relative URL
+    path: `public/projecttemp/${file.filename}`, // relative URL
   }));
 
 
@@ -861,10 +861,9 @@ const ViewFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname = path.resolve();
-     // Remove leading slash to avoid absolute path misinterpretation
-        const safePath = fileObject.path.replace(/^\/+/, '');
-        const filePath = path.join(__dirname, safePath);
+  // 3. Construct safe absolute path
+   const projectRoot = process.cwd();
+   const safePath = path.join(projectRoot, fileObject.path);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
@@ -888,10 +887,16 @@ const ViewFile = async (req, res) => {
       );
     }
 
-    const fileStream = fs.createReadStream(filePath);
+    // 6. Stream file to client
+    const fileStream = fs.createReadStream(safePath);
     fileStream.pipe(res);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).json({ message: "Error reading file" });
+    });
   } catch (error) {
-    console.error("View File Error:", error);
+    console.error("View File Error:", error); 
     return res.status(500).json({
       message: "Something went wrong while viewing the file",
       error: error.message,
