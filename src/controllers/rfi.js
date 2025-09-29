@@ -536,9 +536,13 @@ const viewRFIfiles = async (req, res) => {
 
     const __dirname = path.resolve();
       // Remove leading slash to avoid absolute path misinterpretation
+    console.log("filepath before safe",fileObject.path)
     const safePath = fileObject.path.replace(/^\/+/, '');
+     
     const filePath = path.join(__dirname, safePath);
+    console.log("filepath after safe",filePath)
     if (!fs.existsSync(filePath)) {
+      
       return res.status(404).json({ message: "File not found on server" });
     }
 
