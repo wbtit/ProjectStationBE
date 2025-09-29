@@ -520,53 +520,60 @@ const viewRFIfiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
+    // 1. Fetch RFI record
     const rfi = await prisma.rFI.findUnique({
-      where: { id:id }, // Adjust if `id` is not numeric
+      where: { id },
     });
 
-    if (!rfi) {
-      return res.status(404).json({ message: "RFI not found" });
+    if (!rfi || !rfi.files) {
+      return res.status(404).json({ message: "RFI or files not found" });
     }
 
+    // 2. Find requested file object
     const fileObject = rfi.files.find((file) => file.id === fid);
-    console.log("file object",fileObject)
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const __dirname = path.resolve();
-      // Remove leading slash to avoid absolute path misinterpretation
-    console.log("filepath before safe",fileObject.path)
-    const safePath = fileObject.path.replace(/^\/+/, '');
-     
-    const filePath = path.join(__dirname, safePath);
-    console.log("filepath after safe",filePath)
-    if (!fs.existsSync(filePath)) {
-      
+    console.log("File object:", fileObject);
+
+    // 3. Construct safe absolute path
+    const projectRoot = path.resolve(); // repo root (same as process.cwd())
+    const safePath = path.join(projectRoot, fileObject.path.replace(/^\/+/, ""));
+
+    console.log("Resolved file path:", safePath);
+
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+    // 4. Determine MIME type
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || "application/octet-stream";
 
-    // Handle zip files by forcing download
-    if (fileExt === '.zip') {
-      res.setHeader('Content-Type', 'application/zip');
+    // 5. Set response headers
+    if (fileExt === ".zip") {
+      res.setHeader("Content-Type", "application/zip");
       res.setHeader(
-        'Content-Disposition',
+        "Content-Disposition",
         `attachment; filename="${fileObject.originalName}"`
       );
     } else {
-      // For other file types, allow inline viewing
-      res.setHeader('Content-Type', mimeType);
+      res.setHeader("Content-Type", mimeType);
       res.setHeader(
-        'Content-Disposition',
+        "Content-Disposition",
         `inline; filename="${fileObject.originalName}"`
       );
     }
 
-    const fileStream = fs.createReadStream(filePath);
+    // 6. Stream file to client
+    const fileStream = fs.createReadStream(safePath);
     fileStream.pipe(res);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).json({ message: "Error reading file" });
+    });
   } catch (error) {
     console.error("View File Error:", error);
     return res.status(500).json({
@@ -575,7 +582,6 @@ const viewRFIfiles = async (req, res) => {
     });
   }
 };
-
 const viewRFIResponsefiles = async (req, res) => {
   const { id, fid } = req.params;
 
