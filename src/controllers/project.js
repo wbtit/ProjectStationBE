@@ -871,12 +871,12 @@ const ViewFile = async (req, res) => {
 
    const safePath = path.join(projectRoot, fileObject.path);
 
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(filePath).toLowerCase();
-    const mimeType = mime.getType(filePath) || "application/octet-stream";
+    const fileExt = path.extname(safePath).toLowerCase();
+    const mimeType = mime.getType(safePath) || "application/octet-stream";
 
     // Special handling for .zip files
     if (fileExt === '.zip') {

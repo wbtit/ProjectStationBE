@@ -609,7 +609,7 @@ const ViewFile = async (req, res) => {
    const projectRoot = path.join(__dirname, "..", "..", "public");
 
    const safePath = path.join(projectRoot, fileObject.path);
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 

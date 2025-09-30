@@ -517,7 +517,7 @@ const viewCOfiles = async (req, res) => {
 
    const safePath = path.join(projectRoot, fileObject.path);
     // Check if file exists
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
