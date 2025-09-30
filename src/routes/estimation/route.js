@@ -28,7 +28,7 @@ router.delete("/deleteEstimation/:estimationId",Authenticate,deleteEstimationDat
 router.patch("/updateStatus/:estimationId/:status",Authenticate,updateStatus)
 router.patch("/setPrice/:estimationId",Authenticate,setFinalPrice)
 
-router.get("/:id/:fid",Authenticate,estimationsViewFiles)
+router.get("/:id/:fid",estimationsViewFiles)
 
 router.patch(
   "/estimationLineItems/:lineItemId",
