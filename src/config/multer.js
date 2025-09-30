@@ -1,7 +1,12 @@
 import multer from "multer";
-import { v4 as uuidv4 } from "uuid";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { v4 as uuidv4 } from "uuid";
+
+// Fix __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createMulterUploader(uploadDir, fileMap) {
   const absoluteDir = path.join(__dirname, "..", "..", uploadDir); // project-root/public/rfitemp
