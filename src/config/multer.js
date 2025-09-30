@@ -4,13 +4,15 @@ import path from "path";
 import fs from "fs";
 
 function createMulterUploader(uploadDir, fileMap) {
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  const absoluteDir = path.resolve(uploadDir); // ✅ ensures correct absolute path
+
+  if (!fs.existsSync(absoluteDir)) {
+    fs.mkdirSync(absoluteDir, { recursive: true });
   }
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, uploadDir); // ✅ this was missing
+      cb(null, absoluteDir);
     },
     filename: (req, file, cb) => {
       const uniqueId = uuidv4();

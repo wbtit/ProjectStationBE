@@ -538,7 +538,7 @@ const viewRFIfiles = async (req, res) => {
     console.log("File object:", fileObject);
 
     // 3. Construct safe absolute path
-   const projectRoot = process.cwd();
+   const projectRoot = path.resolve();
    const safePath = path.join(projectRoot, fileObject.path);
 
 

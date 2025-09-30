@@ -539,7 +539,7 @@ const submitalsViewFiles = async (req, res) => {
     }
 
    // 3. Construct safe absolute path
-   const projectRoot = process.cwd();
+   const projectRoot = path.resolve();
    const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
@@ -599,7 +599,7 @@ const submitalsResponseViewFiles = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = process.cwd();
+   const projectRoot = path.resolve();
    const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
