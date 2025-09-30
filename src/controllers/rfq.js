@@ -33,7 +33,7 @@ const addRFQ=async(req,res)=>{
             filename: file.filename, // UUID + extension
             originalName: file.originalname, // Original name of the file
             id: file.filename.split(".")[0], // Extract UUID from the filename
-            path: `public/rfqtemp/${file.filename}`, // Relative path
+            path: `rfqtemp/${file.filename}`, // Relative path
           }));
 
           let salesPersonId;
@@ -598,7 +598,8 @@ const RfqViewFiles = async (req, res) => {
     }
 
         // 3. Construct safe absolute path
-      const projectRoot = path.resolve();
+      const projectRoot = path.join(__dirname, "..", "..", "public");
+
       const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
@@ -655,7 +656,8 @@ const RfqresponseViewFiles = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
 
     if (!fs.existsSync(safePath)) {
@@ -753,7 +755,7 @@ if(parentResponseId!=undefined){
     filename: file.filename, // UUID + extension
     originalName: file.originalname, // Original name of the file
     id: file.filename.split(".")[0], // Extract UUID from the filename
-    path: `public/rfqResponsetemp/${file.filename}`, // Relative path
+    path: `rfqResponsetemp/${file.filename}`, // Relative path
   })); 
   //console.log("File deatiles in RFQ:",fileDetails)
 if(parentResponseId!=undefined){

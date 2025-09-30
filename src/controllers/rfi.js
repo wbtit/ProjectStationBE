@@ -24,7 +24,7 @@ const createRFI=async(req,res,approval)=>{
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `public/rfitemp/${file.filename}`, // Relative path
+      path: `rfitemp/${file.filename}`, // Relative path
     }));
 
     const newrfi = await prisma.rFI.create({
@@ -538,8 +538,8 @@ const viewRFIfiles = async (req, res) => {
     console.log("File object:", fileObject);
 
     // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
-   const safePath = path.join(projectRoot, fileObject.path);
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+      const safePath = path.join(projectRoot, fileObject.path);
 
 
 
@@ -604,7 +604,8 @@ const viewRFIResponsefiles = async (req, res) => {
     }
 
      // 3. Construct safe absolute path
-   const projectRoot = process.cwd();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
 
     if (!fs.existsSync(safePath)) {
@@ -701,7 +702,7 @@ const addRFIResponse=async(req,res)=>{
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `public/rfiResponsetemp/${file.filename}`, // Relative path
+      path: `rfiResponsetemp/${file.filename}`, // Relative path
     }));
     if(parentResponseId!=undefined){
   const updateParentRfqStatus= await prisma.rFIResponse.update({

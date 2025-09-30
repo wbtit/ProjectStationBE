@@ -4,16 +4,14 @@ import path from "path";
 import fs from "fs";
 
 function createMulterUploader(uploadDir, fileMap) {
-  const absoluteDir = path.resolve(uploadDir); // ✅ ensures correct absolute path
+  const absoluteDir = path.join(__dirname, "..", "..", uploadDir); // project-root/public/rfitemp
 
   if (!fs.existsSync(absoluteDir)) {
     fs.mkdirSync(absoluteDir, { recursive: true });
   }
 
   const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, absoluteDir);
-    },
+    destination: (req, file, cb) => cb(null, absoluteDir),
     filename: (req, file, cb) => {
       const uniqueId = uuidv4();
       const ext = path.extname(file.originalname);
@@ -29,10 +27,7 @@ function createMulterUploader(uploadDir, fileMap) {
     },
   });
 
-  return multer({
-    storage,
-    fileFilter: (req, file, cb) => cb(null, true),
-  });
+  return multer({ storage });
 }
 
 export const fileDataMap = {};

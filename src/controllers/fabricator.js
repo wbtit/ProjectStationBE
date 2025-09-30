@@ -353,7 +353,7 @@ const Uploadfiles = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `public/fabricatortemp/${file.filename}`, // Relative path
+      path: `fabricatortemp/${file.filename}`, // Relative path
     }));
 
     // Fetch the project
@@ -602,7 +602,8 @@ const ViewFile = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });

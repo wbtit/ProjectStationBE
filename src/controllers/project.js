@@ -173,7 +173,7 @@ const Uploadfiles = async (req, res) => {
     filename: file.filename,             // UUID.ext
     originalName: file.originalname,     // Original file name
     id: file.filename.split(".")[0],     // UUID
-    path: `public/projecttemp/${file.filename}`, // relative URL
+    path: `projecttemp/${file.filename}`, // relative URL
   }));
 
 
@@ -862,7 +862,8 @@ const ViewFile = async (req, res) => {
     }
 
   // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
 
     if (!fs.existsSync(filePath)) {

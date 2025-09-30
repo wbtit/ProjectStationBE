@@ -27,7 +27,7 @@ try {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `public/submittalstemp/${file?.filename}`, // Relative path
+      path: `submittalstemp/${file?.filename}`, // Relative path
     }));
 
     const submitals = await prisma.submittals.create({
@@ -539,7 +539,8 @@ const submitalsViewFiles = async (req, res) => {
     }
 
    // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot =path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File not found on server" });
@@ -599,7 +600,8 @@ const submitalsResponseViewFiles = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
@@ -693,7 +695,7 @@ try {
     filename: file.filename, // UUID + extension
     originalName: file.originalname, // Original name of the file
     id: file.filename.split(".")[0], // Extract UUID from the filename
-    path: `public/submittalsResponsetemp/${file.filename}`, // Relative path
+    path: `submittalsResponsetemp/${file.filename}`, // Relative path
   }));
 
   // console.log("File deatiles in Submittals:",fileDetails)

@@ -144,7 +144,7 @@ const createCO = async (req, res,approval) => {
           filename: file.filename, // UUID + extension
           originalName: file.originalname, // Original name of the file
           id: file.filename.split(".")[0], // Extract UUID from the filename
-          path: `public/changeordertemp/${file.filename}`, // Relative path
+          path: `changeordertemp/${file.filename}`, // Relative path
         }))
       : [];
 
@@ -237,7 +237,7 @@ const addCoResponse = async (req, res) => {
           filename: file.filename,
           originalName: file.originalname,
           id: file.filename.split(".")[0],
-          path: `public/changeOrderResponsetemp/${file.filename}`,
+          path: `changeOrderResponsetemp/${file.filename}`,
         }))
       : [];
 
@@ -508,7 +508,8 @@ const viewCOfiles = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = path.resolve();
+   const projectRoot = path.join(__dirname, "..", "..", "public");
+
    const safePath = path.join(projectRoot, fileObject.path);
     // Check if file exists
     if (!fs.existsSync(filePath)) {
