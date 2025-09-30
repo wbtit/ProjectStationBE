@@ -5,6 +5,11 @@ import fs from "fs"
 import mime from "mime"
 import path from "path"
 import { sendNotification } from "../utils/notify.js";
+import { fileURLToPath } from "url";
+
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 

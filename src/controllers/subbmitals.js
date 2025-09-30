@@ -6,6 +6,12 @@ import mime from "mime"
 import fs from "fs"
 import { sendNotification } from "../utils/notify.js";
 
+import { fileURLToPath } from "url";
+
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 //Create Change Order function
 const createSubmittal=async(req,res,approval)=>{
   const{id}=req.user

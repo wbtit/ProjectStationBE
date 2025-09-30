@@ -5,8 +5,11 @@ import path from "path"
 import fs from "fs"
 import mime from "mime"
 import { sendNotification } from "../utils/notify.js";
+import { fileURLToPath } from "url";
 
-
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const createRFI=async(req,res,approval)=>{
   const{project_id,recipient_id,subject, description,fabricator_id}=req.body
   const{id}=req.user

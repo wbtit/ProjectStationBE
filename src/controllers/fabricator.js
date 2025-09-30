@@ -9,7 +9,11 @@ import path from "path";
 import fs from "fs";
 // import client from "../redis/index.js";
 import mime from "mime";
+import { fileURLToPath } from "url";
 
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const AddFabricator = async (req, res) => {
   const { id } = req.user;
 

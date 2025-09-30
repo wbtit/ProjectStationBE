@@ -4,6 +4,11 @@ import createEstimationLineItem from "../utils/createEstimationLineItems.js";
 import path from "path"
 import fs from "fs"
 import mime from "mime"
+import { fileURLToPath } from "url";
+
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 

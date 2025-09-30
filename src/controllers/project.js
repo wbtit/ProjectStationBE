@@ -12,6 +12,11 @@ import { fetchTeamDetails } from "../models/getTeamMemberDetails.js"
 import { sendNotification } from "../utils/notify.js";
 import cloneWBSAndSubtasks from "../utils/cloneWBSAndSubTasks.js";
 
+import { fileURLToPath } from "url";
+
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const AddProject = async (req, res) => {
   const {
