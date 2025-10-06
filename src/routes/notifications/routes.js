@@ -1,4 +1,5 @@
-import { getNotificationsByUserId,markNotificationAsRead } from "../../controllers/notification";
+import { getNotificationsByUserId, markNotificationAsRead } from "../../controllers/notification.js";
+
 import express from "express";
 const router = express.Router();
 
