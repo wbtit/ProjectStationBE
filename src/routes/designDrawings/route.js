@@ -6,7 +6,7 @@ import { createDesignDrawing,
   getAllDesignDrawings,
   deleteDesignDrawing,
   viewDesignDrawingResponseFiles,
- } from "../../controllers/designDrawing";
+ } from "../../controllers/designDrawing.js";
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
 import { designDrawingUploads, designDrawingResponseUploads } from "../../config/multer.js";
@@ -61,4 +61,4 @@ router.delete(
   deleteDesignDrawing
 );
 
-export default router;
+export {router as DesignDrawings};
