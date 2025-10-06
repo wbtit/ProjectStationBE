@@ -95,6 +95,8 @@ model Users {
   meetingsCreated Meeting[]          @relation("MeetingCreatedBy") 
   meetingAttendees MeetingAttendee[] @relation("MeetingAttendeeUser")
   notes             Notes[]           @relation("NotesCreatedBy")
+  designdrawingsuser DesignDrawings[] @relation("designdrawingsuser")
+  designdrawingsresponseBy DesignDrawingsResponses[] @relation("designDrawingsresponseBy")
   @@map("users")
 }
 
@@ -239,6 +241,7 @@ model Project {
   mileStones             MileStone[]   @relation("ProjectMileStone")
   notes                  Notes[]        @relation("projectNotes")
   rfq                    RFQ?          @relation("ProjectRFQ", fields: [rfqId], references: [id], onDelete: Cascade)
+  designDrawings         DesignDrawings[] @relation("designdrawingsproject")
   @@map("project")
 }
 
@@ -389,7 +392,40 @@ model Comment {
 
   @@map("comment")
 }
+model DesignDrawings{
+  id          String   @id @default(uuid()) @db.Uuid
+  projectId   String   @db.Uuid
+  stage       Stage    @default(RFI)
+  description String   @default("")
+  files       Json     @default("[]")
+  uploadedBy  String   @db.Uuid
+  uploadedAt  DateTime @default(now())
+  project     Project  @relation("designdrawingsproject",fields: [projectId], references: [id], onDelete: Cascade)
+  user        Users    @relation("designdrawingsuser",fields: [uploadedBy], references: [id], onDelete: Cascade)
+  responses   DesignDrawingsResponses[] @relation("designDrawingsresponse")
 
+  @@map("designdrawings")
+}
+
+model DesignDrawingsResponses{
+  id                String          @id @default(uuid()) @db.Uuid
+  designDrawingsId String          @db.Uuid
+  files            Json            @default("[]")
+  reason           String          @default("")
+  respondedAt      DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  userId           String          @db.Uuid
+  description      String          @default("")
+  status           SubResStatus    @default(NOT_APPROVED)
+  wbtStatus        State           @default(RECEIVED)
+  parentResponseId String?         @db.Uuid
+  parentResponse   DesignDrawingsResponses? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  childResponses   DesignDrawingsResponses[] @relation("ParentChildResponse")
+  designDrawings   DesignDrawings  @relation("designDrawingsresponse", fields: [designDrawingsId], references: [id], onDelete: Cascade)
+  user             Users           @relation("designDrawingsresponseBy", fields: [userId], references: [id])
+
+  @@map("designdrawingsresponses")
+}
 model Submittals {
   id                 String              @id @default(uuid()) @db.Uuid
   fabricator_id      String              @db.Uuid
