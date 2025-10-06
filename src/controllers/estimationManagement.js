@@ -382,11 +382,14 @@ const estimationsViewFiles = async (req, res) => {
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
-
+       console.log("File object:", fileObject);
+    
     // 3. Construct safe absolute path
    const projectRoot = path.join(__dirname, "..", "..", "public");
 
    const safePath = path.join(projectRoot, fileObject.path);
+
+      console.log("Resolved file path:", safePath);
 
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
