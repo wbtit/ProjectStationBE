@@ -70,3 +70,9 @@ export const notesUploads=createMulterUploader("public/notesTemp",notesDataMap)
 
 export const estimationDataMap={};
 export const estimationUploads=createMulterUploader("public/estimationtemp",estimationDataMap)
+
+export const designDrawingDataMap={};
+export const designDrawingUploads=createMulterUploader("public/designDrawingtemp",designDrawingDataMap)
+
+export const designDrawingResponseDataMap={};
+export const designDrawingResponseUploads=createMulterUploader("public/designDrawingResponsetemp",designDrawingResponseDataMap) 

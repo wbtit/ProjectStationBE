@@ -25,6 +25,7 @@ import {Notes} from "./notes/route.js"
 import {Meeting} from "./meeting/route.js"
 import {MileStone} from "./mileStone/route.js";
 import { EstimationLineItemGroupRoutes } from "./estLineItemGroups/route.js";
+import {DesignDrawings} from "./designDrawings/route.js"
 
 const routes = express.Router();
 
@@ -54,5 +55,5 @@ routes.use("/Note",Notes)
 routes.use("/meetings",Meeting);
 routes.use("/MileStone",MileStone)
 routes.use("/lineItemGroup",EstimationLineItemGroupRoutes)
-
+routes.use("/designDrawings", DesignDrawings);
 export { routes };
