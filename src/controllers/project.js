@@ -373,7 +373,9 @@ const UpdateProject = async (req, res) => {
         mailReminder:true,
         submissionMailReminder:true,
         endDateChangeLog:true,
-        approvalDateChangeLog:true
+        approvalDateChangeLog:true,
+        status:true,
+        clientId:true,
       }
     })
 
@@ -439,7 +441,11 @@ const UpdateProject = async (req, res) => {
       updateData.approvalDate=req.body.approvalDate;
       updateData.approvalDateChangeLog=[...existingLog,newLogEntry]
     }
-
+    if(req.body.status && req.body.status!== previousProjectStage.status){
+      sendNotification(previousProjectStage.clientId,{
+        message:`The status of project "${updateData.name || previousProjectStage.name}" has been changed to ${req.body.status}.`,
+      })
+    }
     const updatedProject = await prisma.project.update({
       where: {
         id: id,

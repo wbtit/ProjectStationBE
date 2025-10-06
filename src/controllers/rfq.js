@@ -782,6 +782,7 @@ if (!updateParentRfqStatus) {
   }
 }
 
+
   const addResponse= await prisma.rFQResponse.create({
     data:{
       userId:id,
@@ -792,6 +793,31 @@ if (!updateParentRfqStatus) {
       status:status
     }
   })
+
+  const rfq= await prisma.rFQ.findUnique({
+    where:{id:rfqId}
+  })
+  if(!rfq){
+    return sendResponse({
+      message:"Failed to fetch the RFQ",
+      res,
+      statusCode:400,
+      success:false,
+      data:null
+    })
+  }
+  if(req.user.id !== rfq.sender_id){
+    // Notify original sender of the ChangeOrder
+    await sendNotification(rfq.sender_id, {
+      message: `New response on your RFQ: ${rfq.subject}`,
+      rfqId: rfq.id,
+    });
+  }else{
+    await sendNotification(rfq.recepient_id, {
+      message: `New response on RFQ you received: ${rfq.subject}`,
+      rfqId: rfq.id,
+    });
+  }
   //console.log(addResponse)
   return sendResponse({
     message:"Response created",

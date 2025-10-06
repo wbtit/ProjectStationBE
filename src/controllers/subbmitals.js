@@ -715,6 +715,30 @@ try {
      parentResponseId:parentResponseId||null
     }
   })
+const submittal= await prisma.submittals.findUnique({
+  where:{id:submittalId}
+})
+if(!submittal){
+  return sendResponse({
+    message:"Submittal not found",
+    res,
+    statusCode:404,
+    success:false,
+    data:null
+  })
+}
+if(req.user.id !== submittal.sender_id){
+    // Notify original sender of the ChangeOrder
+    await sendNotification(submittal.sender_id, {
+      message: `New response on your CO: ${submittal.remarks}`,
+      coId: submittal.id,
+    });
+  }else{
+    await sendNotification(submittal.recepient_id, {
+      message: `New response on CO you received: ${submittal.remarks}`,
+      coId: submittal.id,
+    });
+  }
   //console.log(addresponse)
   return sendResponse({
     message:"Response created",

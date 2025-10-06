@@ -301,6 +301,18 @@ const addCoResponse = async (req, res) => {
         COresponse: { connect: { id: coId } },
       },
     });
+    if(req.user.id !== changeOrder.sender){
+    // Notify original sender of the ChangeOrder
+    await sendNotification(changeOrder.sender, {
+      message: `New response on your CO: ${changeOrder.remarks}`,
+      coId: changeOrder.id,
+    });
+  }else{
+    await sendNotification(changeOrder.recipients, {
+      message: `New response on CO you received: ${changeOrder.remarks}`,
+      coId: changeOrder.id,
+    });
+  }
 
     return sendResponse({
       message: "COResponse created successfully",

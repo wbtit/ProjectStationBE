@@ -725,6 +725,35 @@ if (!updateParentRfqStatus) {
     });
   }
     }
+const rfi= await prisma.rFI.findUnique({
+  where:{id:rfiId},
+  include:{
+    sender:true,
+    recepients:true
+  }
+})
+if(!rfi){
+  return sendResponse({
+    message:"RFI not found",
+    res,
+    statusCode:404,
+    success:false,
+    data:null
+  })
+}
+// Notify original sender of the RFI
+       if(req.user.id !== rfi.sender.id){
+    // Notify original sender of the ChangeOrder
+    await sendNotification(rfi.sender, {
+      message: `New response on your RFI: ${rfi.subject}`,
+      rfiId: rfi.id,
+    });
+  }else{
+    await sendNotification(rfi.recepients.id, {
+      message: `New response on RFI you received: ${rfi.subject}`,
+      rfiId: rfi.id,
+    });
+  }
     const addresponse= await prisma.rFIResponse.create({
       data:{
         responseState:responseState,
