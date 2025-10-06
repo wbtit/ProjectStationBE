@@ -6,6 +6,13 @@ export const sendNotification = async(userId, payload) => {
   if (socketId && global.io) {
     console.log(`📢 Sending notification to socket ${socketId} for user ${userId}`);
     global.io.to(socketId).emit("customNotification", payload);
+    await prisma.notification.create({
+      data:{
+        userID:userId,
+        payload:payload,
+        delivered:false
+      }
+    })
   } else {
     console.warn(`⚠️ No socket found for userId: ${userId}`);
 

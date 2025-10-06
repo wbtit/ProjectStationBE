@@ -3,7 +3,8 @@ import { sendResponse } from "../utils/responder.js";
 
 const createDesignDrawing = async (req, res) => {
   try {
-    const { projectId, description, stage } = req.body;
+    const { description, stage } = req.body;
+    const { projectId } = req.params;
     const { id } = req.user;
 
     if (!projectId || !description || !stage) {
@@ -409,12 +410,12 @@ if (!updateParentDesignDrawingStatus) {
 }
 
 const getResponse = async (req, res) => {
-  const { designDrawingId } = req.params;
+  const { id } = req.params;
 
   try {
     const response = await prisma.designDrawingsResponses.findMany({
       where: {
-        designDrawingId: designDrawingId,
+        designDrawingId: id,
       },
       include: {
         files: true,
