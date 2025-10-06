@@ -26,3 +26,4 @@ const markNotificationAsRead = async (req, res) => {
         return sendResponse(res, 500, false, null, error.message, "Failed to mark notification as read");
     }
 }
+export { getNotificationsByUserId, markNotificationAsRead };
