@@ -5,6 +5,7 @@ import { sendResponse } from "../utils/responder.js";
 import { isValidUUID } from "../utils/isValiduuid.js";
 import { isAdmin } from "../middlewares/isadmin.js";
 import { sendNotification } from "../utils/notify.js";
+import { getNextMondayDate,getLastFridayDate } from "../utils/getMondayAndFriday.js";
 
 const AddTask = async (req, res) => {
   const { is_staff, id } = req.user;
@@ -35,12 +36,66 @@ const AddTask = async (req, res) => {
           data: null,
       });
   }
+  
+
 
   try {
-      // Create Task
-      const newTask = await prisma.task.create({
-          data: {
-              description,
+
+    const now = new Date();
+  const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+
+  const oldPendingTask = await prisma.task.findFirst({
+      where: {
+        user_id: user,
+        status: { not: "complete" },
+        created_on: { lte: cutoff48h },
+      },
+    });
+    if(oldPendingTask){
+      return sendResponse({
+        message: "User has an old pending task. Please complete it before assigning a new one.",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null, 
+      });
+    }
+       const currentDay = now.getDay();
+
+       const fridayTask = await prisma.task.findFirst({
+      where: {
+        user_id: user,
+        status: { not: "complete" },
+        // Task created on Friday
+        AND: [
+          {
+            created_on: {
+              gte: getLastFridayDate(now), // Helper function below
+            },
+          },
+          {
+            created_on: {
+              lt: getNextMondayDate(now), // Helper to limit to same week
+            },
+          },
+        ],
+      },
+      orderBy: { created_on: "desc" },
+    });
+     if (fridayTask && currentDay > 1){
+      return sendResponse({
+        message: "User has a pending task assigned on Friday. Please complete it before assigning a new one.",
+        res,
+        statusCode: 400,
+        success: false,
+        data: null, 
+      });
+    }
+     
+    // Create Task
+    const newTask = await prisma.task.create({
+        data: {
+            description,
               due_date,
               duration,
               name,
