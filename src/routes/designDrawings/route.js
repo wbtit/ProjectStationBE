@@ -6,6 +6,7 @@ import { createDesignDrawing,
   getAllDesignDrawings,
   deleteDesignDrawing,
   viewDesignDrawingResponseFiles,
+  viewDesignDrawingFiles
  } from "../../controllers/designDrawing.js";
 import { Router } from "express";
 import Authenticate from "../../middlewares/authenticate.js";
@@ -21,8 +22,13 @@ router.post(
 );
 
 router.get(
-  "/designdrawing/viewfile/:id/:fid",
+  "/designdrawingResponse/viewfile/:id/:fid",
   viewDesignDrawingResponseFiles
+);
+
+router.get(
+  "/designdrawing/viewfile/:id/:fid",
+  viewDesignDrawingFiles
 );
 
 router.get(

@@ -83,13 +83,13 @@ const getDesignDrawingsByProject = async (req, res) => {
     const designDrawings = await prisma.designDrawings.findMany({
       where: { projectId },
       include: {
-        uploadedByUser: {
-          select: { id: true, name: true, email: true },
+        user: {
+          select: { id: true,l_name:true,f_name:true, m_name: true, email: true },
         },
         responses: {
           include: {
-            responseByUser: {
-              select: { id: true, name: true, email: true },
+            user: {
+              select: { id: true, l_name: true, f_name: true, m_name: true, email: true },
             },
           },
         },
@@ -157,16 +157,16 @@ const getAllDesignDrawings = async (req, res) => {
   try {
     const designDrawings = await prisma.designDrawings.findMany({
       include: {
-        uploadedByUser: {
-          select: { id: true, name: true, email: true },
+        user: {
+          select: { id: true, l_name: true, f_name: true, m_name: true, email: true },
         },
         project: {
           select: { id: true, name: true },
         },
         responses: {
           include: {
-            responseByUser: {
-              select: { id: true, name: true, email: true },
+            user: {
+              select: { id: true, l_name: true, f_name: true, m_name: true, email: true },
             },
           },
         },
@@ -528,4 +528,5 @@ export {
   getAllDesignDrawings,
   deleteDesignDrawing,
   viewDesignDrawingResponseFiles,
+  viewDesignDrawingFiles
 };
