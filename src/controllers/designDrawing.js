@@ -1,5 +1,13 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
+import path from "path";
+import fs from "fs";
+import mime from "mime";
+import { fileURLToPath } from "url";
+
+// Recreate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const createDesignDrawing = async (req, res) => {
   try {
@@ -35,7 +43,7 @@ const createDesignDrawing = async (req, res) => {
           filename: file.filename, // UUID + extension
           originalName: file.originalname, // Original name of the file
           id: file.filename.split(".")[0], // Extract UUID from the filename
-          path: `designDrawing/${file.filename}`, // Relative path
+          path: `designDrawingtemp/${file.filename}`, // Relative path
         }));
 
     const newDesignDrawing = await prisma.designDrawings.create({
@@ -238,10 +246,11 @@ const viewDesignDrawingFiles = async (req, res) => {
 
   try {
     // 1. Fetch design drawing record
+    
     const designDrawing = await prisma.designDrawings.findUnique({
       where: { id },
     });
-
+    
     if (!designDrawing || !designDrawing.files) {
       return res.status(404).json({ message: "Design drawing or files not found" });
     }
@@ -357,7 +366,7 @@ const addDesignDrawingResponse = async (req, res) => {
       filename: file.filename, // UUID + extension
       originalName: file.originalname, // Original name of the file
       id: file.filename.split(".")[0], // Extract UUID from the filename
-      path: `designdrawingsresponses/${file.filename}`, // Relative path
+      path: `designdrawingsresponsestemp/${file.filename}`, // Relative path
     }));
     if(parentResponseId!=undefined){
   const updateParentDesignDrawingStatus= await prisma.designDrawingsResponses.update({
