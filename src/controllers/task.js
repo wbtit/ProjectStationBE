@@ -48,7 +48,7 @@ const AddTask = async (req, res) => {
       where: {
         user_id: user,
         status: { not: "complete" },
-        created_on: { lte: cutoff48h },
+        created_on: { lte: cutoff24h },
       },
     });
     if(oldPendingTask){
@@ -266,10 +266,10 @@ const GetTask = async (req, res) => {
       });
     }
 
-    const { is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr,is_supermanager,is_systemadmin} = req.user;
+    const { is_pmo,is_manager, is_staff, id, user_id,is_superuser,departmentId,is_hr,is_supermanager,is_systemadmin} = req.user;
     let tasks;
 
-    if (is_superuser||is_hr||is_supermanager||is_systemadmin) {
+    if (is_superuser||is_hr||is_supermanager||is_systemadmin||is_pmo) {
       // Fetch all tasks since superuser has full access
       tasks = await prisma.task.findMany({
         include: {
@@ -286,7 +286,10 @@ const GetTask = async (req, res) => {
           taskInAssignedList: true,
           workingHourTask: true,
         },
-      })
+      });
+     for (let task of tasks) {
+  task.inReviewTime = task.workingHourTask.map(w => w.end);
+}
     }else if (is_manager && is_staff) {
       // If the user is a manager, fetch projects belonging to their department and include all task details
       tasks = await prisma.project.findMany({
