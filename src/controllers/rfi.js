@@ -237,7 +237,7 @@ const createRFI=async(req,res,approval)=>{
       data: newrfi,
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return sendResponse({
       message: error.message,
       res,
@@ -259,7 +259,7 @@ const addRFI = async (req, res) => {
          return createRFI(req,res,false)
        }
      } catch (error) {
-       console.log(error.mes)
+       console.log(error.message)
        return sendResponse({
          message: error.message,
          res,
@@ -744,7 +744,7 @@ if(!rfi){
 // Notify original sender of the RFI
        if(req.user.id !== rfi.sender.id){
     // Notify original sender of the ChangeOrder
-    await sendNotification(rfi.sender, {
+    await sendNotification(rfi.sender.id, {
       message: `New response on your RFI: ${rfi.subject}`,
       rfiId: rfi.id,
     });
