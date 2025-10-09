@@ -40,55 +40,47 @@ const AddTask = async (req, res) => {
 
 
   try {
-
 const now = new Date();
-const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
-
-// 1️⃣ Check for 24-hour old pending task
-const oldPendingTask = await prisma.task.findFirst({
+const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+ const expiredReviews = await prisma.workingHours.findMany({
   where: {
-    user_id: user,
-    status: { notIn: ["COMPLETE", "VALIDATE_COMPLETE", "COMPLETE_OTHER"] },
-    created_on: { lte: cutoff24h },
+    user_id: id,
+    status: "END", // Correct status for review
+    end: {
+      not: null,
+      lte: twentyFourHoursAgo, // review expired
+    },
+  },
+  include: {
+    task: true,
   },
 });
 
-if (oldPendingTask) {
+const blockedTasks = expiredReviews.filter(
+  (wh) =>
+    wh.task &&
+    !["COMPLETE", "COMPLETE_OTHER", "VALIDATE_COMPLETE"].includes(
+      wh.task.status
+    )
+);
+
+if (blockedTasks.length > 0) {
   return sendResponse({
     message:
-      "User has an old pending task. Please complete it before assigning a new one.",
+      "User has expired reviews that are not completed. Cannot assign new tasks until those reviews are completed.",
     res,
-    statusCode: 400,
+    statusCode: 403,
     success: false,
-    data: null,
+    data: blockedTasks.map((r) => ({
+      task_id: r.task?.id,
+      task_name: r.task?.name,
+      ended_at: r.end,
+      status: r.task?.status,
+    })),
   });
 }
 
-// 2️⃣ Check for Friday task not completed by end of Monday
-const currentDay = now.getDay();
 
-const fridayTask = await prisma.task.findFirst({
-  where: {
-    user_id: user,
-    status: { notIn: ["COMPLETE", "VALIDATE_COMPLETE", "COMPLETE_OTHER"] },
-    AND: [
-      { created_on: { gte: getLastFridayDate(now) } },
-      { created_on: { lt: getNextMondayDate(now) } },
-    ],
-  },
-  orderBy: { created_on: "desc" },
-});
-
-if (fridayTask && currentDay > 1) {
-  return sendResponse({
-    message:
-      "User has a pending task assigned on Friday. Please complete it before assigning a new one.",
-    res,
-    statusCode: 400,
-    success: false,
-    data: null,
-  });
-}
 
      
     // Create Task
