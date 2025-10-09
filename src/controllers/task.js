@@ -41,56 +41,55 @@ const AddTask = async (req, res) => {
 
   try {
 
-    const now = new Date();
-  const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+const now = new Date();
+const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
 
-  const oldPendingTask = await prisma.task.findFirst({
-      where: {
-        user_id: user,
-        status: { not: "complete" },
-        created_on: { lte: cutoff24h },
-      },
-    });
-    if(oldPendingTask){
-      return sendResponse({
-        message: "User has an old pending task. Please complete it before assigning a new one.",
-        res,
-        statusCode: 400,
-        success: false,
-        data: null, 
-      });
-    }
-       const currentDay = now.getDay();
+// 1️⃣ Check for 24-hour old pending task
+const oldPendingTask = await prisma.task.findFirst({
+  where: {
+    user_id: user,
+    status: { notIn: ["COMPLETE", "VALIDATE_COMPLETE", "COMPLETE_OTHER"] },
+    created_on: { lte: cutoff24h },
+  },
+});
 
-       const fridayTask = await prisma.task.findFirst({
-      where: {
-        user_id: user,
-        status: { not: "complete" },
-        // Task created on Friday
-        AND: [
-          {
-            created_on: {
-              gte: getLastFridayDate(now), // Helper function below
-            },
-          },
-          {
-            created_on: {
-              lt: getNextMondayDate(now), // Helper to limit to same week
-            },
-          },
-        ],
-      },
-      orderBy: { created_on: "desc" },
-    });
-     if (fridayTask && currentDay > 1){
-      return sendResponse({
-        message: "User has a pending task assigned on Friday. Please complete it before assigning a new one.",
-        res,
-        statusCode: 400,
-        success: false,
-        data: null, 
-      });
-    }
+if (oldPendingTask) {
+  return sendResponse({
+    message:
+      "User has an old pending task. Please complete it before assigning a new one.",
+    res,
+    statusCode: 400,
+    success: false,
+    data: null,
+  });
+}
+
+// 2️⃣ Check for Friday task not completed by end of Monday
+const currentDay = now.getDay();
+
+const fridayTask = await prisma.task.findFirst({
+  where: {
+    user_id: user,
+    status: { notIn: ["COMPLETE", "VALIDATE_COMPLETE", "COMPLETE_OTHER"] },
+    AND: [
+      { created_on: { gte: getLastFridayDate(now) } },
+      { created_on: { lt: getNextMondayDate(now) } },
+    ],
+  },
+  orderBy: { created_on: "desc" },
+});
+
+if (fridayTask && currentDay > 1) {
+  return sendResponse({
+    message:
+      "User has a pending task assigned on Friday. Please complete it before assigning a new one.",
+    res,
+    statusCode: 400,
+    success: false,
+    data: null,
+  });
+}
+
      
     // Create Task
     const newTask = await prisma.task.create({
@@ -419,7 +418,8 @@ const GetTaskByID = async (req, res) => {
         project: true,
         taskcomment: true,
         taskInAssignedList:true,
-        workingHourTask:true
+        workingHourTask:true,
+        mileStone:true,
       },
     });
 
