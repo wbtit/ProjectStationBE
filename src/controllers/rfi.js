@@ -570,8 +570,7 @@ export const viewRFIfiles = async (req, res) => {
   }
 };
 
-
-export const viewRFIResponsefiles = async (req, res) => {
+const viewRFIResponsefiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
