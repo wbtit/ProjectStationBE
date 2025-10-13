@@ -9,7 +9,7 @@ export default async function sendSubmissionReminder(project){
         from:process.env.EMAIL,
         to:project.manager.email,
         subject:`Project Submission Reminder: ${project.name}`,
-        html:submissionReminderTemplate(project.name,project.approvalDate)
+        html:submissionReminderTemplate(project.name,project.endDate)
     }
     try {
         await transporter.sendMail(mailOptions)
