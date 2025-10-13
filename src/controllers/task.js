@@ -414,7 +414,6 @@ const GetTaskByID = async (req, res) => {
         mileStone:true,
       },
     });
-
     if (!task) {
       return sendResponse({
         message: "error in fetching task by id",
