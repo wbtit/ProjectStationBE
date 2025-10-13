@@ -91,4 +91,94 @@ taskFilter = { project: { departmentID: { in: deptIds } } };
 };
 
 
-export{dashBoardNumbers}
+const dailyWorkingHours = async (req, res) => {
+  const { id } = req.user;
+
+  const now = new Date();
+
+  // Use local date to match string in DB
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const startDateStr = formatDate(now);
+  const endDateStr = formatDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+
+  // Convert HH:MM:SS to hours
+  function parseTimeToHours(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length === 3) {
+      const [hours, minutes, seconds] = parts;
+      return hours + minutes / 60 + seconds / 3600;
+    }
+    if (parts.length === 2) {
+      const [hours, minutes] = parts;
+      return hours + minutes / 60;
+    }
+    return Number(timeStr) || 0;
+  }
+
+  try {
+    // 1️⃣ Fetch today's tasks for the user
+    const tasks = await prisma.task.findMany({
+      where: {
+        user_id: id,
+        start_date: {
+          gte: startDateStr,
+          lt: endDateStr,
+        },
+      },
+    });
+
+    console.log("Tasks Today:", tasks);
+
+    const totalAllocatedHours = tasks.reduce(
+      (sum, t) => sum + parseTimeToHours(t.duration),
+      0
+    );
+
+    const todayTaskIds = tasks.map(t => t.id);
+
+    // 2️⃣ Sum working hours only for today's tasks
+    const workedResult = todayTaskIds.length
+      ? await prisma.workingHours.aggregate({
+          _sum: { duration: true },
+          where: { task_id: { in: todayTaskIds } },
+        })
+      : { _sum: { duration: 0 } };
+
+    const totalWorkingHours = (workedResult._sum.duration || 0);
+
+    console.log("totalAllocatedHours:", totalAllocatedHours);
+    console.log("totalWorkingHours:", totalWorkingHours);
+
+    // 3️⃣ Send response
+    sendResponse({
+      message: "Daily working hours fetched successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: { totalAllocatedHours, totalWorkingHours },
+    });
+  } catch (error) {
+    console.error(error);
+    sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+
+
+
+
+export{dashBoardNumbers,dailyWorkingHours}
