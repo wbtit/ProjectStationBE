@@ -519,20 +519,16 @@ const RFIseen = async (req, res) => {
 };
 
 
-const viewRFIfiles = async (req, res) => {
+export const viewRFIfiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
-    // 1. Fetch RFI record
-    const rfi = await prisma.rFI.findUnique({
-      where: { id },
-    });
+    const rfi = await prisma.rFI.findUnique({ where: { id } });
 
     if (!rfi || !rfi.files) {
       return res.status(404).json({ message: "RFI or files not found" });
     }
 
-    // 2. Find requested file object
     const fileObject = rfi.files.find((file) => file.id === fid);
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
@@ -540,38 +536,24 @@ const viewRFIfiles = async (req, res) => {
 
     console.log("File object:", fileObject);
 
-    // 3. Construct safe absolute path
-   const projectRoot = path.join(__dirname, "..", "..", "public");
-      const safePath = path.join(projectRoot, fileObject.path);
+    // ✅ Use persistent public path from env
+    const projectRoot =
+      process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
 
-
-
+    const safePath = path.join(projectRoot, fileObject.path);
     console.log("Resolved file path:", safePath);
 
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    // 4. Determine MIME type
-    const fileExt = path.extname(safePath).toLowerCase();
     const mimeType = mime.getType(safePath) || "application/octet-stream";
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    // 5. Set response headers
-    if (fileExt === ".zip") {
-      res.setHeader("Content-Type", "application/zip");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${fileObject.originalName}"`
-      );
-    } else {
-      res.setHeader("Content-Type", mimeType);
-      res.setHeader(
-        "Content-Disposition",
-        `inline; filename="${fileObject.originalName}"`
-      );
-    }
-
-    // 6. Stream file to client
     const fileStream = fs.createReadStream(safePath);
     fileStream.pipe(res);
 
@@ -580,59 +562,50 @@ const viewRFIfiles = async (req, res) => {
       res.status(500).json({ message: "Error reading file" });
     });
   } catch (error) {
-    console.error("View File Error:", error); 
+    console.error("View File Error:", error);
     return res.status(500).json({
       message: "Something went wrong while viewing the file",
       error: error.message,
     });
   }
 };
-const viewRFIResponsefiles = async (req, res) => {
+
+
+export const viewRFIResponsefiles = async (req, res) => {
   const { id, fid } = req.params;
 
   try {
-    const rfiResponse = await prisma.rFIResponse.findUnique({
-      where: { id: id }, // Adjust based on your schema
-     
-    });
+    const rfi = await prisma.rFIResponse.findUnique({ where: { id } });
 
-    if (!rfiResponse) {
-      return res.status(404).json({ message: "RFI Response not found" });
+    if (!rfi || !rfi.files) {
+      return res.status(404).json({ message: "RFIResponse or files not found" });
     }
 
-    const fileObject = rfiResponse.files.find((file) => file.id === fid);
-
+    const fileObject = rfi.files.find((file) => file.id === fid);
     if (!fileObject) {
       return res.status(404).json({ message: "File not found" });
     }
 
-     // 3. Construct safe absolute path
-   const projectRoot = path.join(__dirname, "..", "..", "public");
+    console.log("File object:", fileObject);
 
-   const safePath = path.join(projectRoot, fileObject.path);
+    // ✅ Use persistent public path from env
+    const projectRoot =
+      process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
+
+    const safePath = path.join(projectRoot, fileObject.path);
+    console.log("Resolved file path:", safePath);
 
     if (!fs.existsSync(safePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    const fileExt = path.extname(safePath).toLowerCase();
-    const mimeType = mime.getType(safePath) || 'application/octet-stream';
+    const mimeType = mime.getType(safePath) || "application/octet-stream";
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${fileObject.originalName}"`
+    );
 
-    if (fileExt === '.zip') {
-      res.setHeader('Content-Type', 'application/zip');
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="${fileObject.originalName}"`
-      );
-    } else {
-      res.setHeader('Content-Type', mimeType);
-      res.setHeader(
-        'Content-Disposition',
-        `inline; filename="${fileObject.originalName}"`
-      );
-    }
-
-// 6. Stream file to client
     const fileStream = fs.createReadStream(safePath);
     fileStream.pipe(res);
 
@@ -641,14 +614,13 @@ const viewRFIResponsefiles = async (req, res) => {
       res.status(500).json({ message: "Error reading file" });
     });
   } catch (error) {
-    console.error("View File Error:", error); 
+    console.error("View File Error:", error);
     return res.status(500).json({
       message: "Something went wrong while viewing the file",
       error: error.message,
     });
   }
 };
-
 
 const addRFIResponse=async(req,res)=>{
   const{rfiId}=req.params

@@ -525,7 +525,8 @@ const viewCOfiles = async (req, res) => {
     }
 
     // 3. Construct safe absolute path
-   const projectRoot = path.join(__dirname, "..", "..", "public");
+       const projectRoot =
+         process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
 
    const safePath = path.join(projectRoot, fileObject.path);
     // Check if file exists

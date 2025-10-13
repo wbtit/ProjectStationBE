@@ -264,7 +264,8 @@ const viewDesignDrawingFiles = async (req, res) => {
     console.log("File object:", fileObject);
 
     // 3. Construct safe absolute path
-   const projectRoot = path.join(__dirname, "..", "..", "public");
+       const projectRoot =
+         process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
       const safePath = path.join(projectRoot, fileObject.path);
 
 
@@ -481,7 +482,8 @@ const viewDesignDrawingResponseFiles = async (req, res) => {
     console.log("File object:", fileObject);
 
     // 3. Construct safe absolute path
-   const projectRoot = path.join(__dirname, "..", "..", "public");
+       const projectRoot =
+         process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
       const safePath = path.join(projectRoot, fileObject.path);
 
 
