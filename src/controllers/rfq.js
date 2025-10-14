@@ -334,6 +334,7 @@ const sentRFQByUser = async (req, res) => {
             userId:true,
             rfqId:true,
             parentResponseId:true,
+            childResponses:true 
           }
         },
         file:true
@@ -365,6 +366,7 @@ const sentRFQByUser = async (req, res) => {
       data: filtered,
     });
   } catch (error) {
+    console.log(error.message)
     return sendResponse({
       message: error.message,
       res,

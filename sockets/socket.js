@@ -5,8 +5,6 @@ import prisma from "../src/lib/prisma.js";
 import { Compression, decompression } from "../src/utils/Zstd.js";
 
 
-const userSocketMap = new Map();
-
 const initSocket = async(io) => {
 
   const pubClient=createClient({url:"redis://127.0.0.1:6379"})
