@@ -174,7 +174,7 @@ const createCO = async (req, res,approval) => {
 
     // Notify recipients
     sendNotification(recipients, {
-      message: `New CO received: ${remarks}`,
+      message: `New CO received: ${changeorder.remarks}`,
       coId: changeorder.id,
     });
 

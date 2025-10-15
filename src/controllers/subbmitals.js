@@ -731,12 +731,12 @@ if(!submittal){
 if(req.user.id !== submittal.sender_id){
     // Notify original sender of the ChangeOrder
     await sendNotification(submittal.sender_id, {
-      message: `New response on your CO: ${submittal.remarks}`,
+      message: `New response on your submittal: ${submittal.remarks}`,
       coId: submittal.id,
     });
   }else{
     await sendNotification(submittal.recepient_id, {
-      message: `New response on CO you received: ${submittal.remarks}`,
+      message: `New response on Submittal you received: ${submittal.remarks}`,
       coId: submittal.id,
     });
   }
