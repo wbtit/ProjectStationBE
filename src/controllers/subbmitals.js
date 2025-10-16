@@ -219,7 +219,7 @@ try {
 
     // // Emit real-time notification using socket.io
     sendNotification(recepient_id,{
-      message:`New Submittal received: ${subject}`,
+      message:`New Submittal received: ${submitals.subject}`,
       submittlId:submitals.id
     })
 

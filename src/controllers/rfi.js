@@ -226,7 +226,7 @@ const createRFI=async(req,res,approval)=>{
 
     // Emit real-time notification using socket.io
      sendNotification(recipient_id,{
-      message:`New RFI received :${subject}`,
+      message:`New RFI received :${newrfi.subject}`,
       rfiId:newrfi.id
      })
     return sendResponse({

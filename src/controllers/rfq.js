@@ -249,7 +249,7 @@ const addRFQ=async(req,res)=>{
           //console.log("Newly created RFQ:",newrfq)
           // Emit real-time notification using socket.io
           sendNotification(recepient_id,{
-            message:`New RFQ received:${recepient_id}`,
+            message:`New RFQ received:${newrfq.subject}`,
             rfqId:newrfq.id
           })
       
