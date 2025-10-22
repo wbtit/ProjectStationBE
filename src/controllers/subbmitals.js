@@ -280,6 +280,8 @@ const updateSubmittal = async (req, res) => {
     subject,
     description,
     isAproovedByAdmin,
+    isDeputyManagerAprooved,
+    isDeptManagerAprooved
   } = req.body;
 
   try {
@@ -325,6 +327,12 @@ const updateSubmittal = async (req, res) => {
             ? isAproovedByAdmin
             : existing.isAproovedByAdmin,
         files: fileDetails,
+         isDeputyManagerAprooved:typeof isDeputyManagerAprooved === "boolean"
+            ? isDeputyManagerAprooved
+            : existing.isDeputyManagerAprooved,
+    isDeptManagerAprooved:typeof isDeptManagerAprooved === "boolean"
+            ? isDeptManagerAprooved
+            : existing.isDeptManagerAprooved,
       },
     });
 

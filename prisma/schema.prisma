@@ -440,6 +440,8 @@ model Submittals {
   description        String
   files              Json              @default("[]")
   isAproovedByAdmin  Boolean?   @default(false)
+  isDeputyManagerAprooved     Boolean?         @default(false)
+  isDeptManagerAprooved       Boolean?         @default(false)
   mileStoneBelongsTo MileStone?          @relation("mileStoneSubmittals", fields: [mileStoneId], references: [id], onDelete: Cascade)
   file               File[]              @relation("submittalsFiles")
   fabricator         Fabricator          @relation("FabricatorSubmittals", fields: [fabricator_id], references: [id], onDelete: Cascade)
@@ -499,6 +501,8 @@ model RFI {
   description   String
   files         Json       @default("[]")
   isAproovedByAdmin   Boolean?   @default(false)
+  isDeputyManagerAprooved     Boolean?         @default(false)
+  isDeptManagerAprooved       Boolean?         @default(false)
   file          File[]       @relation("rfiFiles")
   fabricator    Fabricator   @relation("FabricatorRFI", fields: [fabricator_id], references: [id], onDelete: Cascade)
   project       Project      @relation("ProjectRFI", fields: [project_id], references: [id], onDelete: Cascade)
@@ -627,6 +631,8 @@ model ChangeOrder {
   createdAt   DateTime           @default(now())
   coResponse  COResponse?        @relation("coResponse")
   isAproovedByAdmin   Boolean?   @default(false)
+  isDeputyManagerAprooved     Boolean?         @default(false)
+  isDeptManagerAprooved       Boolean?         @default(false)
   Project     Project            @relation("ChangeOrderProject", fields: [project], references: [id], onDelete: Cascade)
   Recipients  Users              @relation("ChangeOrderRecipients", fields: [recipients], references: [id], onDelete: Cascade)
   senders     Users              @relation("ChangeOrderSender", fields: [sender], references: [id], onDelete: Cascade)

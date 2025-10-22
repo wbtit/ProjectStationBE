@@ -130,7 +130,7 @@ const changeOrderSent=async(req,res)=>{
 // Create Change Order function
 const createCO = async (req, res,approval) => {
   try {
-    const { project, recipients, remarks, description, Stage } = req.body;
+    const { project, recipients, remarks, description, Stage,changeOrder } = req.body;
     console.log("changeOrder body:",req.body)
 
     if (!project || !recipients || !remarks || !description || !Stage) {
@@ -154,12 +154,12 @@ const createCO = async (req, res,approval) => {
       : [];
 
     // Generate unique CO number
-    const coNum = await getNextCONumber();
+    // const coNum = await getNextCONumber();
 
     // Insert into DB
     const changeorder = await prisma.changeOrder.create({
       data: {
-        changeOrder: coNum,
+        changeOrder:changeOrder ,
         description,
         project,
         status: "NOT_REPLIED",
@@ -671,7 +671,9 @@ const updateChangeOrder = async (req, res) => {
       status,
       reason,
       stage,
-      isAproovedByAdmin
+      isAproovedByAdmin,
+      isDeputyManagerAprooved,
+      isDeptManagerAprooved
     } = req.body;
 
     // Update ChangeOrder
@@ -688,7 +690,9 @@ const updateChangeOrder = async (req, res) => {
         stage,
         status,
         reason,
-        isAproovedByAdmin
+        isAproovedByAdmin,
+        isDeputyManagerAprooved,
+      isDeptManagerAprooved
       }
     });
 

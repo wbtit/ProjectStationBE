@@ -41,6 +41,7 @@ const createRFI=async(req,res,approval)=>{
         subject,
         description,
         files: fileDetails,
+        isAproovedByAdmin:approval
         
       },
       include: {
@@ -280,6 +281,8 @@ const updateRFI = async (req, res) => {
     description,
     status,
     isAproovedByAdmin,
+    isDeputyManagerAprooved,
+    isDeptManagerAprooved,
     files,
   } = req.body;
 
@@ -311,6 +314,8 @@ const updateRFI = async (req, res) => {
             ? isAproovedByAdmin
             : existing.isAproovedByAdmin,
         files: files ?? existing.files,
+        isDeputyManagerAprooved:isDeputyManagerAprooved??existing.isDeputyManagerAprooved,
+    isDeptManagerAprooved:isDeptManagerAprooved??existing.isDeptManagerAprooved,
       },
     });
 
