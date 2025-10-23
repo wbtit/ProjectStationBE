@@ -51,7 +51,8 @@ try {
       },
       include: {
         recepients: true, // Make sure this matches your Prisma schema
-        project:true
+        project:true,
+        sender:true
       },
     });
 
