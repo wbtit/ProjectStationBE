@@ -77,158 +77,289 @@ const addRFQ=async(req,res)=>{
             }
           })
           const htmlContent = `<!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>Project Station - RFI Notification</title>
-              <style>
-                body {
-                  font-family: 'Courier New', Courier, monospace;
-                  background-color: #f2fdf3; /* Light greenish background */
-                  color: #333;
-                  margin: 0;
-                  padding: 0;
-                }
-          
-                .email-container {
+          <html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whiteboard Engineering - Project Update</title>
+
+    <style type="text/css">
+      /* Global Reset */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        background-color: #f6f7f9;
+      }
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      td {
+        padding: 0;
+      }
+      img {
+        border: 0;
+        outline: none;
+        text-decoration: none;
+        display: block;
+        -ms-interpolation-mode: bicubic;
+      }
+      a {
+        text-decoration: none;
+        color: #8cc63f;
+      }
+      .main-content-wrapper {
+        max-width: 600px;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+      }
+
+      /* Typography */
+      .title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333333;
+      }
+      .subtitle {
+        font-size: 14px;
+        color: #555555;
+        line-height: 20px;
+      }
+      .divider {
+        background-color: #8cc63f;
+        height: 4px;
+      }
+
+      /* Mobile Styles */
+      @media only screen and (max-width: 600px) {
+        .main-content-wrapper {
+          width: 100% !important;
+        }
+        .content-padding {
+          padding: 0 20px !important;
+        }
+        .logo-cell {
+          padding: 20px 20px 10px 20px !important;
+          text-align: center !important;
+        }
+        .project-name-cell {
+          text-align: center !important;
+          padding-top: 5px !important;
+        }
+        .button-link {
+          width: 100% !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body style="margin: 0; padding: 0; background-color: #f6f7f9">
+    <table align="center" width="100%" bgcolor="#f6f7f9">
+      <tr>
+        <td align="center" valign="top" style="padding: 30px 10px">
+          <table
+            class="main-content-wrapper"
+            align="center"
+            cellpadding="0"
+            cellspacing="0"
+          >
+            <!-- Header -->
+            <tr>
+              <!-- Left: Logo (30%) -->
+              <td
+                align="left"
+                style="
+                  width: 30%;
+                  padding: 20px 20px 10px 30px;
                   background-color: #ffffff;
-                  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-                  border-radius: 10px;
-                  padding: 35px;
-                  margin-top: 50px;
-                  max-width: 650px;
-                  margin-left: auto;
-                  margin-right: auto;
-                }
-          
-                .email-header {
-                  background-color: #6adb45;
-                  color: white;
-                  padding: 25px;
-                  border-radius: 8px;
-                  text-align: center;
-                }
-          
-                .email-header .title {
-                  font-size: 26px;
-                  font-weight: bold;
-                  margin: 0;
-                }
-          
-                .email-body {
-                  margin-top: 25px;
+                  vertical-align: middle;
+                "
+                class="logo-cell"
+              >
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                  alt="Whiteboard Engineering Logo"
+                  width="140"
+                  style="max-width: 100%; height: auto; display: block"
+                />
+              </td>
+
+              <!-- Right: Project Name (70%) -->
+              <td
+                align="right"
+                style="
+                  width: 70%;
+                  padding: 20px 30px 10px 10px;
+                  font-family: Arial, sans-serif;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #ffffff;
+                  background-color: #8cc63f;
                   text-align: left;
-                  line-height: 1.6;
-                }
-          
-                .card {
-                  background-color: #f9f9f9;
-                  border-radius: 8px;
-                  padding: 25px;
-                  margin-top: 30px;
-                  border: none;
-                }
-          
-                .footer {
-                  text-align: center;
-                  margin-top: 40px;
-                  font-size: 14px;
-                  color: #555;
-                }
-          
-                .footer img {
-                  max-width: 150px;
-                  margin-top: 15px;
-                }
-          
-                a {
-                  color: #6adb45;
-                  text-decoration: none;
-                  font-weight: bold;
-                }
-          
-                .green-text {
-                  color: #6adb45;
-                }
-          
-                h2 {
-                  font-size: 20px;
-                  color: #333;
-                  margin-top: 20px;
-                }
-          
-                p {
-                  font-size: 16px;
-                  color: #555;recepient_id
-                }
-          
-                /* Ensure logo is centered in footer */
-                .footer {
-                  text-align: center;
-                  margin-top: 40px;
-                }
-          
-                .footer img {
-                  max-width: 150px;
-                  display: block;
-                  margin-left: auto;
-                  margin-right: auto;
-                }
-          
-                /* Ensure the email container is centered */
-                .email-container {
-                  text-align: center;
-                }
-              </style>
-          </head>
-          
-          <body>
-              <div class="email-container">
-                  <div class="d-flex justify-content-between align-items-center">
-                  <div class="title">
-                      <span>You’ve Received a New RFI</span><br/>
-                      <span><strong>Project:</strong> ${newrfq.projectName}</span>
-                  </div>
-                  <div> 
-                      <img 
-                          src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
-                          alt="Company Logo" 
-                          style="max-width: 100px;" />
-                  </div>
-              </div>
-                  <div class="email-body">
-                      <h2>Welcome to Project Station, <b>${newrfq.recepients.username}</b>!</h2>
-                      <p>You have received a new RFI notification. Here are the details:</p>
-          
-                      <p><strong>Project Name:</strong> ${newrfq.projectName}</p>
-                      <p><strong>Sender:</strong> ${newrfq.sender.username}</p>
-                      <p><strong>Date:</strong> ${newrfq.date}</p>
-                      <p><strong>Subject:</strong> ${newrfq.subject}</p>
-                      <p>You can check your RFI by clicking the link <a href="projectstation.whiteboardtec.com">here</a>.</p>
-          
-                      <div class="card">
-                          <div class="card-body">
-                              ${newrfq.description}
-                       OPEN   </div>
-                      </div>
-          
-                      <p>Thanks & Regards,</p>
-                      <p><b> ${newrfq.sender.username}</b></p>
-                      <p>Bangalore</p>
-                  </div>
-          
-                  <div class="footer">
+                  vertical-align: middle;
+                "
+                class="project-name-cell"
+              >
+                ${newrfq.projectName || "N/A"}
+              </td>
+            </tr>
+
+            <!-- Divider -->
+            <tr>
+              <td colspan="2" class="divider"></td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td colspan="2" style="padding: 30px 40px">
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #888888">
+                  Date: ${newrfq.createdAt}
+                </p>
+
+                <p
+                  style="
+                    margin: 15px 0;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #333333;
+                  "
+                >
+                  Subject: Status Update for ${newrfq.projectName || "N/A"}
+                </p>
+
+                <p
+                  style="
+                    margin: 20px 0;
+                    font-size: 15px;
+                    color: #333333;
+                    line-height: 24px;
+                  "
+                >
+                  Dear ${newrfq.recepients.f_name || "Sir/Ma'am"},
+                </p>
+
+                <p
+                  style="
+                    margin: 10px 0 25px 0;
+                    font-size: 15px;
+                    color: #333333;
+                    line-height: 24px;
+                  "
+                >
+                  ${newrfq.description || "No description provided."}
+                </p>
+
+                <!-- Button -->
+                <p align="center" style="margin: 30px 0 40px 0">
+                  <a
+                    href="https://projectstation.whiteboardtec.com/"
+                    target="_blank"
+                    style="
+                      background-color: #8cc63f;
+                      border: 1px solid #8cc63f;
+                      border-radius: 6px;
+                      color: #ffffff;
+                      display: inline-block;
+                      font-size: 14px;
+                      font-weight: bold;
+                      line-height: 18px;
+                      text-align: center;
+                      padding: 12px 30px;
+                      text-decoration: none;
+                      letter-spacing: 0.5px;
+                    "
+                  >
+                    Login With Your Credentials
+                  </a>
+                </p>
+
+                <!-- Signature -->
+                <p style="font-size: 15px; color: #333333; margin-bottom: 10px">
+                  Thanks & Regards,
+                </p>
+
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td valign="top" style="padding-right: 15px">
                       <img
-                          src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
-                          alt="Company Logo"
+                        src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                        alt="Sender"
+                        width="80"
+                        height="auto"
+                        style="border-radius: 10%; display: block"
                       />
-                      <p><b>Whiteboard Technologies Pvt. Ltd.</b></p>
-                      <p>Bangalore</p>
-                  </div>
-              </div>
-          </body>
-          </html>
+                    </td>
+
+                    <td valign="middle">
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 16px;
+                          font-weight: bold;
+                          color: #333333;
+                        "
+                      >
+                        ${[
+                          newrfq?.sender?.f_name,
+                          newrfq?.sender?.m_name,
+                          newrfq?.sender?.l_name,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      </p>
+                      <p style="margin: 2px 0; font-size: 14px; color: #888888">
+                        ${newrfq?.sender?.designation || "N/A"}
+                      </p>
+                      <p style="margin: 2px 0; font-size: 14px; color: #888888">
+                        Whiteboard Engineering |
+                        <a
+                          href="https://whiteboardtec.com/"
+                          style="color: #8cc63f"
+                          >whiteboardtec.com</a
+                        >
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                colspan="2"
+                align="center"
+                style="padding: 20px 30px 30px 30px; background-color: #f6f7f9"
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #aaaaaa;
+                    line-height: 18px;
+                  "
+                >
+                  © ${new Date().getFullYear()} Whiteboard Engineering. All
+                  Rights Reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+
+
           `;
 
           sendEmail({

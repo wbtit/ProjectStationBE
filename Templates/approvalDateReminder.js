@@ -9,152 +9,273 @@ export function approvalReminderTemplate(projectName, approvalDate, recipientUse
   });
 
   return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project Station - Approval Reminder</title>
-    <style>
+    <title>Whiteboard Engineering - Project Update</title>
+
+    <style type="text/css">
+      /* Global Reset */
       body {
-        font-family: 'Courier New', Courier, monospace;
-        background-color: #f2fdf3; /* Light greenish background */
-        color: #333;
         margin: 0;
         padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        background-color: #f6f7f9;
       }
-
-      .email-container {
-        background-color: #ffffff;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        border-radius: 10px;
-        padding: 35px;
-        margin-top: 50px;
-        max-width: 650px;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center; /* Center content within container */
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
       }
-
-      .header-flex { /* New class for flexbox in header */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #6adb45;
-        color: white;
-        padding: 25px;
-        border-radius: 8px;
-        text-align: left; /* Keep text left-aligned within header flex item */
+      td {
+        padding: 0;
       }
-
-      .header-title {
-        font-size: 26px;
-        font-weight: bold;
-        margin: 0;
-      }
-
-      .header-logo {
-        max-width: 100px; /* Adjust as needed */
-        height: auto;
-      }
-
-      .email-body {
-        margin-top: 25px;
-        text-align: left; /* Align text within body to left */
-        line-height: 1.6;
-      }
-
-      .card {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 25px;
-        margin-top: 30px;
-        border: none;
-      }
-
-      .footer {
-        text-align: center;
-        margin-top: 40px;
-        font-size: 14px;
-        color: #555;
-      }
-
-      .footer img {
-        max-width: 150px;
-        display: block; /* Make it a block element to center with margin auto */
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 15px; /* Add some space above the footer logo */
-      }
-
-      a {
-        color: #6adb45;
+      img {
+        border: 0;
+        outline: none;
         text-decoration: none;
-        font-weight: bold;
+        display: block;
+        -ms-interpolation-mode: bicubic;
+      }
+      a {
+        text-decoration: none;
+        color: #8cc63f;
+      }
+      .main-content-wrapper {
+        max-width: 600px;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
       }
 
-      .green-text {
-        color: #6adb45;
+      /* Typography */
+      .title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333333;
+      }
+      .subtitle {
+        font-size: 14px;
+        color: #555555;
+        line-height: 20px;
+      }
+      .divider {
+        background-color: #8cc63f;
+        height: 4px;
       }
 
-      h2 {
-        font-size: 20px;
-        color: #333;
-        margin-top: 20px;
-      }
-
-      p {
-        font-size: 16px;
-        color: #555;
+      /* Mobile Styles */
+      @media only screen and (max-width: 600px) {
+        .main-content-wrapper {
+          width: 100% !important;
+        }
+        .content-padding {
+          padding: 0 20px !important;
+        }
+        .logo-cell {
+          padding: 20px 20px 10px 20px !important;
+          text-align: center !important;
+        }
+        .project-name-cell {
+          text-align: center !important;
+          padding-top: 5px !important;
+        }
+        .button-link {
+          width: 100% !important;
+        }
       }
     </style>
-</head>
+  </head>
 
-<body>
-    <div class="email-container">
-        <div class="header-flex">
-            <div class="header-title">
-                <span>Project Approval Reminder</span><br/>
-                <span><strong>Project:</strong> ${projectName}</span>
-            </div>
-            <div>
+  <body style="margin: 0; padding: 0; background-color: #f6f7f9">
+    <table align="center" width="100%" bgcolor="#f6f7f9">
+      <tr>
+        <td align="center" valign="top" style="padding: 30px 10px">
+          <table
+            class="main-content-wrapper"
+            align="center"
+            cellpadding="0"
+            cellspacing="0"
+          >
+            <!-- Header -->
+            <tr>
+              <!-- Left: Logo (30%) -->
+              <td
+                align="left"
+                style="
+                  width: 30%;
+                  padding: 20px 20px 10px 30px;
+                  background-color: #ffffff;
+                  vertical-align: middle;
+                "
+                class="logo-cell"
+              >
                 <img
-                    src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
-                    alt="Company Logo"
-                    class="header-logo" />
-            </div>
-        </div>
-        <div class="email-body">
-            <h2>Hello, <b>${recipientUsername || 'Project Manager'}</b>!</h2>
-            <p>This is a friendly reminder about the upcoming **approval deadline** for your project on Project Station.</p>
+                  src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                  alt="Whiteboard Engineering Logo"
+                  width="140"
+                  style="max-width: 100%; height: auto; display: block"
+                />
+              </td>
 
-            <p><strong>Project Name:</strong> ${projectName}</p>
-            <p><strong>Scheduled Approval Date:</strong> <span class="green-text">${formattedDate}</span></p>
+              <!-- Right: Project Name (70%) -->
+              <td
+                align="right"
+                style="
+                  width: 70%;
+                  padding: 20px 30px 10px 10px;
+                  font-family: Arial, sans-serif;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #ffffff;
+                  background-color: #8cc63f;
+                  text-align: left;
+                  vertical-align: middle;
+                "
+                class="project-name-cell"
+              >
+                ${projectName || "N/A"}
+              </td>
+            </tr>
 
-            <p>Please ensure all necessary information and documentation are finalized and submitted for approval by this date. You can review all project details and update the status by clicking the link below:</p>
+            <!-- Divider -->
+            <tr>
+              <td colspan="2" class="divider"></td>
+            </tr>
 
-            <p style="text-align: center; margin-top: 20px;">
-                <a href="projectstation.whiteboardtec.com" style="background-color: #6adb45; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-size: 16px; font-weight: bold;">
-                    Go to Project Station
-                </a>
-            </p>
+            <!-- Body -->
+            <tr>
+              <td colspan="2" style="padding: 30px 40px">
+               
+                <h4 style="font-weight: normal;">
+                  Hello, <b style="color: #555555;">${
+                    recipientUsername || "Project Manager"
+                  }</b>!
+                </h2>
+                <p>This is a friendly reminder about the upcoming <span style="font-weight: bold;">approval deadline</span> for your project on Project Station.</p>
+                
+                <p><strong style="color: #555555;">Project Name:</strong> ${projectName}</p>
+                <p
+                  style="
+                    margin: 0 0 5px 0;
+                    font-size: 15px;
+                    color: hsl(150, 98%, 41%);
+                  "
+                >
+                  Scheduled Approval Date: ${
+                    formattedDate || new Date().toLocaleDateString()
+                  }
+                </p>
 
-            <p style="margin-top: 30px;">If this project has already been approved, please update its status on Project Station to prevent further reminders.</p>
+                <p>Please ensure all necessary information and documentation are finalized and submitted for approval by this date. You can review all project details and update the status by clicking the link below:</p>
 
-            <p>Thanks & Regards,</p>
-            <p><b>The Project Station Team</b></p>
-            <p>Bangalore</p>
-        </div>
+                <!-- Button -->
+                <p align="center" style="margin: 30px 0 40px 0">
+                  <a
+                    href="https://projectstation.whiteboardtec.com/"
+                    target="_blank"
+                    style="
+                      background-color: #8cc63f;
+                      border: 1px solid #8cc63f;
+                      border-radius: 6px;
+                      color: #ffffff;
+                      display: inline-block;
+                      font-size: 14px;
+                      font-weight: bold;
+                      line-height: 18px;
+                      text-align: center;
+                      padding: 12px 30px;
+                      text-decoration: none;
+                      letter-spacing: 0.5px;
+                    "
+                  >
+                    Login With Your Credentials
+                  </a>
+                </p>
 
-        <div class="footer">
-            <img
-                src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
-                alt="Company Logo"
-            />
-            <p><b>Whiteboard Technologies Pvt. Ltd.</b></p>
-            <p>Bangalore</p>
-        </div>
-    </div>
-</body>
+                <p style="margin-top: 30px; font-size: 12px;">If this project has already been approved, please update its status on Project Station to prevent further reminders.</p>
+
+                <!-- Signature -->
+                <p style="font-size: 15px; color: #333333; margin-bottom: 10px">
+                  Thanks & Regards,
+                </p>
+
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td valign="top" style="padding-right: 15px">
+                      <img
+                        src="https://firebasestorage.googleapis.com/v0/b/whiteboard-website.appspot.com/o/assets%2Fimage%2Flogo%2Fwhiteboardtec-logo.png?alt=media&token=f73c5257-9b47-4139-84d9-08a1b058d7e9"
+                        alt="Sender"
+                        width="80"
+                        height="auto"
+                        style="border-radius: 10%; display: block"
+                      />
+                    </td>
+
+                    <td valign="middle">
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 16px;
+                          font-weight: bold;
+                          color: #333333;
+                        "
+                      >
+                       Project Station
+                      </p>
+                      <p style="margin: 2px 0; font-size: 14px; color: #888888">
+                        Your friendly Tracking Application
+                      </p>
+                      <p style="margin: 2px 0; font-size: 14px; color: #888888">
+                        Whiteboard Engineering |
+                        <a
+                          href="https://whiteboardtec.com/"
+                          style="color: #8cc63f"
+                          >whiteboardtec.com</a
+                        > | <a
+                        href="https://projectstation.whiteboardtec.com/"
+                        style="color: #8cc63f"
+                        >Project Station</a
+                      >
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                colspan="2"
+                align="center"
+                style="padding: 20px 30px 30px 30px; background-color: #f6f7f9"
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #aaaaaa;
+                    line-height: 18px;
+                  "
+                >
+                  © ${new Date().getFullYear()} Whiteboard Engineering. All
+                  Rights Reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
+
 `;
 }
