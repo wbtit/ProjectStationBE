@@ -236,11 +236,10 @@ const GetAllFabricator = async (req, res) => {
       user.is_manager ||
       user.is_sales ||
       user.is_oe ||
-      user.is_pmo ||
       user.is_est;
 
     let fabricators;
-    if(user.is_superuser|| user.is_supermanager){
+    if(user.is_superuser|| user.is_supermanager||user.is_pmo){
       fabricators= await prisma.fabricator.findMany({
         include:{
           project:true
