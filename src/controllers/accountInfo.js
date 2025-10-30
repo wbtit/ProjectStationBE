@@ -1,5 +1,5 @@
-import { prisma } from "@/config/prisma";
-import { sendResponse } from "@/utils/sendResponse";
+import prisma from "../lib/prisma.js";
+import { sendResponse } from "../utils/responder.js";
 
 export const addAccountInfo = async (req, res) => {
   try {

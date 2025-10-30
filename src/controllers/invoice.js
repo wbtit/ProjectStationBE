@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma";
-import { sendResponse } from "../utils/responder";
+import prisma from "../lib/prisma.js";
+import { sendResponse } from "../utils/responder.js";
 
 
 
