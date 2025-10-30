@@ -159,6 +159,7 @@ model Fabricator {
   users       Users[]      @relation("FabricatorUsers")
   RFQ         RFQ[]       @relation("FabricatorRFQ")
   mileStone   MileStone[] @relation("FabricatorMileStone")
+  invoice     Invoice[]   @relation("fabricatorInvoice")
 
   @@map("fabricators")
 }
@@ -242,6 +243,7 @@ model Project {
   notes                  Notes[]        @relation("projectNotes")
   rfq                    RFQ?          @relation("ProjectRFQ", fields: [rfqId], references: [id], onDelete: Cascade)
   designDrawings         DesignDrawings[] @relation("designdrawingsproject")
+  invoice                 Invoice[]       @relation("projectInvoice")
   @@map("project")
 }
 
@@ -923,6 +925,68 @@ model EstimatorEfficiency {
   @@unique([estimatorId, month, year])
   @@map("estimator_efficiency")
 }
+
+model Invoice {
+  id                         String        @id @default(uuid()) @db.Uuid
+  projectId                  String        @db.Uuid
+  fabricatorId               String        @db.Uuid
+  customerName               String        @default("")
+  contactName                String        @default("")
+  address                    String        @default("")
+  stateCode                  String        @default("")
+  GSTIN                      String        @default("")
+  invoiceNumber              String
+  invoiceDate                DateTime      @default(now())
+  dateOfSupply               DateTime      @default(now())
+  placeOfSupply              String        @default("")
+  jobName                    String
+  signature                  Json?         @default("[]")
+  currencyType               String        @default("USD")
+  totalInvoiceValue          Float         @default(0)
+  totalInvoiceValueInWords   String        @default("")
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+
+  // 🔗 Relations
+  project                    Project       @relation("projectInvoice", fields: [projectId], references: [id])
+  fabricator                 Fabricator    @relation("fabricatorInvoice", fields: [fabricatorId], references: [id])
+  accountInfo                AccountInfo[] @relation("invoice")
+  invoiceItems               InvoiceItem[]
+}
+
+model InvoiceItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  invoiceId      String   @db.Uuid
+  description    String
+  sacCode        String?
+  unit           Int?
+  rateUSD        Float?
+  totalUSD       Float?
+  remarks        String?
+  createdAt      DateTime @default(now())
+
+  // 🔗 Relation
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+}
+
+model AccountInfo {
+  id                  String   @id @default(uuid()) @db.Uuid
+  invoiceId           String   @db.Uuid
+  abaRoutingNumber    String
+  accountNumber       String
+  accountType         String
+  beneficiaryInfo     String
+  beneficiaryAddress  String
+  bankInfo            String
+  bankAddress         String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // 🔗 Relation
+  invoice             Invoice  @relation("invoice", fields: [invoiceId], references: [id])
+}
+
+ 
 
 enum EstimationStatus {
   DRAFT
