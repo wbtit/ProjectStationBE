@@ -1,5 +1,7 @@
-import { prisma } from "@/config/prisma";
-import { sendResponse } from "@/utils/sendResponse";
+import prisma from "../lib/prisma";
+import { sendResponse } from "../utils/responder";
+
+
 
 export const createInvoice = async (req, res) => {
   try {
