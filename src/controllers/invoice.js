@@ -5,7 +5,7 @@ import { sendResponse } from "../utils/responder.js";
 
 export const createInvoice = async (req, res) => {
   try {
-    const { projectId, fabricatorId, customerName, contactName, address, stateCode, GSTIN, invoiceNumber, placeOdSupply, jobName, currencyType, TotalInvoiveValues, TotalInvoiveValuesinWords, invoiceItems, accountInfo } = req.body;
+    const { projectId, fabricatorId, customerName, contactName, address, stateCode, GSTIN, invoiceNumber, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
 
     if (!projectId || !fabricatorId || !customerName || !invoiceNumber) {
       return sendResponse({
@@ -27,11 +27,11 @@ export const createInvoice = async (req, res) => {
         stateCode,
         GSTIN,
         invoiceNumber,
-        placeOdSupply,
+        placeOfSupply,
         jobName,
         currencyType,
-        TotalInvoiveValues,
-        TotalInvoiveValuesinWords,
+        totalInvoiceValue,
+        totalInvoiceValueInWords,
         invoiceItems: {
           create: invoiceItems || [],
         },

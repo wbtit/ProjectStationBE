@@ -190,7 +190,7 @@ const privateChatHistory=async(req,res)=>{
         })
 
         const decompressedMessages = await Promise.all(
-  groupMessages.map(async msg => {
+  privateChats.map(async msg => {
     const content = msg.contentCompressed
       ? await decompression(msg.contentCompressed)
       : null;
