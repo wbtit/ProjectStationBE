@@ -5,9 +5,9 @@ import { sendResponse } from "../utils/responder.js";
 
 export const createInvoice = async (req, res) => {
   try {
-    const { projectId, fabricatorId, customerName, contactName, address, stateCode, GSTIN, invoiceNumber, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
+    const { projectId, fabricatorId, customerName, contactName, address,clientId, stateCode, GSTIN, invoiceNumber, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
 
-    if (!projectId || !fabricatorId || !customerName || !invoiceNumber) {
+    if (!projectId || !fabricatorId || !customerName || !invoiceNumber||clientId) {
       return sendResponse({
         message: "Required fields missing",
         res,
@@ -23,6 +23,7 @@ export const createInvoice = async (req, res) => {
         fabricatorId,
         customerName,
         contactName,
+        clientId,
         address,
         stateCode,
         GSTIN,
@@ -63,9 +64,10 @@ export const createInvoice = async (req, res) => {
 
 export const getAllInvoices = async (req, res) => {
   try {
-    const invoices = await prisma.invoice.findMany({
-      include: { invoiceItems: true, accountInfo: true },
+    let invoices = await prisma.invoice.findMany({
+      include: { invoiceItems: true, accountInfo: true ,pointOfContact:true},
     });
+    
 
     return sendResponse({
       message: "Fetched all invoices successfully",
@@ -92,7 +94,7 @@ export const getInvoiceById = async (req, res) => {
 
     const invoice = await prisma.invoice.findUnique({
       where: { id },
-      include: { invoiceItems: true, accountInfo: true },
+      include: { invoiceItems: true, accountInfo: true,pointOfContact:true },
     });
 
     if (!invoice) {

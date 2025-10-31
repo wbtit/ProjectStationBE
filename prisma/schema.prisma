@@ -97,6 +97,7 @@ model Users {
   notes             Notes[]           @relation("NotesCreatedBy")
   designdrawingsuser DesignDrawings[] @relation("designdrawingsuser")
   designdrawingsresponseBy DesignDrawingsResponses[] @relation("designDrawingsresponseBy")
+  invoicePointOfContact     Invoice?     @relation("invoicePointOfContact")
   @@map("users")
 }
 
@@ -930,6 +931,7 @@ model Invoice {
   id                         String        @id @default(uuid()) @db.Uuid
   projectId                  String        @db.Uuid
   fabricatorId               String        @db.Uuid
+  clientId                   String?        @unique @db.Uuid @default("00000000-0000-0000-0000-000000000000")
   customerName               String        @default("")
   contactName                String        @default("")
   address                    String        @default("")
@@ -950,6 +952,7 @@ model Invoice {
   // 🔗 Relations
   project                    Project       @relation("projectInvoice", fields: [projectId], references: [id])
   fabricator                 Fabricator    @relation("fabricatorInvoice", fields: [fabricatorId], references: [id])
+  pointOfContact             Users?         @relation("invoicePointOfContact",fields: [clientId],references: [id])
   accountInfo                AccountInfo[] @relation("invoice")
   invoiceItems               InvoiceItem[]
 }
