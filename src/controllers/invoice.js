@@ -7,7 +7,7 @@ export const createInvoice = async (req, res) => {
   try {
     const { projectId, fabricatorId, customerName, contactName, address,clientId, stateCode, GSTIN, invoiceNumber, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
 
-    if (!projectId || !fabricatorId || !customerName || !invoiceNumber||clientId) {
+    if (!projectId || !fabricatorId || !customerName || !invoiceNumber||!clientId) {
       return sendResponse({
         message: "Required fields missing",
         res,
@@ -33,6 +33,7 @@ export const createInvoice = async (req, res) => {
         currencyType,
         totalInvoiceValue,
         totalInvoiceValueInWords,
+        pointOfContact:{connect:{id:clientId}},
         invoiceItems: {
           create: invoiceItems || [],
         },
@@ -63,12 +64,25 @@ export const createInvoice = async (req, res) => {
 };
 
 export const getAllInvoices = async (req, res) => {
+  const user = req.user
+  
   try {
-    let invoices = await prisma.invoice.findMany({
+    let invoices;
+
+     if(user.is_pmo||user.is_superuser){
+      invoices= await prisma.invoice.findMany({
       include: { invoiceItems: true, accountInfo: true ,pointOfContact:true},
     });
     
-
+     }else{
+       invoices = await prisma.invoice.findMany({
+      where:{
+        clientId:user.id
+      },
+       include: { invoiceItems: true, accountInfo: true ,pointOfContact:true},
+     })
+     }
+     console.log("The invoces",invoices)
     return sendResponse({
       message: "Fetched all invoices successfully",
       res,
@@ -87,6 +101,7 @@ export const getAllInvoices = async (req, res) => {
     });
   }
 };
+
 
 export const getInvoiceById = async (req, res) => {
   try {

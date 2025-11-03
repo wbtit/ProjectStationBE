@@ -263,6 +263,9 @@ const GetTask = async (req, res) => {
     if (is_superuser||is_hr||is_supermanager||is_systemadmin||is_pmo) {
       // Fetch all tasks since superuser has full access
       tasks = await prisma.task.findMany({
+        where:{
+          isArchived:false
+        },
         include: {
           project: { include: { manager: true, department: true } },
           user: true,
@@ -286,6 +289,7 @@ const GetTask = async (req, res) => {
       tasks = await prisma.project.findMany({
         where: {
           department: { managerId: id }, // ✅ Correct reference to the department manager
+          isArchived:false
         },
         include: {
           tasks: {
@@ -311,7 +315,7 @@ const GetTask = async (req, res) => {
     else if (is_manager) {
       // If the user is a manager, fetch tasks assigned to their managed projects
       tasks = await prisma.task.findMany({
-        where: { project: { manager: { id } } },
+        where: { project: { manager: { id } },isArchived:false },
         include: {
           project: { include: { manager: true } },
           user: true,
@@ -328,6 +332,7 @@ const GetTask = async (req, res) => {
             { user_id: user_id || id }, // Tasks where user is the creator
             { assignedTask: { some: { assigned_to: user_id || id } } }, // Tasks assigned to user
           ],
+          isArchived:false
         },
         include: {
           project: { include: { manager: true } },
@@ -405,6 +410,7 @@ const GetTaskByID = async (req, res) => {
     const task = await prisma.task.findUnique({
       where: {
         id,
+        isArchived:false
       },
       include: {
         project: true,
@@ -562,6 +568,7 @@ const calender = async (req, res) => {
           gte: startDate,
           lte: endDate,
         },
+        isArchived:false
       },
       include: {
         project: true,
@@ -626,6 +633,7 @@ const getMyTaskByIdAndStatus = async (req, res) => {
       where: {
         user_id: user_id,
         status: { notIn: ["COMPLETE"] }, // Exclude these statuses
+        isArchived:false
       },
       include:{
         taskInAssignedList:true
@@ -695,7 +703,11 @@ const getAllTasksByUserId = async (req, res) => {
   try {
     let tasks;
     if (user.is_superuser && user.is_staff && user.is_active) {
-      tasks = await prisma.task.findMany();
+      tasks = await prisma.task.findMany({
+        where:{
+          isArchived:false
+        },
+      });
     } else {
       tasks = await prisma.task.findMany({
         where: {
@@ -703,6 +715,7 @@ const getAllTasksByUserId = async (req, res) => {
             { user_id: id }, // Tasks where the user is the creator
             { assignedTask: { some: { assigned_to: id } } }, // Tasks assigned to the user
           ],
+          isArchived:false
         },
         include: {
           workingHourTask: true,
@@ -767,6 +780,7 @@ const getMyTaskRecords = async (req, res) => {
     const tasks = await prisma.task.findMany({
       where: {
         user_id: id,
+        isArchived:false
       },
       include: {
         project: true,

@@ -97,7 +97,7 @@ model Users {
   notes             Notes[]           @relation("NotesCreatedBy")
   designdrawingsuser DesignDrawings[] @relation("designdrawingsuser")
   designdrawingsresponseBy DesignDrawingsResponses[] @relation("designDrawingsresponseBy")
-  invoicePointOfContact     Invoice?     @relation("invoicePointOfContact")
+  invoicePointOfContact     Invoice[]     @relation("invoicePointOfContact")
   @@map("users")
 }
 
@@ -149,6 +149,7 @@ model Fabricator {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   files       Json         @default("[]")
+  isArchived  Boolean      @default(false)
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
   estimation  Estimation[] @relation("estimationUnderFabricator")
   createdBy   Users        @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
@@ -226,6 +227,7 @@ model Project {
   modelingHours          Float         @default(0)
   mailReminder           Boolean       @default(false)
   submissionMailReminder Boolean       @default(false)
+  isArchived             Boolean      @default(false)
   accepttasks            AcceptTask[]  @relation("acceptTaskProject")
   changeOrder            ChangeOrder[] @relation("ChangeOrderProject")
   file                   File[]        @relation("projectFiles")
@@ -292,6 +294,7 @@ model Task {
   start_date         String
   Stage              Stage           @default(IFA)
   changeOrderNumber  Int?            @default(0)
+  isArchived         Boolean      @default(false)
   mileStone          MileStone?        @relation("mileStoneTasks", fields: [mileStone_id], references: [id], onDelete: Cascade)
   taskInAssignedList Assigned_list[] @relation("taskInAssignedList")
   assignedTask       Assignes[]      @relation("assignedTask")
@@ -828,6 +831,7 @@ model Estimation {
   fabricatorId     String               @db.Uuid
   tools            String?
   startDate        DateTime             @default(now())
+  isArchived       Boolean      @default(false)
   lineItemGroups   EstimationLineItemGroup[]  // multiple groups of line items
   tasks            EstimationTask[]
   template         EstimationTemplate?
@@ -852,7 +856,7 @@ model EstimationTask {
   reviewedById String?        @db.Uuid
   id           String         @id @default(uuid()) @db.Uuid
   files        Json?          @default("[]")
-
+  isArchived  Boolean      @default(false)
 
   assignedTo   Users          @relation("AssignedEstimator", fields: [assignedToId], references: [id])
   assignedBy   Users          @relation("AssignedBy",fields: [assignedById],references: [id])
@@ -931,7 +935,7 @@ model Invoice {
   id                         String        @id @default(uuid()) @db.Uuid
   projectId                  String        @db.Uuid
   fabricatorId               String        @db.Uuid
-  clientId                   String?        @unique @db.Uuid @default("00000000-0000-0000-0000-000000000000")
+  clientId                   String?        @db.Uuid @default("00000000-0000-0000-0000-000000000000")
   customerName               String        @default("")
   contactName                String        @default("")
   address                    String        @default("")
@@ -948,11 +952,12 @@ model Invoice {
   totalInvoiceValueInWords   String        @default("")
   createdAt                  DateTime      @default(now())
   updatedAt                  DateTime      @updatedAt
+  paymentStatus              Boolean       @default(false)
 
   // 🔗 Relations
   project                    Project       @relation("projectInvoice", fields: [projectId], references: [id])
   fabricator                 Fabricator    @relation("fabricatorInvoice", fields: [fabricatorId], references: [id])
-  pointOfContact             Users?         @relation("invoicePointOfContact",fields: [clientId],references: [id])
+  pointOfContact             Users[]         @relation("invoicePointOfContact")
   accountInfo                AccountInfo[] @relation("invoice")
   invoiceItems               InvoiceItem[]
 }
