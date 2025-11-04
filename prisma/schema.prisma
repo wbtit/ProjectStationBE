@@ -98,6 +98,7 @@ model Users {
   designdrawingsuser DesignDrawings[] @relation("designdrawingsuser")
   designdrawingsresponseBy DesignDrawingsResponses[] @relation("designDrawingsresponseBy")
   invoicePointOfContact     Invoice[]     @relation("invoicePointOfContact")
+  invoices                  Invoice[]     @relation("invoiceCreatedBy")
   @@map("users")
 }
 
@@ -953,12 +954,14 @@ model Invoice {
   createdAt                  DateTime      @default(now())
   updatedAt                  DateTime      @updatedAt
   paymentStatus              Boolean       @default(false)
+  createdBy                  String?        @db.Uuid
 
   // 🔗 Relations
   project                    Project       @relation("projectInvoice", fields: [projectId], references: [id])
   fabricator                 Fabricator    @relation("fabricatorInvoice", fields: [fabricatorId], references: [id])
   pointOfContact             Users[]         @relation("invoicePointOfContact")
   accountInfo                AccountInfo[] @relation("invoice")
+  user                       Users?         @relation("invoiceCreatedBy",fields: [createdBy],references: [id])
   invoiceItems               InvoiceItem[]
 }
 
@@ -979,7 +982,7 @@ model InvoiceItem {
 
 model AccountInfo {
   id                  String   @id @default(uuid()) @db.Uuid
-  invoiceId           String   @db.Uuid
+  invoiceId           String?   @db.Uuid
   abaRoutingNumber    String
   accountNumber       String
   accountType         String
@@ -991,7 +994,7 @@ model AccountInfo {
   updatedAt           DateTime @updatedAt
 
   // 🔗 Relation
-  invoice             Invoice  @relation("invoice", fields: [invoiceId], references: [id])
+  invoice             Invoice?  @relation("invoice", fields: [invoiceId], references: [id])
 }
 
  

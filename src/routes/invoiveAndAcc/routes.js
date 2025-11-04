@@ -19,9 +19,9 @@ router.put("/:invoiceId/items/:itemId",Authenticate, itemController.updateInvoic
 router.delete("/:invoiceId/items/:itemId",Authenticate, itemController.deleteInvoiceItem);
 
 // 🏦 Account Info
-router.post("/:id/account",Authenticate, accountController.addAccountInfo);
+router.post("/accountInfo",Authenticate, accountController.addAccountInfo);
 router.put("/:id/account",Authenticate, accountController.updateAccountInfo);
-router.get("/:id/account",Authenticate, accountController.getAccountInfo);
-router.get("/",Authenticate,accountController.getAllAccountInfo)
+router.get("/account/:id/account",Authenticate, accountController.getAccountInfo);
+router.get("/accounts/all",Authenticate,accountController.getAllAccountInfo)
 
 export { router as Invoice };

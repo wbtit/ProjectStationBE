@@ -1,4 +1,4 @@
-import prisma from "./lib/prisma";
+import prisma from "./lib/prisma.js";
 
 export async function archiveTasksInDateRange() {
   try {
@@ -19,7 +19,7 @@ export async function archiveTasksInDateRange() {
 
     console.log(`✅ ${result.count} tasks archived between March and July 2025.`);
   } catch (error) {
-    console.error("❌ Error archiving tasks:", error);
+    console.error("Error archiving tasks:", error);
   }
 }
 archiveTasksInDateRange()

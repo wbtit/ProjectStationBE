@@ -3,11 +3,11 @@ import { sendResponse } from "../utils/responder.js";
 
 export const addAccountInfo = async (req, res) => {
   try {
-    const { id: invoiceId } = req.params;
+    
     const data = req.body;
 
     const account = await prisma.accountInfo.create({
-      data: { ...data, invoiceId },
+      data:data ,
     });
 
     return sendResponse({
@@ -60,10 +60,10 @@ export const updateAccountInfo = async (req, res) => {
 
 export const getAccountInfo = async (req, res) => {
   try {
-    const { id: invoiceId } = req.params;
+    const { id} = req.params;
 
     const account = await prisma.accountInfo.findMany({
-      where: { invoiceId },
+      where: { id },
     });
 
     return sendResponse({

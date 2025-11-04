@@ -6,7 +6,7 @@ import { sendResponse } from "../utils/responder.js";
 export const createInvoice = async (req, res) => {
   try {
     const { projectId, fabricatorId, customerName, contactName, address,clientId, stateCode, GSTIN, invoiceNumber, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
-
+    const {id}=req.user
     if (!projectId || !fabricatorId || !customerName || !invoiceNumber||!clientId) {
       return sendResponse({
         message: "Required fields missing",
@@ -33,6 +33,7 @@ export const createInvoice = async (req, res) => {
         currencyType,
         totalInvoiceValue,
         totalInvoiceValueInWords,
+        createdBy:id,
         pointOfContact:{connect:{id:clientId}},
         invoiceItems: {
           create: invoiceItems || [],
@@ -82,7 +83,7 @@ export const getAllInvoices = async (req, res) => {
        include: { invoiceItems: true, accountInfo: true ,pointOfContact:true},
      })
      }
-     console.log("The invoces",invoices)
+    //  console.log("The invoces",invoices)
     return sendResponse({
       message: "Fetched all invoices successfully",
       res,
