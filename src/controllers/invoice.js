@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
-import invoiveNumberGenerator from "../utils/invoiveNUmGenerator.js";
+import invoiceNumberGenerator from "../utils/invoiveNUmGenerator.js";
 
 
 export const createInvoice = async (req, res) => {
@@ -30,7 +30,7 @@ console.log("**************************************");
     address,
     stateCode,
     GSTIN,
-    invoiceNumber: await invoiveNumberGenerator(),
+    invoiceNumber: await invoiceNumberGenerator(),
     placeOfSupply,
     jobName,
     currencyType,
