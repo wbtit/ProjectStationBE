@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const AddFabricator = async (req, res) => {
   const { id } = req.user;
 
-  const { name, headquater, website, drive } = req.body;
+  const { name, headquater, website, drive, currencyType } = req.body;
 
   if (!name || !headquater) {
     return sendResponse({
@@ -39,6 +39,7 @@ const AddFabricator = async (req, res) => {
         headquaters: { ...headquater, id: uuidv4() },
         drive: drive ? drive : " ",
         website: website ? website : "",
+        currencyType: currencyType ? currencyType : "",
       },
     });
 

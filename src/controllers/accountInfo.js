@@ -31,11 +31,11 @@ export const addAccountInfo = async (req, res) => {
 
 export const updateAccountInfo = async (req, res) => {
   try {
-    const { id: invoiceId } = req.params;
+    const { id } = req.params;
     const data = req.body;
 
-    const account = await prisma.accountInfo.updateMany({
-      where: { invoiceId },
+    const account = await prisma.accountInfo.update({
+      where: { id },
       data,
     });
 
@@ -107,4 +107,31 @@ export const getAllAccountInfo = async(req,res)=>{
     });  
     }
 
+}
+
+export const deleteAccountInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const account = await prisma.accountInfo.delete({
+      where: { id },
+    });
+
+    return sendResponse({
+      message: "Account info deleted successfully",
+      res,
+      statusCode: 200,
+      success: true,
+      data: account,
+    });
+  } catch (error) {
+    console.error("Delete Account Info Error:", error);
+    return sendResponse({
+      message: error.message,
+      res,
+      statusCode: 500,
+      success: false,
+      data: null,
+    });
+  }
 }

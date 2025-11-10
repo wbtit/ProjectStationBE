@@ -18,6 +18,7 @@ const Start = async (req, res) => {
   }
 
   try {
+    console.log(`[LOG] Start: Received request to start work for task_id: ${task_id} by user: ${id}`);
     await prisma.$transaction(async(tx)=>{
      // Check if an active work session already exists
     const existingWork= await tx.workingHours.findFirst({
@@ -37,6 +38,7 @@ const Start = async (req, res) => {
     })
     if (existingWork) {
       if(new Date(existingWork.start)<new Date(task.created_on)){
+        console.log(`[LOG] Start: Found old work session ${existingWork.id} for task ${task_id}. Updating its status to END.`);
         await tx.workingHours.update({
           where:{ user_id:id,
             task_id:task_id,
@@ -44,6 +46,7 @@ const Start = async (req, res) => {
           data:{status:"END"}
         })
       }else{
+        console.log(`[LOG] Start: Aborting. An active work session ${existingWork.id} already exists for this task.`);
         return sendResponse({
           message: "A work session is already active for this task.",
           res,
@@ -55,6 +58,7 @@ const Start = async (req, res) => {
       
     }
 
+    console.log(`[LOG] Start: Creating new working hour for user ${id} on task ${task_id} with status START.`);
     const workinghour = await tx.workingHours.create({
       data: {
        user_id:id,
@@ -65,6 +69,7 @@ const Start = async (req, res) => {
       },
     });
 
+    console.log(`[LOG] Start: Updating task ${task_id} status to IN_PROGRESS.`);
     await tx.task.update({
       where: {
         id: task_id,
@@ -74,6 +79,7 @@ const Start = async (req, res) => {
       },
     });
 
+    console.log(`[LOG] Start: Successfully started work. Responding to client.`);
     return sendResponse({
       message: "Work started.",
       res,
@@ -82,6 +88,7 @@ const Start = async (req, res) => {
       data: workinghour,
     });})
   } catch (error) {
+    console.error(`[ERROR] Start: Failed to start work for task_id: ${task_id}. Error: ${error.message}`);
     return sendResponse({
       message: error.message,
       res,
@@ -96,92 +103,77 @@ const Pause = async (req, res) => {
   const { id } = req.user;
   const { work_id, task_id } = req.body;
 
-  // console.log(req.body);
-  console.log("TaskId and WorkId:",work_id,task_id)
-
-  if (!work_id || !task_id) {
-    console.log("TaskId and WorkId:",work_id,task_id)
-    return sendResponse({
-      message: "Invalid work_id or task_id",
-      res,
-      statusCode: 400,
-      success: false,
-      data: null,
-    });
-  }
+  console.log(`[LOG] Pause: Received request to pause work_id: ${work_id} for task_id: ${task_id}`);
 
   try {
-    await prisma.$transaction(async(tx)=>{// Fetch the current `start` value from the database
-    const workingHourRecord = await tx.workingHours.findUnique({
-      where: {
-        id: work_id,
-      },
-    });
-
-    if (!workingHourRecord) {
-      return sendResponse({
-        message: "Work session not found",
-        res,
-        statusCode: 404,
-        success: false,
-        data: null,
+    const updatedWorkingHour = await prisma.$transaction(async (tx) => {
+      // Fetch the current `start` value from the database
+      const workingHourRecord = await tx.workingHours.findUnique({
+        where: {
+          id: work_id,
+        },
       });
-    }
 
-    // if (workingHourRecord.status === "PAUSE") {
-    //   return sendResponse({
-    //     message: "Work is already paused",
-    //     res,
-    //     statusCode: 400,
-    //     success: false,
-    //     data: workingHourRecord,
-    //   });
-    // }
+      if (!workingHourRecord) {
+        // Throw an error to be caught outside the transaction
+        throw new Error("Work session not found");
+      }
+      if(workingHourRecord.status==="PAUSE"){
+        throw new Error("Work is already paused");
+      }
 
-    if (!workingHourRecord.start) {
-      return sendResponse({
-        message: "Invalid Work session",
-        res,
-        statusCode: 400,
-        success: false,
-        data: null,
+      if (!workingHourRecord.start) {
+        throw new Error("Invalid Work session: start time is missing.");
+      }
+
+      const startTimestamp = new Date(workingHourRecord.start).getTime(); // convert starttime to time stamp
+      const currentTimeStamp = Date.now();
+      const durationInMinutes = Math.floor((currentTimeStamp - startTimestamp) / 60000);
+
+      // Update the duration in the database
+      console.log(`[LOG] Pause: Updating working hour ${work_id} status to PAUSE.`);
+      const updatedRecord = await tx.workingHours.update({
+        where: {
+          id: work_id,
+        },
+        data: {
+          duration: workingHourRecord.duration + durationInMinutes, // Store the duration in minutes as an integer
+          status: "PAUSE",
+        },
       });
-    }
 
-    const startTimetask_idstamp= new Date(workingHourRecord.start).getTime()// convert starttime to time stamp
-    const currentTimeStamp= Date.now()
-    const durationInMinutes=Math.floor((currentTimeStamp-startTimetask_idstamp)/60000)
+      console.log(`[LOG] Pause: Updating task ${task_id} status to BREAK.`);
+      await tx.task.update({
+        where: {
+          id: task_id,
+        },
+        data: {
+          status: "BREAK",
+        },
+      });
 
-    // Update the duration in the database
-    const updatedWorkingHour = await tx.workingHours.update({
-      where: {
-        id: work_id,
-      },
-      data: {
-        duration: workingHourRecord.duration + durationInMinutes, // Store the duration in minutes as an integer
-        status: "PAUSE",
-      },
+      return updatedRecord;
     });
+    
 
-    await tx.task.update({
-      where: {
-        id: task_id,
-      },
-      data: {
-        status: "BREAK",
-      },
-    });
-
+    console.log(`[LOG] Pause: Successfully paused work ${work_id}. Responding to client.`);
     return sendResponse({
-      message: `Work paused, Total time : ${workingHourRecord.duration } mins`,
+      message: `Work paused, Total time : ${updatedWorkingHour.duration} mins`,
       res,
       statusCode: 200,
-      success: false,
+      success: true,
       data: updatedWorkingHour,
     });
-  })
   } catch (error) {
-    console.log(error.message);
+    console.error(`[ERROR] Pause: Failed to pause work ${work_id}. Error: ${error.message}`);
+    // Handle specific errors thrown from the transaction
+    if (error.message === "Work session not found") {
+      return sendResponse({ message: error.message, res, statusCode: 404, success: false });
+    }
+    if (error.message === "Work is already paused" || error.message.startsWith("Invalid Work session")) {
+      return sendResponse({ message: error.message, res, statusCode: 400, success: false });
+    }
+
     return sendResponse({
       message: error.message,
       res,
@@ -195,9 +187,8 @@ const Pause = async (req, res) => {
 const Resume = async (req, res) => {
   const { work_id, task_id } = req.body;
   const { id } = req.user;
-    console.log("Tatask_idskId and WorkId:",work_id,task_id)
+  console.log(`[LOG] Resume: Received request to resume work_id: ${work_id} for task_id: ${task_id}`);
   if (!work_id || !task_id) {
-    console.log("TaskId and WorkId:",work_id,task_id)
     return sendResponse({
       message: "Invalid work_id or task_id",
       res,
@@ -214,6 +205,7 @@ const Resume = async (req, res) => {
         id: work_id,
       },
     });
+
     if (!work) {
       return sendResponse({
         message: "Work session not found",
@@ -223,7 +215,6 @@ const Resume = async (req, res) => {
         data: null,
       });
     }
-    // console.log(work);
 
     if (work?.user_id !== id) {
       return sendResponse({
@@ -236,6 +227,7 @@ const Resume = async (req, res) => {
     }
 
     if (work.status !== "PAUSE") {
+      console.log(`[LOG] Resume: Aborting. Work ${work_id} is not in PAUSE state. Current status: ${work.status}.`);
       return sendResponse({
         message: "Work is not in a paused state",
         res,
@@ -245,6 +237,7 @@ const Resume = async (req, res) => {
       });
     }
 
+    console.log(`[LOG] Resume: Updating working hour ${work_id} status to RESUME.`);
     const workingupdate = await tx.workingHours.update({
       where: {
         id: work_id,
@@ -255,6 +248,7 @@ const Resume = async (req, res) => {
       },
     });
 
+    console.log(`[LOG] Resume: Updating task ${task_id} status to IN_PROGRESS.`);
     await tx.task.update({
       where: {
         id: task_id,
@@ -264,6 +258,7 @@ const Resume = async (req, res) => {
       },
     });
 
+    console.log(`[LOG] Resume: Successfully resumed work ${work_id}. Responding to client.`);
     return sendResponse({
       message: `Work resumed, Total time: ${workingupdate.duration} mins`,
       res,
@@ -273,7 +268,7 @@ const Resume = async (req, res) => {
     });
   })
   } catch (error) {
-    // console.log(error.message);
+    console.error(`[ERROR] Resume: Failed to resume work ${work_id}. Error: ${error.message}`);
     return sendResponse({
       message: error.message,
       res,
@@ -285,11 +280,10 @@ const Resume = async (req, res) => {
 };
 
 const End = async (req, res) => {
-  const { work_id, task_id,end} = req.body;
-  console.log("*-*-*-*-*-*-*-*-*-*-*-*",req.body)
+  const { work_id, task_id, end } = req.body;
   const { id } = req.user;
-
   if (!work_id || !task_id) {
+    console.log(`[LOG] End: Received request to end work_id: ${work_id} for task_id: ${task_id}`);
     return sendResponse({
       message: "Invalid work_id or task_id",
       res,
@@ -327,6 +321,7 @@ const End = async (req, res) => {
     }
 
     if (workingHourRecord.status === "END") {
+      console.log(`[LOG] End: Aborting. Work ${work_id} is already in END state.`);
       return sendResponse({
         message: `Work Ended, Total time : ${workingHourRecord.duration} mins`,
         res,
@@ -356,10 +351,14 @@ const End = async (req, res) => {
       });
     }
 
-    const start = new Date(workingHourRecord.start).getTime(); // Convert start to timestamp in milliseconds
-    const durationInMinutes = Math.floor((Date.now() - start) / 60000); // Calculate duration in minutes
+    const startTime = new Date(workingHourRecord.start).getTime();
+    // Use the client-provided 'end' time for a more accurate calculation. Fallback to server time.
+    const endTime = end ? new Date(end).getTime() : Date.now();
+
+    const durationInMinutes = Math.floor((endTime - startTime) / 60000); // Calculate duration in minutes
 
     // Update the duration in the database
+    console.log(`[LOG] End: Updating working hour ${work_id} status to END.`);
     const updatedWorkingHour = await tx.workingHours.update({
       where: {
         id: work_id,
@@ -367,7 +366,7 @@ const End = async (req, res) => {
       data: {
         duration: workingHourRecord.duration + durationInMinutes, // Store the duration in minutes as an integer
         status: "END",
-        end:end
+        end: new Date(endTime) // Use the calculated end time
       },
     });
 
@@ -386,11 +385,13 @@ const End = async (req, res) => {
       });
     }
 
+    console.log(`[LOG] End: Updating task ${task_id} status to IN_REVIEW.`);
     await tx.task.update({
       where: { id: task_id },
       data: { status: "IN_REVIEW" },
     });
 
+    console.log(`[LOG] End: Updating project ${task.project_id} status to ACTIVE.`);
     // Update project status to "ACTIVE"
     await tx.project.update({
       where: { id: task.project_id },
@@ -398,6 +399,7 @@ const End = async (req, res) => {
     });
 
     return sendResponse({
+      
       message: `Work Ended, Total time : ${
         workingHourRecord.duration + durationInMinutes
       } mins`,
@@ -408,7 +410,7 @@ const End = async (req, res) => {
     })
   });
   } catch (error) {
-    // console.log(error.message);
+    console.error(`[ERROR] End: Failed to end work ${work_id}. Error: ${error.message}`);
     return sendResponse({
       message: error,
       res,
@@ -479,6 +481,7 @@ const getWork = async (req, res) => {
   }
 };
 
+
 const getReWorkDuration = async (req, res) => {
   const { work_id, task_id } = req.body;
 
@@ -497,12 +500,7 @@ const getReWorkDuration = async (req, res) => {
       where: { id: task_id }
     });
 
-    const work = await prisma.workingHours.update({
-      where: { id: work_id },
-      data: {
-        status: "PAUSE"
-      }
-    });
+    
 
     if (!task || !work || !work.end || !task.reworkStartTime) {
       return sendResponse({
@@ -553,6 +551,7 @@ const getReWorkDuration = async (req, res) => {
 };
 const updateWorkingHours = async (req, res) => {
   try {
+    console.log(`[LOG] updateWorkingHours: Received request to manually update work_id: ${req.params.id}`);
     const { id } = req.params;
     const {
       status,
@@ -564,6 +563,7 @@ const updateWorkingHours = async (req, res) => {
     } = req.body;
 
     // Update working hour
+    console.log(`[LOG] updateWorkingHours: Updating working hour ${id} with status: ${status}`);
     const updatedWorkingHour = await prisma.workingHours.update({
       where: { id },
       data: {
@@ -581,7 +581,7 @@ const updateWorkingHours = async (req, res) => {
       data: updatedWorkingHour,
     });
   } catch (error) {
-    console.error("Error updating working hour:", error);
+    console.error(`[ERROR] updateWorkingHours: Failed to update work ${req.params.id}. Error: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: "Failed to update working hour",

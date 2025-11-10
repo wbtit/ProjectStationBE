@@ -151,6 +151,7 @@ model Fabricator {
   updatedAt   DateTime     @updatedAt
   files       Json         @default("[]")
   isArchived  Boolean      @default(false)
+  currencyType String       @default("")
   accepttasks AcceptTask[] @relation("acceptTaskFabricator")
   estimation  Estimation[] @relation("estimationUnderFabricator")
   createdBy   Users        @relation("FabricatorCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
@@ -426,7 +427,7 @@ model DesignDrawingsResponses{
   status           SubResStatus    @default(NOT_APPROVED)
   wbtStatus        State           @default(RECEIVED)
   parentResponseId String?         @db.Uuid
-  parentResponse   DesignDrawingsResponses? @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  parentResponse   DesignDrawingsResponses? @relation("ParentChildResponse", fields: [parentResponseId], references: [id],onDelete: Cascade)
   childResponses   DesignDrawingsResponses[] @relation("ParentChildResponse")
   designDrawings   DesignDrawings  @relation("designDrawingsresponse", fields: [designDrawingsId], references: [id], onDelete: Cascade)
   user             Users           @relation("designDrawingsresponseBy", fields: [userId], references: [id])
@@ -488,9 +489,9 @@ model SubmittalsResponse {
   wbtStatus        State                @default(RECEIVED)
   parentResponseId String?              @db.Uuid
   file             File[]               @relation("submittalsResponseFiles")
-  parentResponse   SubmittalsResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  parentResponse   SubmittalsResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id],onDelete: Cascade)
   childResponses   SubmittalsResponse[] @relation("ParentChildResponse")
-  submittals       Submittals           @relation("submittalsresponse", fields: [submittalsId], references: [id])
+  submittals       Submittals           @relation("submittalsresponse", fields: [submittalsId], references: [id],onDelete: Cascade)
   user             Users                @relation("submittalsresponseBy", fields: [userId], references: [id])
 
   @@map("submittalsresponse")
@@ -532,7 +533,7 @@ model RFIResponse {
   userId           String        @db.Uuid
   parentResponseId String?       @db.Uuid
   file             File[]        @relation("rfiResponseFiles")
-  parentResponse   RFIResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  parentResponse   RFIResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id],onDelete: Cascade)
   childResponses   RFIResponse[] @relation("ParentChildResponse")
   rfi              RFI           @relation("rfiresponse", fields: [rfiId], references: [id], onDelete: Cascade)
   user             Users         @relation("rfiresponseBy", fields: [userId], references: [id])
@@ -586,9 +587,9 @@ model RFQResponse {
   parentResponseId String?       @db.Uuid
   wbtStatus        RFQStatus     @default(SENT)
   file             File[]        @relation("rfqResponseFiles")
-  parentResponse   RFQResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  parentResponse   RFQResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id],onDelete: Cascade)
   childResponses   RFQResponse[] @relation("ParentChildResponse")
-  rfqResponses     RFQ           @relation("rfqResponses", fields: [rfqId], references: [id])
+  rfqResponses     RFQ           @relation("rfqResponses", fields: [rfqId], references: [id],onDelete: Cascade)
   user             Users         @relation("rfqresponseBy", fields: [userId], references: [id])
 
   @@map("rfqResponse")
@@ -664,7 +665,7 @@ model ChangeOrdertable {
   costUpdatedAt  DateTime?   // timestamp of last cost update
 
   CoId           String      @db.Uuid
-  CoRefersTo     ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id])
+  CoRefersTo     ChangeOrder @relation("CoRefersTo", fields: [CoId], references: [id],onDelete: Cascade)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
@@ -680,8 +681,8 @@ model COResponse {
   userId           String       @db.Uuid
   parentResponseId String?      @db.Uuid
   files       Json               @default("[]")
-  COresponse       ChangeOrder?  @relation("coResponse", fields: [CoId], references: [id])
-  parentResponse   COResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id])
+  COresponse       ChangeOrder?  @relation("coResponse", fields: [CoId], references: [id],onDelete: Cascade)
+  parentResponse   COResponse?  @relation("ParentChildResponse", fields: [parentResponseId], references: [id],onDelete: Cascade)
   childResponses   COResponse[] @relation("ParentChildResponse")
   user             Users        @relation("COrespondedby", fields: [userId], references: [id])
   file             File[]       @relation("CoResponseFiles")
@@ -756,7 +757,7 @@ model GroupUser {
   id       String @id @default(uuid()) @db.Uuid
   memberId String @db.Uuid
   groupId  String @db.Uuid
-  group    Group  @relation("groupOfUsers", fields: [groupId], references: [id])
+  group    Group  @relation("groupOfUsers", fields: [groupId], references: [id],onDelete: Cascade)
   members  Users  @relation("groupMembers", fields: [memberId], references: [id])
 
   @@map("groupuser")
@@ -962,7 +963,7 @@ model Invoice {
   pointOfContact             Users[]         @relation("invoicePointOfContact")
   accountInfo                AccountInfo[] @relation("invoice")
   user                       Users?         @relation("invoiceCreatedBy",fields: [createdBy],references: [id])
-  invoiceItems               InvoiceItem[]
+  invoiceItems               InvoiceItem[]  
 }
 
 model InvoiceItem {
@@ -977,7 +978,7 @@ model InvoiceItem {
   createdAt      DateTime @default(now())
 
   // 🔗 Relation
-  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model AccountInfo {
@@ -1153,4 +1154,3 @@ enum MeetingRole {
   ATTENDEE    // Regular participant
   OBSERVER    // Can join but not actively participate
 }
-

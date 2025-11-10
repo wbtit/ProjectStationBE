@@ -8,7 +8,8 @@
     "dev": "nodemon index.js",
     "build": "prisma generate && nodemon index.js",
     "prisma:generate": "prisma generate",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "WBT",
   "license": "ISC",
@@ -38,6 +39,9 @@
   },
   "devDependencies": {
     "@prisma/client": "^6.10.1",
-    "prisma": "^6.10.1"
+    "jest": "^30.2.0",
+    "jest-mock-extended": "^4.0.0",
+    "prisma": "^6.10.1",
+    "supertest": "^7.1.4"
   }
 }

@@ -59,7 +59,7 @@ const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 const blockedTasks = expiredReviews.filter(
   (wh) =>
     wh.task &&
-    !["COMPLETE", "COMPLETE_OTHER", "VALIDATE_COMPLETE"].includes(
+    !["COMPLETE", "COMPLETE_OTHER", "VALIDATE_COMPLETE", "USER_FAULT"].includes(
       wh.task.status
     )
 );

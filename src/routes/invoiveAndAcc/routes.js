@@ -23,5 +23,5 @@ router.post("/accountInfo",Authenticate, accountController.addAccountInfo);
 router.put("/:id/account",Authenticate, accountController.updateAccountInfo);
 router.get("/account/:id/account",Authenticate, accountController.getAccountInfo);
 router.get("/accounts/all",Authenticate,accountController.getAllAccountInfo)
-
+router.delete("/account/:id",Authenticate,accountController.deleteAccountInfo)
 export { router as Invoice };
