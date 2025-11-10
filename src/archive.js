@@ -7,13 +7,13 @@ export async function archiveTasksInDateRange() {
 
     const result = await prisma.task.updateMany({
       where: {
-        createdAt: {
+        created_on: {
           gte: startDate,
           lte: endDate,
         },
       },
       data: {
-        isArchive: true,
+        isArchived: true,
       },
     });
 
