@@ -64,6 +64,7 @@ taskFilter = { project: { departmentID: { in: deptIds } } };
     taskStats.forEach(({ status, _count }) => {
       if (status === 'COMPLETE') response.noOfCompleteTask = _count._all;
       if(status === 'COMPLETE_OTHER') response.noOfCompleteTask += _count._all;
+      if(status=== 'COMPLETE_TRAINEE') response.noOfCompleteTask += _count._all;
       if(status==='USER_FAULT') response.noOfCompleteTask+=_count._all;
       if(status === 'VALIDATE_COMPLETE') response.noOfCompleteTask += _count._all;
       if (status === 'ASSIGNED') response.noOfAssignedTasks = _count._all;

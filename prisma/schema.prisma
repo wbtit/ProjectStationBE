@@ -1,12 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
+  extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [uuid_ossp(map: "uuid-ossp")]
+  
 }
 
 model Users {
@@ -290,6 +291,7 @@ model Task {
   reworkStartTime    DateTime?
   due_date           String
   duration           String
+  userFault          String          @default("")
   project_id         String          @db.Uuid
   user_id            String          @db.Uuid
   mileStone_id        String?         @db.Uuid

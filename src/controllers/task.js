@@ -20,6 +20,7 @@ const AddTask = async (req, res) => {
       priority,
       project,
       user,
+      userFault,
       status,
       changeOrderNumber,
       Stage,
@@ -98,6 +99,7 @@ if (blockedTasks.length > 0) {
               status,
               project_id: project,
               user_id: user,
+              userFault:userFault||null
           },
       });
 
