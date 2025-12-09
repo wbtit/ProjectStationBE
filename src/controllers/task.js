@@ -85,30 +85,40 @@ if (blockedTasks.length > 0) {
 
      
     // Create Task
-    const newTask = await prisma.task.create({
+  const newTask = await prisma.task.create({
   data: {
+    name,
     description,
+    status,
+    priority,
     due_date,
     duration,
-    name,
-    priority,
-    mileStone_id: mileStone_id || null,
     start_date,
-    changeOrderNumber: changeOrderNumber || 0,
     Stage,
-    status,
-    
+    changeOrderNumber: changeOrderNumber ?? 0,
+    userFault: userFault ?? "",
+    isArchived: false,
+
+    // required relation: PROJECT
     project: {
-      connect: { id: project }   // <-- FIX HERE
+      connect: { id: project },   // <-- project is project_id
     },
 
+    // required relation: USER
     user: {
-      connect: { id: user }      // <-- you'll also likely need this
+      connect: { id: user },      // <-- user is user_id
     },
 
-    userFault: userFault || null,
+    // optional relation: MILESTONE
+    ...(mileStone_id
+      ? {
+          mileStone: { connect: { id: mileStone_id } }
+        }
+      : {} // if null, omit relation entirely
+    ),
   },
 });
+
 
 
       if (!newTask) {
