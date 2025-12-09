@@ -1,12 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
+  extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [uuid_ossp(map: "uuid-ossp")]
+  
 }
 
 model Users {
@@ -290,6 +291,7 @@ model Task {
   reworkStartTime    DateTime?
   due_date           String
   duration           String
+  userFault          String          @default("")
   project_id         String          @db.Uuid
   user_id            String          @db.Uuid
   mileStone_id        String?         @db.Uuid
@@ -998,7 +1000,17 @@ model AccountInfo {
   invoice             Invoice?  @relation("invoice", fields: [invoiceId], references: [id])
 }
 
- 
+model FileShareLink {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  parentTable  String   // e.g. "notes", "projects", "todos"
+  parentId     String   // the primary key of Notes/Project/etc
+  fileId       String   // id inside JSON array
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime?
+}
+
+
 
 enum EstimationStatus {
   DRAFT
