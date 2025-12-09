@@ -86,22 +86,30 @@ if (blockedTasks.length > 0) {
      
     // Create Task
     const newTask = await prisma.task.create({
-        data: {
-            description,
-              due_date,
-              duration,
-              name,
-              priority,
-              mileStone_id:mileStone_id || null,
-              start_date,
-              changeOrderNumber:changeOrderNumber || 0,
-              Stage:Stage,
-              status,
-              project_id: project,
-              user_id: user,
-              userFault:userFault||null
-          },
-      });
+  data: {
+    description,
+    due_date,
+    duration,
+    name,
+    priority,
+    mileStone_id: mileStone_id || null,
+    start_date,
+    changeOrderNumber: changeOrderNumber || 0,
+    Stage,
+    status,
+    
+    project: {
+      connect: { id: project }   // <-- FIX HERE
+    },
+
+    user: {
+      connect: { id: user }      // <-- you'll also likely need this
+    },
+
+    userFault: userFault || null,
+  },
+});
+
 
       if (!newTask) {
           return sendResponse({
