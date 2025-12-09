@@ -1000,7 +1000,17 @@ model AccountInfo {
   invoice             Invoice?  @relation("invoice", fields: [invoiceId], references: [id])
 }
 
- 
+model FileShareLink {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  parentTable  String   // e.g. "notes", "projects", "todos"
+  parentId     String   // the primary key of Notes/Project/etc
+  fileId       String   // id inside JSON array
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime?
+}
+
+
 
 enum EstimationStatus {
   DRAFT
