@@ -688,7 +688,7 @@ const GetProjectByID = async (req, res) => {
         tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
         accepttasks: true,
         changeOrder:true,
-        rfi:{include:{rfiresponses:true}},
+        rfi:{include:{rfiresponse:true}},
         submittals:{include:{submittalsResponse:true}},
         mileStones:true,
         rfq:true,
