@@ -85,7 +85,7 @@ if (blockedTasks.length > 0) {
 
      
     // Create Task
-  const newTask = await prisma.task.create({
+     const newTask = await prisma.task.create({
   data: {
     name,
     description,
@@ -118,7 +118,6 @@ if (blockedTasks.length > 0) {
     ),
   },
 });
-
 
 
       if (!newTask) {

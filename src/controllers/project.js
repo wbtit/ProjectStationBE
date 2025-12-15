@@ -450,7 +450,13 @@ const UpdateProject = async (req, res) => {
       where: {
         id: id,
       },
-      data: updateData, // req.body must contains only fields present in the project schema
+      data: {
+        ...updateData,
+        manager:{connect: updateData.managerID ? { id: updateData.managerID } : undefined},
+        team:{connect: updateData.team ? { id: updateData.team } : undefined},
+        department:{connect: updateData.department ? { id: updateData.department } : undefined},
+        fabricator:{connect: updateData.fabricator ? { id: updateData.fabricator } : undefined},
+      }, // req.body must contains only fields present in the project schema
     });
 
     if(req.body.stage && req.body.stage !== previousProjectStage.stage){
@@ -687,10 +693,12 @@ const GetProjectByID = async (req, res) => {
         manager: true,
         tasks:{include:{mileStone:{select:{description:true,subject:true,stage:true,status:true}}}},
         accepttasks: true,
-        file:true,
         changeOrder:true,
-        rfi:true,
-        submittals:true
+        rfi:{include:{rfiresponse:true}},
+        submittals:{include:{submittalsResponse:true}},
+        mileStones:true,
+        rfq:true,
+         designDrawings:{include:{responses:true}},
       },
     });
 
