@@ -450,7 +450,13 @@ const UpdateProject = async (req, res) => {
       where: {
         id: id,
       },
-      data: updateData, // req.body must contains only fields present in the project schema
+      data: {
+        ...updateData,
+        manager:{connect: updateData.managerID ? { id: updateData.managerID } : undefined},
+        team:{connect: updateData.team ? { id: updateData.team } : undefined},
+        department:{connect: updateData.department ? { id: updateData.department } : undefined},
+        fabricator:{connect: updateData.fabricator ? { id: updateData.fabricator } : undefined},
+      }, // req.body must contains only fields present in the project schema
     });
 
     if(req.body.stage && req.body.stage !== previousProjectStage.stage){
