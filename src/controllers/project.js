@@ -241,7 +241,7 @@ const UpdateProject = async (req, res) => {
     });
   }
 
-   console.log(req.body);
+   //console.log(req.body);
 
   req.body = { ...req.body, fabricator: null };
 
@@ -324,7 +324,6 @@ const UpdateProject = async (req, res) => {
     const updateData = {};
     const fieldsToUpdate = [
       "name",
-      "fabricator",
       "description",
       "duration",
       "startDate",
@@ -333,8 +332,6 @@ const UpdateProject = async (req, res) => {
       "approvalDateChangeLog",
       "status",
       "stage",
-      "managerID",
-      "team",
       "approvalDate",
       "estimatedHours",
       "modelingHours",
