@@ -452,10 +452,10 @@ const UpdateProject = async (req, res) => {
       },
       data: {
         ...updateData,
-        manager:{connect: updateData.managerID ? { id: updateData.managerID } : undefined},
-        team:{connect: updateData.team ? { id: updateData.team } : undefined},
-        department:{connect: updateData.department ? { id: updateData.department } : undefined},
-        fabricator:{connect: updateData.fabricator ? { id: updateData.fabricator } : undefined},
+        manager:{connect: req.body.managerID ? { id: req.body.managerID } : undefined},
+        team:{connect: req.body.teamID ? { id: req.body.teamID } : undefined},
+        department:{connect: req.body.departmentID ? { id: req.body.departmentID } : undefined},
+        fabricator:{connect: req.body.fabricatorID ? { id: req.body.fabricatorID } : undefined},
       }, // req.body must contains only fields present in the project schema
     });
 
