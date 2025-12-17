@@ -89,64 +89,65 @@ const downloadShare = async (req, res) => {
   try {
     const { token } = req.params;
 
-    // lookup token in db
     const share = await prisma.fileShareLink.findUnique({
-      where: { token }
+      where: { token },
     });
 
-    if (!share) {
-      return res.status(404).json({ message: "Invalid link" });
-    }
-
-    if (share.expiresAt && share.expiresAt < new Date()) {
+    if (!share) return res.status(404).json({ message: "Invalid link" });
+    if (share.expiresAt && share.expiresAt < new Date())
       return res.status(410).json({ message: "Link expired" });
-    }
 
     const modelName = MODEL_MAP[share.parentTable];
-    if (!modelName) {
+    if (!modelName)
       return res.status(400).json({ message: "Invalid table in link" });
-    }
 
-    // fetch parent row
     const row = await prisma[modelName].findUnique({
       where: { id: share.parentId },
     });
 
-    if (!row) {
-      return res.status(404).json({ message: "Parent record not found" });
-    }
+    if (!row) return res.status(404).json({ message: "Parent record not found" });
 
     const file = (row.files || []).find(f => f.id === share.fileId);
+    if (!file) return res.status(404).json({ message: "File not found in record" });
 
-    if (!file) {
-      return res.status(404).json({ message: "File not found in record" });
-    }
-
-    // build path
-    const root = process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
+    const root =
+      process.env.PUBLIC_DIR || path.join(__dirname, "..", "..", "public");
     const filePath = path.join(root, file.path);
 
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(filePath))
       return res.status(404).json({ message: "File missing on server" });
-    }
 
+    const stat = fs.statSync(filePath);
     const mimeType = mime.getType(filePath) || "application/octet-stream";
 
+    // IMPORTANT HEADERS
     res.setHeader("Content-Type", mimeType);
-    res.setHeader("Content-Disposition", `attachment; filename="${file.originalName}"`);
+    res.setHeader("Content-Length", stat.size);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${file.originalName}"`
+    );
 
     const stream = fs.createReadStream(filePath);
-    stream.pipe(res);
 
-    stream.on("error", (err) => {
-      console.error("Stream error:", err);
-      res.status(500).json({ message: "Error reading file" });
+    req.on("close", () => {
+      stream.destroy();
     });
+
+    stream.on("error", err => {
+      console.error("Stream error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Error reading file" });
+      }
+    });
+
+    stream.pipe(res);
 
   } catch (err) {
     console.error("Share Download Error:", err);
-    return res.status(500).json({ message: "Something went wrong", error: err.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 
 export { createShareLink, downloadShare };
