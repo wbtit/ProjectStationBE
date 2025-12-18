@@ -439,7 +439,7 @@ const GetAllTeams = async (req, res) => {
 
   try {
     //console.log("-=-=--=--=-=-=-",user);
-    if (user.is_superuser||user.is_supermanager) {
+    if (user.is_superuser||user.is_supermanager||user.is_hr) {
   // Admin can see all
   Teams = await prisma.team.findMany({
     include: { manager: true },
