@@ -522,6 +522,7 @@ const RFIByID = async (req, res) => {
     const rfi = await prisma.rFI.findUnique({
       where: { id },
       include: {
+        project:{select:{name:true}},
         recepients: {
           include: {
             fabricator: {

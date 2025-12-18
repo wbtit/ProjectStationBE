@@ -37,7 +37,7 @@ const changeOrderReceived=async(req,res)=>{
                 changeOrder:true,
                 sentOn:true,
                 files:true,
-                project:true,
+                project:{select:{name:true}},
                 recipients:true
                 
             }
@@ -93,7 +93,7 @@ const changeOrderSent=async(req,res)=>{
                 sentOn:true,
                 files:true,
                 recipients:true,
-                project:true
+                project:{select:{name:true}},
                 
                 
             }

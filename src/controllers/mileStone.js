@@ -4,7 +4,7 @@ import { sendResponse } from "../utils/responder.js";
 const createMileStone = async (req, res) => {
   try {
     const { projectId, fabricatorId } = req.params;
-    const { subject, description, status, approvalDate } = req.body;
+    const { subject, description, status, approvalDate,percentage } = req.body;
 
     if (!projectId || !fabricatorId || !subject || !description) {
       return sendResponse({
@@ -23,6 +23,7 @@ const createMileStone = async (req, res) => {
         subject,
         description,
         status,
+        percentage,
         approvalDate: approvalDate ? new Date(approvalDate) : undefined,
       },
     });
@@ -90,7 +91,7 @@ const getMileStoneById = async (req, res) => {
 const updateMileStone = async (req, res) => {
   try {
     const { id } = req.params;
-    const { subject, description, status, approvalDate } = req.body;
+    const { subject, description, status, approvalDate ,percentage} = req.body;
 
     const updatedMileStone = await prisma.mileStone.update({
       where: { id },
@@ -98,6 +99,7 @@ const updateMileStone = async (req, res) => {
         subject,
         description,
         status,
+        percentage,
         approvalDate: approvalDate ? new Date(approvalDate) : undefined,
       },
     });

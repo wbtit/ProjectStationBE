@@ -471,6 +471,7 @@ model MileStone{
   status             Status             @default(ACTIVE)
   stage              Stage              @default(IFA)
   subject            String
+  percentage         String             @default("")
   description        String
   //relations
   fabricator         Fabricator          @relation("FabricatorMileStone", fields: [fabricator_id], references: [id], onDelete: Cascade)

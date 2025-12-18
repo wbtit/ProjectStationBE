@@ -502,6 +502,7 @@ const getSubmittal = async (req, res) => {
     const submittal = await prisma.submittals.findUnique({
       where: { id: submittalId },
       include: {
+        project:{select:{name:true}},
         sender: {
           include: { 
             fabricator: true },
@@ -551,7 +552,7 @@ const SentSubmittals = async (req, res) => {
       },
       include: {
         fabricator: true,
-        project: true,
+        project:{select:{name:true}},
         recepients: true,
         sender: true,
         submittalsResponse:true,
@@ -588,7 +589,7 @@ const RecievedSubmittals = async (req, res) => {
       },
       include: {
         fabricator: true,
-        project: true,
+        project:{select:{name:true}},
         recepients: true,
         sender: true,
         submittalsResponse:true,
@@ -638,6 +639,7 @@ const SubmittalsSeen = async (req, res) => {
         status:status,
       },
       include:{
+        project:{select:{name:true}},
         submittalsResponse:true
       }
     });

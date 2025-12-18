@@ -451,6 +451,7 @@ const sentRFQByUser = async (req, res) => {
         sender_id: id,
       },
       include: {
+        project:{select:{name:true}},
         recepients: true,
         fabricators:true,
         response:{
@@ -519,6 +520,7 @@ const RFQByID = async (req, res) => {
         id,
       },
       include: {
+        project:{select:{name:true}},
         recepients:true,
         fabricators:true,
         response:{
@@ -574,6 +576,7 @@ const Inbox = async (req, res) => {
     if(is_superuser){
       sentRFQ = await prisma.rFQ.findMany({
         include: {
+        project:{select:{name:true}},
         recepients: true,
         fabricators:true,
         response:{
@@ -610,6 +613,7 @@ const Inbox = async (req, res) => {
         recepient_id: id,
       },
       include: {
+        project:{select:{name:true}},
         recepients: true,
         fabricators:true,
         response:{
