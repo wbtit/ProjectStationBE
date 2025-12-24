@@ -397,7 +397,8 @@ try {
 
 // updateSubmittal.ts
 const updateSubmittal = async (req, res) => {
-  const { id } = req.params; // submittal ID
+  const { id } = req.params;
+
   const {
     fabricator_id,
     project_id,
@@ -409,14 +410,21 @@ const updateSubmittal = async (req, res) => {
     description,
     isAproovedByAdmin,
     isDeputyManagerAprooved,
-    isDeptManagerAprooved
+    isDeptManagerAprooved,
   } = req.body;
+const toBoolean = (value) => {
+  if (value === true || value === "true") return true;
+  if (value === false || value === "false") return false;
+  return undefined;
+};
 
   try {
-    // check if submittal exists
+    // 1. Check existence
     const existing = await prisma.submittals.findUnique({
       where: { id },
     });
+
+ 
 
     if (!existing) {
       return sendResponse({
@@ -428,41 +436,46 @@ const updateSubmittal = async (req, res) => {
       });
     }
 
-    // update file details if files are uploaded
-    const fileDetails = req.files
-      ? req.files.map((file) => ({
-          filename: file.filename,
-          originalName: file.originalname,
-          id: file.filename.split(".")[0],
-          path: `public/submittals/${file.filename}`,
-        }))
-      : existing.files; // keep existing files if none uploaded
+    // 2. Handle files (keep existing if none uploaded)
+    const fileDetails =
+      req.files && req.files.length > 0
+        ? req.files.map((file) => ({
+            id: file.filename.split(".")[0],
+            filename: file.filename,
+            originalName: file.originalname,
+            path: `public/submittals/${file.filename}`,
+          }))
+        : existing.files;
 
-    // update the submittal
+    // 3. Build update payload (BOOLEAN SAFE)
+    const updateData = {
+      fabricator_id: fabricator_id ?? existing.fabricator_id,
+      project_id: project_id ?? existing.project_id,
+      recepient_id: recepient_id ?? existing.recepient_id,
+      sender_id: sender_id ?? existing.sender_id,
+      stage: stage ?? existing.stage,
+      subject: subject ?? existing.subject,
+      description: description ?? existing.description,
+      status: toBoolean(status) ?? existing.status,
+      isAproovedByAdmin:
+        toBoolean(isAproovedByAdmin) ?? existing.isAproovedByAdmin,
+      isDeputyManagerAprooved:
+        toBoolean(isDeputyManagerAprooved) ??
+        existing.isDeputyManagerAprooved,
+      isDeptManagerAprooved:
+        toBoolean(isDeptManagerAprooved) ??
+        existing.isDeptManagerAprooved,
+      files: fileDetails,
+    };
+
+  
+    // 4. Update
     const updated = await prisma.submittals.update({
       where: { id },
-      data: {
-        fabricator_id: fabricator_id ?? existing.fabricator_id,
-        project_id: project_id ?? existing.project_id,
-        recepient_id: recepient_id ?? existing.recepient_id,
-        sender_id: sender_id ?? existing.sender_id,
-        status: typeof status === "boolean" ? status : existing.status,
-        stage: stage ?? existing.stage,
-        subject: subject ?? existing.subject,
-        description: description ?? existing.description,
-        isAproovedByAdmin:
-          typeof isAproovedByAdmin === "boolean"
-            ? isAproovedByAdmin
-            : existing.isAproovedByAdmin,
-        files: fileDetails,
-         isDeputyManagerAprooved:typeof isDeputyManagerAprooved === "boolean"
-            ? isDeputyManagerAprooved
-            : existing.isDeputyManagerAprooved,
-    isDeptManagerAprooved:typeof isDeptManagerAprooved === "boolean"
-            ? isDeptManagerAprooved
-            : existing.isDeptManagerAprooved,
-      },
+      data: updateData,
     });
+
+
 
     return sendResponse({
       message: "Submittal updated successfully",
@@ -472,7 +485,7 @@ const updateSubmittal = async (req, res) => {
       data: updated,
     });
   } catch (error) {
-    console.error("Error updating submittal:", error.message);
+    console.error(" Error updating submittal:", error);
     return sendResponse({
       message: error.message,
       res,
@@ -482,6 +495,7 @@ const updateSubmittal = async (req, res) => {
     });
   }
 };
+
 
 
 const getSubmittal = async (req, res) => {

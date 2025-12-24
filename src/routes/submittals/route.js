@@ -36,7 +36,7 @@ router.get("/:projectId",Authenticate,getSubmittalsByProjectId)
 router.get("/submittals/recieved", Authenticate, RecievedSubmittals);
 
 router.put("/submittalsStatus/:id", Authenticate, SubmittalsSeen);
-router.put("/update/:id",Authenticate,updateSubmittal);
+router.put("/update/:id",Authenticate, submittalsUploads.array("files"),updateSubmittal);
 
 router.post("/addresponse/:submittalId",
   Authenticate,

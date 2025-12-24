@@ -418,13 +418,34 @@ const updateRFI = async (req, res) => {
     files,
   } = req.body;
 
+  
+
+const toBoolean = (value) => {
+  if (value === true || value === "true") return true;
+  if (value === false || value === "false") return false;
+  return undefined;
+};
+
+
   try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+  return sendResponse({
+    message: "No fields provided to update",
+    res,
+    statusCode: 400,
+    success: false,
+    data: null,
+  });
+}
     // 1. Check if RFI exists
     const existing = await prisma.rFI.findUnique({
       where: { id },
     });
 
+    
+
     if (!existing) {
+      console.log(" RFI not found");
       return sendResponse({
         message: "RFI not found",
         res,
@@ -434,24 +455,34 @@ const updateRFI = async (req, res) => {
       });
     }
 
-    // 2. Update only provided fields
+    // 2. Prepare update payload
+    const updateData = {
+  subject: subject ?? existing.subject,
+  description: description ?? existing.description,
+  status: toBoolean(status) ?? existing.status,
+  isAproovedByAdmin:
+    toBoolean(isAproovedByAdmin) ?? existing.isAproovedByAdmin,
+  isDeputyManagerAprooved:
+    toBoolean(isDeputyManagerAprooved) ??
+    existing.isDeputyManagerAprooved,
+  isDeptManagerAprooved:
+    toBoolean(isDeptManagerAprooved) ??
+    existing.isDeptManagerAprooved,
+  files: files ?? existing.files,
+};
+
+
+    console.log("Data being sent to Prisma update:", updateData);
+
+    // 3. Update RFI
     const updatedRFI = await prisma.rFI.update({
       where: { id },
-      data: {
-        subject: subject ?? existing.subject,
-        description: description ?? existing.description,
-        status: typeof status === "boolean" ? status : existing.status,
-        isAproovedByAdmin:
-          typeof isAproovedByAdmin === "boolean"
-            ? isAproovedByAdmin
-            : existing.isAproovedByAdmin,
-        files: files ?? existing.files,
-        isDeputyManagerAprooved:isDeputyManagerAprooved??existing.isDeputyManagerAprooved,
-    isDeptManagerAprooved:isDeptManagerAprooved??existing.isDeptManagerAprooved,
-      },
+      data: updateData,
     });
 
-    // 3. Send success response
+    console.log("Updated RFI returned by Prisma:", updatedRFI);
+
+    // 4. Send success response
     return sendResponse({
       message: "RFI updated successfully",
       res,
@@ -460,7 +491,9 @@ const updateRFI = async (req, res) => {
       data: updatedRFI,
     });
   } catch (error) {
-    console.error("Error updating RFI:", error.message);
+    console.error(" Error updating RFI:");
+    console.error(error);
+
     return sendResponse({
       message: error.message,
       res,
