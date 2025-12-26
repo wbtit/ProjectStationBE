@@ -721,10 +721,11 @@ const GetProjectByID = async (req, res) => {
       success: true,
       data: {
         ...project,
+        completionPercentage,
         team: {
           ...project.team,
           members: Data,
-          completionPercentage,
+          
         },
       },
     });
