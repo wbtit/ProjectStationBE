@@ -5,7 +5,7 @@ import invoiceNumberGenerator from "../utils/invoiveNUmGenerator.js";
 
 export const createInvoice = async (req, res) => {
   try {
-    const { projectId, fabricatorId, customerName, contactName, address,clientId, stateCode, GSTIN, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
+    const { projectId, fabricatorId,paymentMethod,customerName, contactName, address,clientId, stateCode, GSTIN, placeOfSupply, jobName, currencyType, totalInvoiceValue, totalInvoiceValueInWords, invoiceItems, accountInfo } = req.body;
     const {id}=req.user
     if (!projectId || !fabricatorId || !customerName ||!clientId) {
       return sendResponse({
@@ -26,6 +26,7 @@ console.log("**************************************");
     fabricatorId,
     customerName,
     contactName,
+    paymentMethod,
     clientId,
     address,
     stateCode,
@@ -167,6 +168,7 @@ export const updateInvoice = async (req, res) => {
       pointOfContact, 
       projectId, 
       fabricatorId, 
+      paymentMethod,
       clientId,
       // Exclude fields that should not be updated directly
       id: bodyId,
