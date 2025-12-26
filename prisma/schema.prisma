@@ -142,6 +142,7 @@ model MeetingAttendee {
 model Fabricator {
   id          String       @id @default(uuid()) @db.Uuid
   createdById String       @db.Uuid
+  percetageToRaiseInvoice Int?         @default(0)
   fabName     String       @default("")
   headquaters Json         @default("{}")
   website     String?      @default("")
