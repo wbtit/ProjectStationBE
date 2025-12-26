@@ -942,6 +942,7 @@ model Invoice {
   fabricatorId               String        @db.Uuid
   clientId                   String?        @db.Uuid @default("00000000-0000-0000-0000-000000000000")
   customerName               String        @default("")
+  paymentMethod              String?   @default("")
   contactName                String        @default("")
   address                    String        @default("")
   stateCode                  String        @default("")
