@@ -698,7 +698,10 @@ const GetProjectByID = async (req, res) => {
          designDrawings:{include:{responses:true}},
       },
     });
+    const noOfMileStones = project.mileStones.length;
+    const noOfSubmitals = project.submittals.length;
 
+    const completionPercentage = (noOfMileStones / noOfSubmitals)*100;
 
     const ids = project.team.members.map((mem) => mem.id);
 
@@ -721,6 +724,7 @@ const GetProjectByID = async (req, res) => {
         team: {
           ...project.team,
           members: Data,
+          completionPercentage,
         },
       },
     });
