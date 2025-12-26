@@ -987,6 +987,11 @@ model InvoiceItem {
 model AccountInfo {
   id                  String   @id @default(uuid()) @db.Uuid
   invoiceId           String?   @db.Uuid
+  accountName         String?   @default("")
+  paymentMethod       String?   @default("")
+  institutionNumber   String?   @default("")
+  transitNumber       String?   @default("")
+  bankName            String?   @default("")
   abaRoutingNumber    String
   accountNumber       String
   accountType         String
