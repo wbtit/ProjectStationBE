@@ -2,10 +2,12 @@ import prisma from "../lib/prisma.js";
 import { sendResponse } from "../utils/responder.js";
 import { sendNotification } from "../utils/notify.js";
 import { getNextCONumber } from "../utils/generateCoNumber.js";
+import changeOrderInvoiceRequestTemplate from "../../Templates/changeOrderApprovedInvoice.js"
 import path from "path"
 import fs from "fs"
 import mime from "mime"
 import { fileURLToPath } from "url";
+import { transporter } from "../config/mailconfig.js";
 
 // Recreate __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -259,7 +261,9 @@ const addCoResponse = async (req, res) => {
     }
 
     // Check if ChangeOrder exists
-    const changeOrder = await prisma.changeOrder.findUnique({ where: { id: coId } });
+    const changeOrder = await prisma.changeOrder.findUnique({ where: { id: coId },include:{
+      Project:{select:{name:true}}
+    } });
     if (!changeOrder) {
       return sendResponse({
         message: "Change Order not found",
@@ -299,10 +303,35 @@ const addCoResponse = async (req, res) => {
         parentResponse: parentConnect,
         user: { connect: { id: userId } },
         COresponse: { connect: { id: coId } },
-      },
+      },include:{
+        user:{select:{f_name:true,m_name:true,l_name:true}}
+      }
     });
     if(coResponse.Status === 'APPROVED'){
-      
+      const mailOptions={
+              from:process.env.EMAIL,
+              to:process.env.PMO_EMAIL,
+              subject:`Raise Invoice for the ChangeOrder : ${changeOrder.description}`,
+              html:changeOrderInvoiceRequestTemplate(
+                changeOrder.Project.name,
+                changeOrder.changeOrder,
+                coResponse.user.f_name,
+                coResponse.createdAt,
+                changeOrder.remarks,
+                coResponse.user.f_name,
+              )
+          }
+         try {
+           await transporter.sendMail(mailOptions)
+          await prisma.cOResponse.update({
+            where:{id:coResponse.id},
+            data:{
+              InvoiceAlerted:true
+            }
+          });
+         } catch (error) {
+          console.log(error.message);
+         }
     }
     if(req.user.id !== changeOrder.sender){
     // Notify original sender of the ChangeOrder

@@ -686,6 +686,7 @@ model COResponse {
   id               String       @id @default(uuid()) @db.Uuid
   Status           COSTATUS     @default(NOT_REPLIED)
   description      String       @default("")
+  InvoiceAlerted   Boolean?     @default(false) 
   CoId             String?      @unique @db.Uuid
   userId           String       @db.Uuid
   parentResponseId String?      @db.Uuid
@@ -695,6 +696,11 @@ model COResponse {
   childResponses   COResponse[] @relation("ParentChildResponse")
   user             Users        @relation("COrespondedby", fields: [userId], references: [id])
   file             File[]       @relation("CoResponseFiles")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@map("coresponse")
+  
 }
 
 model JobStudy {
