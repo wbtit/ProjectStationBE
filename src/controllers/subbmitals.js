@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 //Create Change Order function
 const createSubmittal=async(req,res,approval)=>{
   const{id}=req.user
-  const{description,subject,fabricator_id,project_id,recepient_id}=req.body
+  const{description,subject,fabricator_id,project_id,recepient_id,stage}=req.body
 try {
     if (!project_id || !recepient_id || !subject || !description) {
       // console.log("Fields are empty");
@@ -43,6 +43,7 @@ try {
         fabricator_id:
           fabricator_id,
         files: fileDetails,
+        stage:stage,
         project_id,
         recepient_id,
         sender_id: id,

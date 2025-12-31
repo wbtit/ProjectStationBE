@@ -4,7 +4,7 @@ import { sendResponse } from "../utils/responder.js";
 const createMileStone = async (req, res) => {
   try {
     const { projectId, fabricatorId } = req.params;
-    const { subject, description, status, approvalDate,percentage } = req.body;
+    const { subject, description, status,stage, approvalDate,percentage } = req.body;
 
     if (!projectId || !fabricatorId || !subject || !description) {
       return sendResponse({
@@ -21,6 +21,7 @@ const createMileStone = async (req, res) => {
         project_id: projectId,
         fabricator_id: fabricatorId,
         subject,
+        stage:stage,
         description,
         status,
         percentage,

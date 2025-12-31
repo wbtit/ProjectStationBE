@@ -301,6 +301,9 @@ const addCoResponse = async (req, res) => {
         COresponse: { connect: { id: coId } },
       },
     });
+    if(coResponse.Status === 'APPROVED'){
+      
+    }
     if(req.user.id !== changeOrder.sender){
     // Notify original sender of the ChangeOrder
     await sendNotification(changeOrder.sender, {

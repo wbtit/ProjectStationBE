@@ -17,9 +17,9 @@ const __dirname = path.dirname(__filename);
 const AddFabricator = async (req, res) => {
   const { id } = req.user;
 
-  const { name, headquater, website, drive, currencyType ,percetageToRaiseInvoice} = req.body;
+  const { name, headquater, website, drive, currencyType ,IFAComepletionAlertPercentage,IFCompletionAlertPercentage} = req.body;
 
-  if (!name || !headquater||!percetageToRaiseInvoice) {
+  if (!name || !headquater) {
     return sendResponse({
       message: "Fields are emmpty",
       res,
@@ -36,7 +36,8 @@ const AddFabricator = async (req, res) => {
       data: {
         createdById: id,
         fabName: name,
-        percetageToRaiseInvoice:percetageToRaiseInvoice,
+        IFAComepletionAlertPercentage:IFAComepletionAlertPercentage,
+        IFCompletionAlertPercentage:IFCompletionAlertPercentage,
         headquaters: { ...headquater, id: uuidv4() },
         drive: drive ? drive : " ",
         website: website ? website : "",

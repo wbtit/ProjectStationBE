@@ -11,7 +11,10 @@ import {initSocket} from "./sockets/socket.js"
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from "./swaggerDef.js";
 
-import './corn-jobs/checkAndSendReminders.js'
+import "./corn-jobs/meetingReminders.js"
+import "./corn-jobs/projectReminders.js"
+import "./corn-jobs/pmoCompletion.js"
+
 dotenv.config();
 
 const server = createServer(app)

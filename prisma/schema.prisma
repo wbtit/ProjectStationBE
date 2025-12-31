@@ -142,7 +142,8 @@ model MeetingAttendee {
 model Fabricator {
   id          String       @id @default(uuid()) @db.Uuid
   createdById String       @db.Uuid
-  percetageToRaiseInvoice Int?         @default(0)
+  IFAComepletionAlertPercentage Int?         @default(0)
+  IFCompletionAlertPercentage   Int?         @default(0)
   fabName     String       @default("")
   headquaters Json         @default("{}")
   website     String?      @default("")
@@ -232,6 +233,10 @@ model Project {
   mailReminder           Boolean       @default(false)
   submissionMailReminder Boolean       @default(false)
   isArchived             Boolean      @default(false)
+  IFAComepletionPercentage Int?         @default(0)
+  IFACompletionAlertSent   Boolean      @default(false)
+  IFCCompletionAlertSent   Boolean
+  IFCompletionPercentage   Int?         @default(0)
   accepttasks            AcceptTask[]  @relation("acceptTaskProject")
   changeOrder            ChangeOrder[] @relation("ChangeOrderProject")
   file                   File[]        @relation("projectFiles")
@@ -1148,8 +1153,8 @@ enum SubResStatus {
 }
 
 enum COSTATUS {
-  ACCEPT
-  REJECT
+  APPROVED
+  REJECTED
   NOT_REPLIED
 }
 // Meeting status values
