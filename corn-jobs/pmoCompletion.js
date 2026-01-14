@@ -59,7 +59,7 @@ export async function runPMOCompletionCheck() {
       IFACompletion === 100 &&
       !project.IFACompletionAlertSent
     ) {
-      await sendIFACompletionAlertPMO(project, fabricator);
+      await sendIFACompletionAlertPMO(project, project.fabricatorID);
       await prisma.project.update({
         where: { id: project.id },
         data: { IFACompletionAlertSent: true }
@@ -71,7 +71,7 @@ export async function runPMOCompletionCheck() {
       IFCCompletion === 100 &&
       !project.IFCCompletionAlertSent
     ) {
-      await sendIFCCompletionAlertPMO(project, fabricator);
+      await sendIFCCompletionAlertPMO(project, project.fabricatorID);
       await prisma.project.update({
         where: { id: project.id },
         data: { IFCCompletionAlertSent: true }
